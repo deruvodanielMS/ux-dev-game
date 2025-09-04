@@ -7,7 +7,7 @@ export type UsePlayersState = {
   error: string | null;
 };
 
-export function usePlayers() {
+export const usePlayers = () => {
   const [{ players, loading, error }, setState] = useState<UsePlayersState>({ players: [], loading: true, error: null });
 
   const load = useCallback(async () => {
