@@ -3,17 +3,24 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
 import WelcomePage from './pages/WelcomePage/WelcomePage';
 import HomePage from './pages/HomePage/HomePage';
+import ProfileSetupPage from './pages/ProfileSetupPage/ProfileSetupPage';
+import BattlePage from './pages/BattlePage/BattlePage';
+import { PlayerProvider } from './context/PlayerContext';
 
 function App() {
   return (
-    <BrowserRouter>
-      <div className="app-root">
-        <Routes>
-          <Route path="/" element={<WelcomePage />} />
-          <Route path="/home" element={<HomePage />} />
-        </Routes>
-      </div>
-    </BrowserRouter>
+    <PlayerProvider>
+      <BrowserRouter>
+        <div className="app-root">
+          <Routes>
+            <Route path="/" element={<WelcomePage />} />
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/profile" element={<ProfileSetupPage />} />
+            <Route path="/battle" element={<BattlePage />} />
+          </Routes>
+        </div>
+      </BrowserRouter>
+    </PlayerProvider>
   );
 }
 
