@@ -1,0 +1,54 @@
+[
+  {
+    "id": "html-bug",
+    "name": "HTML Bug",
+    "type": "technology",
+    "difficulty": "easy",
+    "stats": {
+      "health": 50,
+      "attack": 10,
+      "defense": 5
+    },
+    "description": "Un error trivial que provoca desalineación y elementos invisibles. Se derrota con una estructura limpia y semántica.",
+    "avatar_url": "/enemies/html_bug.png"
+  },
+  {
+    "id": "css-glitch",
+    "name": "CSS Glitch",
+    "type": "technology",
+    "difficulty": "easy",
+    "stats": {
+      "health": 70,
+      "attack": 15,
+      "defense": 10
+    },
+    "description": "Un error visual que rompe el diseño en diferentes navegadores. Se derrota con una estrategia de CSS Modules.",
+    "avatar_url": "/enemies/css_glitch.png"
+  },
+  {
+    "id": "javascript-logic-error",
+    "name": "JS Logic Error",
+    "type": "technology",
+    "difficulty": "medium",
+    "stats": {
+      "health": 120,
+      "attack": 25,
+      "defense": 15
+    },
+    "description": "Un fallo de lógica que congela la interfaz y provoca comportamiento inesperado. Requiere un pensamiento algorítmico y buenas prácticas de 'hooks'.",
+    "avatar_url": "/enemies/js_error.png"
+  },
+  {
+    "id": "react-reconciliation-glitch",
+    "name": "React Reconciliation Glitch",
+    "type": "technology",
+    "difficulty": "hard",
+    "stats": {
+      "health": 200,
+      "attack": 40,
+      "defense": 30
+    },
+    "description": "Un error en la actualización del DOM virtual que causa 're-renders' infinitos. Se derrota con optimización de componentes y 'memoization'.",
+    "avatar_url": "/enemies/react_glitch.png"
+  }
+]
