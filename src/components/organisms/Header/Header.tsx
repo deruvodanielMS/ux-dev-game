@@ -8,7 +8,19 @@ import EmailLogin from '../EmailLogin/EmailLogin';
 export default function Header(){
   const { state } = usePlayer();
   const navigate = useNavigate();
-  const { showModal } = useModal();
+  const { showModal, hideModal } = useModal();
+  const location = window.location.pathname; // simple check
+  const wasLoggedRef = React.useRef<boolean>(false);
+
+  React.useEffect(() => {
+    const was = wasLoggedRef.current;
+    if (!was && state.isLoggedIn) {
+      // just logged in
+      try { hideModal(); } catch (e) {}
+      if (location !== '/profile') navigate('/profile');
+    }
+    wasLoggedRef.current = state.isLoggedIn;
+  }, [state.isLoggedIn, navigate, hideModal, location]);
 
   return (
     <header className={styles.header}>
