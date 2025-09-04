@@ -8,36 +8,37 @@
 .card{
   display:flex;
   align-items:center;
-  gap:1rem;
-  padding:0.9rem 1rem;
+  gap:1.25rem;
+  padding:1.1rem 1.2rem;
   background:var(--card-bg);
-  border-radius:10px;
+  border-radius:12px;
   border:1px solid transparent;
   cursor:pointer;
   width:100%;
   text-align:left;
   transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  min-height:84px;
 }
 
-.card:hover{transform:translateY(-4px);}
+.card:hover{transform:translateY(-6px);}
 
 .selected{
   border-color:var(--neon);
-  box-shadow:0 8px 30px rgba(94,234,212,0.06);
+  box-shadow:0 12px 36px rgba(94,234,212,0.08);
 }
 
 .avatar{
-  min-width:56px;
-  min-height:56px;
+  min-width:84px;
+  min-height:84px;
   border-radius:12px;
   background:linear-gradient(135deg, rgba(96,165,250,0.12), rgba(94,234,212,0.06));
   display:flex;
   align-items:center;
   justify-content:center;
   color:var(--neon);
-  font-weight:800;
-  font-size:1.05rem;
-  box-shadow: 0 6px 20px rgba(2,6,23,0.6);
+  font-weight:900;
+  font-size:1.25rem;
+  box-shadow: 0 10px 28px rgba(2,6,23,0.6);
 }
 
 .info{
