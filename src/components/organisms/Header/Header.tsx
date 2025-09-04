@@ -115,7 +115,7 @@ export default function Header(){
         </div>
 
         {/* hamburger for small screens */}
-        <button className={styles.hamburger} aria-label="Abrir menu" onClick={toggleHamburger} aria-expanded={hamburgerOpen}>{hamburgerOpen ? '✕' : '☰'}</button>
+        <button ref={hamburgerRef} className={styles.hamburger} aria-label="Abrir menu" onClick={toggleHamburger} aria-expanded={hamburgerOpen}>{hamburgerOpen ? '✕' : '☰'}</button>
 
         <div className={styles.avatarWrap} ref={avatarRef}>
           <div className={styles.avatar} ref={avatarRef} onClick={toggleDropdown} aria-haspopup="true" aria-expanded={open}>
