@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React, { useReducer, useEffect, useState } from 'react';
 import styles from './BattlePage.module.css';
 import PlayerHUD from '../../components/organisms/PlayerHUD/PlayerHUD';
 import EnemyHUD from '../../components/organisms/EnemyHUD/EnemyHUD';
@@ -7,6 +7,7 @@ import enemies from '../../data/enemies.json';
 import { usePlayer } from '../../context/PlayerContext';
 import Button from '../../components/atoms/Button/Button';
 import PlayerCard from '../../components/molecules/PlayerCard/PlayerCard';
+import { useNavigate } from 'react-router-dom';
 
 type State = {
   playerHealth: number;
