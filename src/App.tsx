@@ -13,17 +13,21 @@ import { ToastProvider } from './context/ToastContext';
 function App() {
   return (
     <PlayerProvider>
-      <BrowserRouter>
-        <div className="app-root">
-          <Header />
-          <Routes>
-            <Route path="/" element={<WelcomePage />} />
-            <Route path="/profile" element={<ProfileSetupPage />} />
-            <Route path="/battle" element={<BattlePage />} />
-            <Route path="/progress" element={<ProgressMapPage />} />
-          </Routes>
-        </div>
-      </BrowserRouter>
+      <ModalProvider>
+        <ToastProvider>
+          <BrowserRouter>
+            <div className="app-root">
+              <Header />
+              <Routes>
+                <Route path="/" element={<WelcomePage />} />
+                <Route path="/profile" element={<ProfileSetupPage />} />
+                <Route path="/battle" element={<BattlePage />} />
+                <Route path="/progress" element={<ProgressMapPage />} />
+              </Routes>
+            </div>
+          </BrowserRouter>
+        </ToastProvider>
+      </ModalProvider>
     </PlayerProvider>
   );
 }
