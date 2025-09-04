@@ -102,34 +102,34 @@ export async function updatePlayerAvatar(authUid: string, avatarUrl: string): Pr
 
   if (!supabase) return;
 
+  let lastError: any = null;
   try {
     // 1) Try update by id (uuid) using snake_case avatar_url
-    const { error: err1, count: count1 } = await supabase
-      .from('players')
-      .update({ avatar_url: avatarUrl })
-      .eq('id', authUid);
-
-    if (!err1 && (count1 ?? 0) > 0) return;
+    const res1 = await supabase.from('players').update({ avatar_url: avatarUrl }).eq('id', authUid);
+    if (!res1.error) return; // success
+    lastError = res1.error;
 
     // 2) Try update by slug (some tables use slug text identifiers)
-    const { error: err2, count: count2 } = await supabase
-      .from('players')
-      .update({ avatar_url: avatarUrl })
-      .eq('slug', authUid);
-
-    if (!err2 && (count2 ?? 0) > 0) return;
+    const res2 = await supabase.from('players').update({ avatar_url: avatarUrl }).eq('slug', authUid);
+    if (!res2.error) return; // success
+    lastError = res2.error;
 
     // 3) Fallback: upsert a player record using authUid as id so the avatar is associated (snake_case)
     const userRes = await supabase.auth.getUser();
     const user = userRes.data?.user ?? null;
     const name = user?.email ?? authUid;
-    const payload: any = { id: authUid, name, avatar_url: avatarUrl, level: 1 };
-    // include slug so future lookups by slug may work
-    payload.slug = authUid;
-    const { error: upsertErr } = await supabase.from('players').upsert(payload);
-    if (upsertErr) console.warn('Failed upserting player with avatar', upsertErr);
+    const payload: any = { id: authUid, name, avatar_url: avatarUrl, level: 1, slug: authUid };
+    const upsertRes = await supabase.from('players').upsert(payload);
+    if (!upsertRes.error) return; // success
+    lastError = upsertRes.error;
+
+    // all attempts failed
+    const err = new Error(lastError?.message ?? 'Failed to update avatar');
+    (err as any).original = lastError;
+    throw err;
   } catch (err) {
-    console.warn('Failed updating avatar in Supabase', err);
+    // surface error to caller
+    throw err;
   }
 }
 
