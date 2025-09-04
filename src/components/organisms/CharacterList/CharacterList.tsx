@@ -1,5 +1,3 @@
-import React from 'react';
-import styles from './CharacterList.module.css';
 import React, { useEffect, useState } from 'react';
 import styles from './CharacterList.module.css';
 import CharacterCard, { Character } from '../../molecules/CharacterCard/CharacterCard';
