@@ -13,6 +13,7 @@ export type Character = {
   stats?: Record<string, number>;
   avatarUrl?: string;
   last_pr_at?: string | null;
+  ai_level?: number | null;
 };
 
 type Props = {
@@ -43,6 +44,14 @@ export default function CharacterCard({ character, selected = false, onSelect, a
   const progress = Math.max(0, Math.min(100, Math.round(((daysLimit - Math.min(daysSince, daysLimit)) / daysLimit) * 100)));
   const willBeAbsorbed = daysSince >= daysLimit;
 
+  const aiLevel = character.ai_level ?? character.stats?.ai_level ?? 0;
+
+  function determineColor(): 'green' | 'blue' | 'red' | 'orange' {
+    if (aiLevel >= 7) return 'red';
+    if (aiLevel >= 4) return 'orange';
+    return 'blue';
+  }
+
   function openView() {
     showModal({
       title: `${character.name} — Nivel ${character.level ?? 1}`,
@@ -65,7 +74,7 @@ export default function CharacterCard({ character, selected = false, onSelect, a
             )}
 
             <div style={{ marginTop: 12 }}>
-              <StatusBar label="Tiempo hasta absorción" value={progress} max={100} color={willBeAbsorbed ? 'red' : 'blue'} />
+              <StatusBar label="Tiempo hasta absorción" value={progress} max={100} color={determineColor()} />
               <p style={{ marginTop: 6, color: 'var(--muted)', fontSize: 13 }}>{willBeAbsorbed ? 'En riesgo: sin PR en 30 días' : `${Math.max(0, daysLimit - daysSince)} días restantes`}</p>
             </div>
           </div>
@@ -85,7 +94,7 @@ export default function CharacterCard({ character, selected = false, onSelect, a
       <button
         type="button"
         className={styles.card}
-        onClick={() => !absorbed && onSelect && onSelect(character.id)}
+        onClick={() => { if (!absorbed) openView(); }}
         aria-pressed={selected}
         aria-disabled={absorbed}
         disabled={absorbed}
@@ -101,16 +110,17 @@ export default function CharacterCard({ character, selected = false, onSelect, a
         <div className={styles.info}>
           <div className={styles.name}>{character.name}</div>
           <div className={styles.meta}>Nivel {character.level ?? 1}</div>
+
+          <div className={styles.absorbWrapInline}>
+            <StatusBar label={willBeAbsorbed ? 'En riesgo' : 'Tiempo para absorción'} value={progress} max={100} color={determineColor()} />
+            <p className={styles.absorbText}>{willBeAbsorbed ? 'En riesgo: sin PR en 30 días' : `${Math.max(0, daysLimit - daysSince)} días restantes`}</p>
+          </div>
+        </div>
+
+        <div className={styles.actionsInline}>
+          <span className={styles.levelPill}>Lv {character.level ?? 1}</span>
         </div>
       </button>
-
-      <div className={styles.cardActions}>
-        <button type="button" className={styles.viewBtn} onClick={openView}>Ver</button>
-      </div>
-
-      <div className={styles.absorbWrap}>
-        <StatusBar label={willBeAbsorbed ? 'En riesgo' : 'Tiempo para absorción'} value={progress} max={100} color={willBeAbsorbed ? 'red' : 'blue'} />
-      </div>
     </div>
   );
 }
