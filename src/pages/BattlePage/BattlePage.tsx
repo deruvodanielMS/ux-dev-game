@@ -6,6 +6,7 @@ import CardHand from '../../components/organisms/CardHand/CardHand';
 import enemies from '../../data/enemies.json';
 import { usePlayer } from '../../context/PlayerContext';
 import Button from '../../components/atoms/Button/Button';
+import PlayerCard from '../../components/molecules/PlayerCard/PlayerCard';
 
 type State = {
   playerHealth: number;
