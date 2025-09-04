@@ -3,6 +3,8 @@ import styles from './WelcomePage.module.css';
 import Button from '../../components/atoms/Button/Button';
 import CharacterCard, { Character } from '../../components/molecules/CharacterCard/CharacterCard';
 import charactersData from '../../data/characters.json';
+import { usePlayer } from '../../context/PlayerContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function WelcomePage(){
   const [playerName, setPlayerName] = useState('');
