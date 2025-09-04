@@ -54,7 +54,7 @@ export default function WelcomePage(){
                 <div className={styles.heroButtonsRight}>
                   <Button onClick={() => setStep('select')} className={styles.primaryLarge} ariaLabel="Siguiente">Siguiente</Button>
                   { /* show Map when logged in, otherwise open login modal */ }
-                  {usePlayer().state.isLoggedIn ? (
+                  {state.isLoggedIn ? (
                     <Button onClick={() => navigate('/progress')} variant="ghost" className={styles.ghostLarge} ariaLabel="Mapa">Mapa</Button>
                   ) : (
                     <Button onClick={() => showModal({ title: 'Iniciar Sesión', body: <EmailLogin />, allowClose: true })} variant="ghost" className={styles.ghostLarge} ariaLabel="Login">Login</Button>
