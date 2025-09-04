@@ -1,31 +1,23 @@
 import React, { useState } from 'react';
 import styles from './WelcomePage.module.css';
 import Button from '../../components/atoms/Button/Button';
-import CharacterCard, { Character } from '../../components/molecules/CharacterCard/CharacterCard';
-import charactersData from '../../data/characters.json';
+import CharacterList from '../../components/organisms/CharacterList/CharacterList';
+import AbsorbedCharactersSection from '../../components/organisms/AbsorbedCharactersSection/AbsorbedCharactersSection';
 import { usePlayer } from '../../context/PlayerContext';
 import { useNavigate } from 'react-router-dom';
 
 export default function WelcomePage(){
-  const [playerName, setPlayerName] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const { dispatch } = usePlayer();
   const navigate = useNavigate();
 
-  const characters: Character[] = charactersData as Character[];
-
   const handleStart = () => {
-    if (!playerName.trim()){
-      alert('Por favor ingresa tu nombre para continuar.');
-      return;
-    }
     if (!selectedId){
       alert('Selecciona un personaje para continuar.');
       return;
     }
 
-    // Save to global state and go to profile setup
-    dispatch({ type: 'SET_NAME', payload: playerName });
+    // Save selected character to global state and go to profile setup
     dispatch({ type: 'SET_SELECTED_CHARACTER', payload: selectedId });
 
     navigate('/profile');
@@ -46,27 +38,11 @@ export default function WelcomePage(){
         </section>
 
         <section className={styles.formArea}>
-          <label className={styles.label} htmlFor="playerName">Tu nombre</label>
-          <input
-            id="playerName"
-            value={playerName}
-            onChange={(e) => setPlayerName(e.target.value)}
-            className={styles.input}
-            placeholder="Ingresa tu nombre"
-          />
-
           <div className={styles.characterListTitle}>Elige tu personaje</div>
-          <div className={styles.characterGrid} role="list">
-            {characters.map((c) => (
-              <div key={c.id} role="listitem" className={styles.gridItem}>
-                <CharacterCard
-                  character={c}
-                  selected={selectedId === c.id}
-                  onSelect={(id) => setSelectedId(id)}
-                />
-              </div>
-            ))}
-          </div>
+
+          <CharacterList selectedId={selectedId} onSelect={(id) => setSelectedId(id)} />
+
+          <AbsorbedCharactersSection />
 
           <div className={styles.ctaRow}>
             <Button onClick={handleStart} ariaLabel="Iniciar Aventura">Iniciar Aventura</Button>
