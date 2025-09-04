@@ -94,8 +94,22 @@ export default function BattlePage(){
   const enemy = (enemies as any[])[0];
   const [s, dispatch] = useReducer(reducer, initialState(enemy.stats.health));
   const navigate = useNavigate();
+  const audio = useAudio();
   const [handledVictory, setHandledVictory] = useState(false);
   const [damageNumbers, setDamageNumbers] = useState<{id:string;value:number;top:number;left:number|string}[]>([]);
+
+  // play battle music while this page is mounted
+  React.useEffect(() => {
+    const src = 'https://cdn.builder.io/o/assets%2F18b71006d6404cecbe90ad5e2b850e0e%2Fc4c10a69a33a4bbdb8bacc26bfcf1e26?alt=media&token=b7e21c32-d821-483d-b8a4-22eacf9f04d8&apiKey=18b71006d6404cecbe90ad5e2b850e0e';
+    audio.setSource(src);
+    // try to play; audio.play handles promise
+    audio.play();
+    return () => {
+      audio.pause();
+      audio.setSource(null);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handlePlay = (card: string) => {
     dispatch({ type: 'PLAY_CARD', card });
