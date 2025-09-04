@@ -41,7 +41,20 @@ export default function Header(){
           setProfile(p);
           // sync to context
           dispatch({ type: 'SET_NAME', payload: p.name ?? state.playerName });
-          dispatch({ type: 'SET_AVATAR', payload: p.avatar_url ?? state.avatarUrl });
+          // resolve avatar path to signed url if needed
+          (async () => {
+            try {
+              let avatarVal = p.avatar_url ?? p.avatarUrl ?? state.avatarUrl ?? null;
+              if (avatarVal && !(avatarVal.startsWith('http://') || avatarVal.startsWith('https://'))) {
+                const { resolveAvatarUrl } = await import('../../../services/avatars');
+                const resolved = await resolveAvatarUrl(avatarVal);
+                if (resolved) avatarVal = resolved;
+              }
+              dispatch({ type: 'SET_AVATAR', payload: avatarVal });
+            } catch (e) {
+              dispatch({ type: 'SET_AVATAR', payload: p.avatar_url ?? state.avatarUrl });
+            }
+          })();
         }
       } catch (e) {
         // ignore
