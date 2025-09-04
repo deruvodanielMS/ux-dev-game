@@ -39,6 +39,6 @@ export const usePlayers = () => {
   const ladder = useMemo(() => sortPlayersForLadder(players), [players]);
 
   return { players, ladder, loading, error, refresh: load, upsert } as const;
-}
+};
 
 export type { Player };
