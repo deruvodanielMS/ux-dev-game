@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import styles from './Header.module.css';
 import { usePlayer } from '../../../context/PlayerContext';
 import { useModal } from '../../../context/ModalContext';
-import EmailLogin from '../EmailLogin/EmailLogin';
 import { useAudio } from '../../../context/AudioContext';
 import supabase from '../../../services/supabase';
 
