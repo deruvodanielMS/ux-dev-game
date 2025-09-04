@@ -27,6 +27,7 @@ function App() {
                   <Route path="/profile" element={<ProfileSetupPage />} />
                   <Route path="/battle" element={<BattlePage />} />
                   <Route path="/progress" element={<ProgressMapPage />} />
+                  <Route path="/ladder" element={<Ladderboard />} />
                 </Routes>
                 <AppFooter />
               </div>
