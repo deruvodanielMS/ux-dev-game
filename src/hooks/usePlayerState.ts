@@ -58,6 +58,91 @@ export default function usePlayerState() {
     }
   }, [state]);
 
+  // Listen to Supabase auth state and sync profile
+  useEffect(() => {
+    if (!supabase) return; // nothing to do if not configured
+
+    let mounted = true;
+
+    const getProfile = async (userId: string) => {
+      try {
+        const { data, error } = await supabase.from('players').select('*').eq('id', userId).single();
+        if (error && (error as any).code !== 'PGRST116') {
+          console.warn('Error fetching player profile:', error);
+          return null;
+        }
+        return data;
+      } catch (err) {
+        console.warn('Failed to fetch profile', err);
+        return null;
+      }
+    };
+
+    const createProfile = async (userId: string, email?: string | null) => {
+      const base = {
+        id: userId,
+        name: email ?? userId,
+        avatarUrl: null,
+        level: 1,
+        exp: 0,
+        coins: 0,
+        softSkills: 10,
+        techSkills: 10,
+        coreValues: 10,
+        creativity: 10,
+        aiLevel: 1,
+        characterId: null,
+      };
+      try {
+        await supabase.from('players').insert(base);
+        return base;
+      } catch (err) {
+        console.warn('Failed to create profile', err);
+        return base;
+      }
+    };
+
+    const { data: sub } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!mounted) return;
+      const user = session?.user ?? null;
+      if (!user) {
+        // signed out
+        setState((prev) => ({ ...DEFAULT_STATE }));
+        return;
+      }
+
+      const userId = user.id;
+      // Try fetch profile
+      const profile = await getProfile(userId);
+      let finalProfile = profile;
+      if (!profile) {
+        finalProfile = await createProfile(userId, user.email ?? user.user_metadata?.email ?? null);
+      }
+
+      if (finalProfile) {
+        setState((prev) => ({
+          ...prev,
+          playerName: finalProfile.name ?? prev.playerName,
+          avatarUrl: finalProfile.avatarUrl ?? prev.avatarUrl,
+          isLoggedIn: true,
+          stats: {
+            soft_skills: finalProfile.softSkills ?? prev.stats.soft_skills,
+            tech_skills: finalProfile.techSkills ?? prev.stats.tech_skills,
+            core_values: finalProfile.coreValues ?? prev.stats.core_values,
+            creativity: finalProfile.creativity ?? prev.stats.creativity,
+            ai_level: finalProfile.aiLevel ?? prev.stats.ai_level,
+          },
+        }));
+      }
+    });
+
+    return () => {
+      mounted = false;
+      // unsubscribe
+      try { sub?.subscription.unsubscribe(); } catch (e) {}
+    };
+  }, []);
+
   const setPlayerState = useCallback(
     (patch: Partial<PlayerState> | ((prev: PlayerState) => Partial<PlayerState>)) => {
       setState((prev) => {
