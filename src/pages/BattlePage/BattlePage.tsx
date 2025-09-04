@@ -79,15 +79,31 @@ function reducer(state: State, action: Action): State {
 }
 
 export default function BattlePage(){
-  const { state: player } = usePlayer();
+  const { state: player, dispatch: playerDispatch } = usePlayer();
   const enemy = (enemies as any[])[0];
   const [s, dispatch] = useReducer(reducer, initialState(enemy.stats.health));
+  const navigate = useNavigate();
+  const [handledVictory, setHandledVictory] = useState(false);
 
   const handlePlay = (card: string) => {
     dispatch({ type: 'PLAY_CARD', card });
     // enemy responds after a short delay
     setTimeout(() => dispatch({ type: 'ENEMY_ATTACK' }), 700);
   };
+
+  // Victory detection
+  useEffect(() => {
+    if (s.enemyHealth <= 0 && !handledVictory) {
+      setHandledVictory(true);
+      // add to defeated list
+      playerDispatch({ type: 'ADD_DEFEATED_ENEMY', payload: enemy.id });
+      // small delay then navigate to progress map
+      setTimeout(() => {
+        const go = window.confirm('¡Enemigo derrotado! ¿Ir al mapa de progreso?');
+        if (go) navigate('/progress');
+      }, 500);
+    }
+  }, [s.enemyHealth, handledVictory, playerDispatch, enemy, navigate]);
 
   return (
     <div className={styles.page}>
