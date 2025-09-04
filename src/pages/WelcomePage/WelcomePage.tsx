@@ -12,7 +12,7 @@ import EmailLogin from '../../components/organisms/EmailLogin/EmailLogin';
 export default function WelcomePage(){
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [step, setStep] = useState<'hero'|'select'>('hero');
-  const { dispatch } = usePlayer();
+  const { state, dispatch } = usePlayer();
   const navigate = useNavigate();
   const { showModal } = useModal();
   const { notify } = useToast();
