@@ -15,6 +15,7 @@ export type PlayerState = {
   githubPRs: number;
   level: number;
   stats: Stats;
+  defeatedEnemies: string[];
 };
 
 const initialState: PlayerState = {
@@ -30,6 +31,7 @@ const initialState: PlayerState = {
     creativity: 10,
     ai_level: 1,
   },
+  defeatedEnemies: [],
 };
 
 type Action =
@@ -37,7 +39,8 @@ type Action =
   | { type: 'SET_SELECTED_CHARACTER'; payload: string }
   | { type: 'SET_AVATAR'; payload: string | null }
   | { type: 'INC_PR'; payload?: number }
-  | { type: 'SET_STATS'; payload: Partial<Stats> };
+  | { type: 'SET_STATS'; payload: Partial<Stats> }
+  | { type: 'ADD_DEFEATED_ENEMY'; payload: string };
 
 function reducer(state: PlayerState, action: Action): PlayerState {
   switch (action.type) {
@@ -51,6 +54,9 @@ function reducer(state: PlayerState, action: Action): PlayerState {
       return { ...state, githubPRs: state.githubPRs + (action.payload ?? 1) };
     case 'SET_STATS':
       return { ...state, stats: { ...state.stats, ...action.payload } };
+    case 'ADD_DEFEATED_ENEMY':
+      if (state.defeatedEnemies.includes(action.payload)) return state;
+      return { ...state, defeatedEnemies: [...state.defeatedEnemies, action.payload] };
     default:
       return state;
   }
