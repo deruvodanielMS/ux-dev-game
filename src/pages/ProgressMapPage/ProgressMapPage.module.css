@@ -1,6 +1,15 @@
 :root{--muted:#9aa4b2}
 
-.page{min-height:100vh;background:linear-gradient(180deg,#060712 0%,#070915 60%);color:#e6eef8;display:flex;align-items:center;justify-content:center;padding:3rem}
+.page{
+  min-height: 100vh;
+  background-color: #022825;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='41' height='41' viewBox='0 0 200 200'%3E%3Cdefs%3E%3ClinearGradient id='a' gradientUnits='userSpaceOnUse' x1='100' y1='33' x2='100' y2='-3'%3E%3Cstop offset='0' stop-color='%23000' stop-opacity='0'/%3E%3Cstop offset='1' stop-color='%23000' stop-opacity='1'/%3E%3C/linearGradient%3E%3ClinearGradient id='b' gradientUnits='userSpaceOnUse' x1='100' y1='135' x2='100' y2='97'%3E%3Cstop offset='0' stop-color='%23000' stop-opacity='0'/%3E%3Cstop offset='1' stop-color='%23000' stop-opacity='1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg fill='%23002421' fill-opacity='0.4'%3E%3Crect x='100' width='100' height='100'/%3E%3Crect y='100' width='100' height='100'/%3E%3C/g%3E%3Cg fill-opacity='0.4'%3E%3Cpolygon fill='url(%23a)' points='100 30 0 0 200 0'/%3E%3Cpolygon fill='url(%23b)' points='100 100 0 130 0 100 200 100 200 130'/%3E%3C/g%3E%3C/svg%3E");
+  color: #e6eef8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+}
 .card{width:100%;max-width:1100px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:1.6rem;border-radius:12px;border:1px solid rgba(96,165,250,0.04);box-shadow:0 12px 40px rgba(2,6,23,0.6)}
 .title{margin:0;font-size:1.6rem;font-weight:800}
 .subtitle{color:var(--muted);margin-top:0.2rem}
