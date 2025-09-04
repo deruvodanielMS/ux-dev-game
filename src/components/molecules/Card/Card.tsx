@@ -7,10 +7,22 @@ const CARD_INFO: Record<string, { title: string; desc: string }>= {
   'refactor': { title: 'Refactor', desc: 'Mejora el código y causa daño estable.' },
 };
 
+import React, { useState } from 'react';
+
 export default function Card({ id, onPlay }: { id: string; onPlay: () => void }){
   const info = CARD_INFO[id] ?? { title: id, desc: '' };
+  const [anim, setAnim] = useState(false);
+
+  const handleClick = () => {
+    setAnim(true);
+    setTimeout(() => {
+      onPlay();
+      setAnim(false);
+    }, 180);
+  };
+
   return (
-    <button className={styles.card} onClick={onPlay} aria-label={`Jugar ${info.title}`}>
+    <button className={`${styles.card} ${anim ? styles.anim : ''}`} onClick={handleClick} aria-label={`Jugar ${info.title}`}>
       <div className={styles.title}>{info.title}</div>
       <div className={styles.desc}>{info.desc}</div>
     </button>
