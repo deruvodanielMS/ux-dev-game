@@ -1,8 +1,8 @@
-.modalBackdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);opacity:0;pointer-events:none;transition:opacity 220ms;z-index:999}
+.modalBackdrop{position:fixed;inset:0;background:rgba(0,0,0,0.75);opacity:0;pointer-events:none;transition:opacity 220ms;z-index:999}
 .modalBackdrop.open{opacity:1;pointer-events:auto}
 .modalWrap{position:fixed;left:0;right:0;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center;padding:1rem;z-index:1000;opacity:0;transition:opacity 220ms,transform 220ms}
 .modalWrap.open{opacity:1;transform:translateY(-50%)}
-.modalCard{background:var(--card-bg,#111);border-radius:12px;padding:1rem;max-width:720px;width:100%;color:var(--text,#fff);box-shadow:0 6px 30px rgba(0,0,0,0.6)}
+.modalCard{background:#0b0b0b;border-radius:12px;padding:1rem;max-width:720px;width:100%;color:var(--text,#fff);box-shadow:0 6px 30px rgba(0,0,0,0.9)}
 .modalTitle{margin:0 0 0.5rem 0}
 .modalBody{margin-bottom:0.75rem}
 .modalActions{display:flex;gap:0.5rem;justify-content:flex-end}
