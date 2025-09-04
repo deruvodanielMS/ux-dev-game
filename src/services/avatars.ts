@@ -26,20 +26,48 @@ export async function uploadCharacterAvatar(file: File, characterId: string): Pr
 
   const fileExt = file.name.split('.').pop() ?? 'png';
   const fileName = `${characterId}.${fileExt}`;
-  const filePath = `characters/${characterId}/${fileName}`;
+  const attempts: { path: string; label: string }[] = [];
 
-  const { error: uploadError } = await supabase.storage
-    .from('avatars')
-    .upload(filePath, file, {
-      cacheControl: '3600',
-      upsert: true,
-    });
+  // primary path: characters/<characterId>/<file>
+  attempts.push({ path: `characters/${characterId}/${fileName}`, label: 'characters folder' });
 
-  if (uploadError) throw uploadError;
+  // fallback: upload under current user's folder (if storage policies restrict to auth.uid folders)
+  try {
+    const userRes = await supabase.auth.getUser();
+    const userId = userRes.data?.user?.id ?? null;
+    if (userId) attempts.push({ path: `${userId}/${fileName}`, label: 'user folder' });
+    // also try user/characters/<id>
+    if (userId) attempts.push({ path: `${userId}/characters/${characterId}.${fileExt}`, label: 'user characters folder' });
+  } catch (e) {
+    // ignore - we'll just try primary
+  }
 
-  const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
-  if (!publicUrlData) throw new Error('Could not get public URL for character avatar');
-  return publicUrlData.publicUrl;
+  let lastError: any = null;
+  for (const attempt of attempts) {
+    try {
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(attempt.path, file, {
+          cacheControl: '3600',
+          upsert: true,
+        });
+      if (uploadError) throw uploadError;
+
+      const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(attempt.path);
+      if (!publicUrlData) throw new Error('Could not get public URL for character avatar');
+      return publicUrlData.publicUrl;
+    } catch (err: any) {
+      lastError = err;
+      console.warn(`Upload to ${attempt.label} failed:`, err?.message || err);
+      // try next
+    }
+  }
+
+  // all attempts failed
+  const message = lastError?.message ?? 'Upload failed for unknown reason';
+  const err = new Error(`Failed uploading character avatar: ${message}`);
+  (err as any).original = lastError;
+  throw err;
 }
 
 // Resolve a path or public URL to an accessible URL. If the provided value looks like a storage path
