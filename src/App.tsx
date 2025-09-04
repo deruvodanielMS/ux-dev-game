@@ -9,6 +9,7 @@ import Header from './components/organisms/Header/Header';
 import { PlayerProvider } from './context/PlayerContext';
 import { ModalProvider } from './context/ModalContext';
 import { ToastProvider } from './context/ToastContext';
+import { AudioProvider } from './context/AudioContext';
 
 function App() {
   return (
