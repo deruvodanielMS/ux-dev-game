@@ -13,7 +13,7 @@ export async function fetchCharacters(): Promise<Character[]> {
         data.map(async (d: any) => {
           const raw = d.avatarUrl ?? d.avatar_url ?? d.avatar_path ?? d.avatar_path_url ?? undefined;
           const avatarUrl = raw ? (raw.startsWith('http') ? raw : await resolveAvatarUrl(raw)) : undefined;
-          return { id: d.id, name: d.name, level: d.level ?? 1, stats: d.stats ?? undefined, avatarUrl } as Character;
+          return { id: d.id, name: d.name, level: d.level ?? 1, stats: d.stats ?? undefined, avatarUrl, last_pr_at: d.last_pr_at ?? d.lastPrAt ?? d.last_pr_date ?? d.last_pr_date } as Character;
         })
       );
       return mapped;
