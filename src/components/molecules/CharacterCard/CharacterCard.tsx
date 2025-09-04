@@ -123,9 +123,7 @@ export default function CharacterCard({ character, selected = false, onSelect, a
           </div>
         </div>
 
-        <div className={styles.actionsInline}>
-          <span className={styles.levelPill}>Lv {character.level ?? 1}</span>
-        </div>
+        <div className={styles.actionsInline} />
       </button>
     </div>
   );
