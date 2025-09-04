@@ -36,7 +36,7 @@
       "defense": 15
     },
     "description": "Un fallo de lógica que congela la interfaz y provoca comportamiento inesperado. Requiere un pensamiento algorítmico y buenas prácticas de 'hooks'.",
-    "avatar_url": "/enemies/js_error.png"
+    "avatar_url": "https://cdn.builder.io/api/v1/image/assets%2F18b71006d6404cecbe90ad5e2b850e0e%2Fddda0f3562a44039b6d43252060fbae0?format=webp&width=800"
   },
   {
     "id": "react-reconciliation-glitch",
