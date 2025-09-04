@@ -8,6 +8,7 @@ import PlayerCard from '../../components/molecules/PlayerCard/PlayerCard';
 import DamageNumber from '../../components/atoms/DamageNumber/DamageNumber';
 import TurnIndicator from '../../components/atoms/TurnIndicator/TurnIndicator';
 import { useNavigate } from 'react-router-dom';
+import { useAudio } from '../../context/AudioContext';
 
 type State = {
   playerHealth: number;
