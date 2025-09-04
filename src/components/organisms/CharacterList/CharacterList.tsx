@@ -48,7 +48,18 @@ export default function CharacterList({ selectedId, onSelect }: Props) {
     await load();
   }
 
-  if (loading) return <div className={styles.list}>Cargando personajes...</div>;
+  if (loading) return (
+    <div className={styles.list}>
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className={styles.item}>
+          <div className={styles.skelRow}>
+            <div className={styles.skelAvatar} />
+            <div className={styles.skelText} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
   if (error) return <div className={styles.list}>{error}</div>;
   if (active.length === 0) return <div className={styles.list}>No hay personajes disponibles.</div>;
 
