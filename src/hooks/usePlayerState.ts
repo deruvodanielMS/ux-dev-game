@@ -140,11 +140,11 @@ export default function usePlayerState() {
             avatarUrl: (avatar as string) ?? prev.avatarUrl,
             isLoggedIn: true,
             stats: {
-              soft_skills: finalProfile.softSkills ?? prev.stats.soft_skills,
-              tech_skills: finalProfile.techSkills ?? prev.stats.tech_skills,
-              core_values: finalProfile.coreValues ?? prev.stats.core_values,
-              creativity: finalProfile.creativity ?? prev.stats.creativity,
-              ai_level: finalProfile.aiLevel ?? prev.stats.ai_level,
+              soft_skills: finalProfile.softSkills ?? finalProfile.soft_skills ?? prev.stats.soft_skills,
+              tech_skills: finalProfile.techSkills ?? finalProfile.tech_skills ?? prev.stats.tech_skills,
+              core_values: finalProfile.coreValues ?? finalProfile.core_values ?? prev.stats.core_values,
+              creativity: finalProfile.creativity ?? finalProfile.creativity ?? prev.stats.creativity,
+              ai_level: finalProfile.aiLevel ?? finalProfile.ai_level ?? prev.stats.ai_level,
             },
           }));
         })();
