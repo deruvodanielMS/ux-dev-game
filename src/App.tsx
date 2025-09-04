@@ -5,6 +5,8 @@ import WelcomePage from './pages/WelcomePage/WelcomePage';
 import HomePage from './pages/HomePage/HomePage';
 import ProfileSetupPage from './pages/ProfileSetupPage/ProfileSetupPage';
 import BattlePage from './pages/BattlePage/BattlePage';
+import ProgressMapPage from './pages/ProgressMapPage/ProgressMapPage';
+import Header from './components/organisms/Header/Header';
 import { PlayerProvider } from './context/PlayerContext';
 
 function App() {
