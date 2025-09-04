@@ -39,6 +39,10 @@ export default function WelcomePage(){
           <p className={styles.mission}>
             La IA está absorbiendo a quienes no se mantienen actualizados y no colaboran. Tu misión: unirte al equipo y luchar por el código.
           </p>
+
+          <div className={styles.finalMonsterWrap}>
+            <img className={styles.finalMonster} src="https://i.pinimg.com/736x/ab/25/f6/ab25f694780cc113fd8fd7814857afe3.jpg" alt="Monstruo IA Final" />
+          </div>
         </section>
 
         <section className={styles.formArea}>
