@@ -27,6 +27,7 @@ function App() {
                   <Route path="/battle" element={<BattlePage />} />
                   <Route path="/progress" element={<ProgressMapPage />} />
                 </Routes>
+                <AppFooter />
               </div>
             </BrowserRouter>
           </AudioProvider>
