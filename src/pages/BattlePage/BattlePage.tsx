@@ -166,6 +166,10 @@ export default function BattlePage(){
   return (
     <div className={styles.page}>
       <div className={styles.arena}>
+        <div className={styles.turnRow}>
+          <TurnIndicator turn={s.playerTurn ? 'player' : 'enemy'} />
+        </div>
+
         <div className={styles.side}>
           <PlayerCard name={player.playerName || 'Jugador'} avatarUrl={player.avatarUrl} level={player.level} health={s.playerHealth} stamina={s.playerStamina} isActive={s.playerTurn} />
         </div>
