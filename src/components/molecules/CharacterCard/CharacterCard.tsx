@@ -79,7 +79,7 @@ export default function CharacterCard({ character, selected = false, onSelect, a
             )}
 
             <div style={{ marginTop: 12 }}>
-              <StatusBar label="Tiempo hasta absorción" value={progress} max={100} color={determineColor()} />
+              <StatusBar label="Tiempo hasta absorción" value={riskProgress} max={100} color={determineColor()} />
               <p style={{ marginTop: 6, color: 'var(--muted)', fontSize: 13 }}>{willBeAbsorbed ? 'En riesgo: sin PR en 30 días' : `${Math.max(0, daysLimit - daysSince)} días restantes`}</p>
             </div>
           </div>
