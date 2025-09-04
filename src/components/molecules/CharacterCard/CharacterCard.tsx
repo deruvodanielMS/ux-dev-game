@@ -117,7 +117,7 @@ export default function CharacterCard({ character, selected = false, onSelect, a
           <div className={styles.meta}>Nivel {character.level ?? 1}</div>
 
           <div className={styles.absorbWrapInline}>
-            <StatusBar label={willBeAbsorbed ? 'En riesgo' : 'Tiempo para absorción'} value={progress} max={100} color={determineColor()} />
+            <StatusBar label={willBeAbsorbed ? 'En riesgo' : 'Tiempo para absorción'} value={riskProgress} max={100} color={determineColor()} />
             <p className={styles.absorbText}>{willBeAbsorbed ? 'En riesgo: sin PR en 30 días' : `${Math.max(0, daysLimit - daysSince)} días restantes`}</p>
           </div>
         </div>
