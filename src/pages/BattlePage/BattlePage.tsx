@@ -94,6 +94,7 @@ export default function BattlePage(){
   const [s, dispatch] = useReducer(reducer, initialState(enemy.stats.health));
   const navigate = useNavigate();
   const [handledVictory, setHandledVictory] = useState(false);
+  const [damageNumbers, setDamageNumbers] = useState<{id:string;value:number;top:number;left:number|string}[]>([]);
 
   const handlePlay = (card: string) => {
     dispatch({ type: 'PLAY_CARD', card });
