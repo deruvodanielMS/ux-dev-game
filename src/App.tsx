@@ -7,6 +7,7 @@ import BattlePage from './pages/BattlePage/BattlePage';
 import ProgressMapPage from './pages/ProgressMapPage/ProgressMapPage';
 import Header from './components/organisms/Header/Header';
 import AppFooter from './components/organisms/AppFooter/AppFooter';
+import Ladderboard from './components/organisms/Ladderboard/Ladderboard';
 import { PlayerProvider } from './context/PlayerContext';
 import { ModalProvider } from './context/ModalContext';
 import { ToastProvider } from './context/ToastContext';
