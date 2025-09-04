@@ -5,11 +5,16 @@
 .title{margin:0;font-size:1.25rem}
 .state{padding:1rem;color:var(--muted);text-align:center}
 
-.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0.5rem}
-.row{display:grid;grid-template-columns:40px 1fr 120px 120px;align-items:center;gap:0.75rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:10px;padding:0.6rem 0.75rem}
+.tableWrap{overflow:auto}
+.table{width:100%;border-collapse:separate;border-spacing:0;border-radius:10px;overflow:hidden}
+.table thead{display:table-header-group;background:transparent}
+.table th{text-align:left;padding:0.75rem;color:var(--muted);font-weight:700}
+.table tbody{display:table-row-group}
+.row{display:table-row;background:rgba(255,255,255,0.02);border-bottom:1px solid rgba(255,255,255,0.04)}
+.row td{display:table-cell;padding:0.75rem;vertical-align:middle}
 
-.topRow{background:linear-gradient(135deg,rgba(255,215,0,0.16),rgba(255,255,255,0.04));border-color:rgba(255,215,0,0.35)}
-.rank{font-weight:800;text-align:center}
+.topRow{background:linear-gradient(135deg,rgba(255,215,0,0.16),rgba(255,255,255,0.04));}
+.rank{font-weight:800;text-align:center;width:40px}
 
 .playerBox{display:flex;align-items:center;gap:0.75rem;min-width:0}
 .avatarWrap{width:40px;height:40px;border-radius:999px;overflow:hidden;background:linear-gradient(135deg,rgba(96,165,250,0.12),rgba(94,234,212,0.06));display:flex;align-items:center;justify-content:center}
