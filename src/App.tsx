@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
 import WelcomePage from './pages/WelcomePage/WelcomePage';
-import HomePage from './pages/HomePage/HomePage';
 import ProfileSetupPage from './pages/ProfileSetupPage/ProfileSetupPage';
 import BattlePage from './pages/BattlePage/BattlePage';
 import ProgressMapPage from './pages/ProgressMapPage/ProgressMapPage';
