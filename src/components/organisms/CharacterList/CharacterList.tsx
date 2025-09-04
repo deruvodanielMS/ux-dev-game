@@ -26,6 +26,7 @@ export default function CharacterList({ selectedId, onSelect }: Props) {
       console.warn('Error loading characters', err);
       setError(err?.message ?? 'Error cargando personajes');
       setCharacters([]);
+      notify({ title: 'Error', message: err?.message ?? 'Error cargando personajes', level: 'danger' });
     } finally {
       setLoading(false);
     }
