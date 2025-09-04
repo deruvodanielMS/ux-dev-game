@@ -9,6 +9,10 @@
   align-items:center;
 }
 
+.left{display:flex;flex-direction:column;gap:0.6rem;align-items:flex-start}
+
+.hint{color:var(--muted);font-size:0.9rem}
+
 .preview{
   width:96px;
   height:96px;
