@@ -44,7 +44,7 @@
 
 .hero{padding:2rem}
 .heroLeft{flex:1}
-.heroRight{width:420px;display:flex;align-items:center;justify-content:center}
+.heroRight{width:560px;display:flex;align-items:center;justify-content:center}
 
 .finalMonsterWrap{display:flex;justify-content:center;margin-top:1.2rem}
 .finalMonster{width:100%;max-width:420px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 12px 40px rgba(2,6,23,0.6);object-fit:cover}
