@@ -103,23 +103,30 @@ export async function updatePlayerAvatar(authUid: string, avatarUrl: string): Pr
   if (!supabase) return;
 
   try {
-    // 1) Try update by auth_uid column (preferred when players linked to auth)
+    // 1) Try update by id (uuid) using snake_case avatar_url
     const { error: err1, count: count1 } = await supabase
       .from('players')
-      .update({ avatarUrl })
-      .match({ auth_uid: authUid });
+      .update({ avatar_url: avatarUrl })
+      .eq('id', authUid);
 
     if (!err1 && (count1 ?? 0) > 0) return;
 
-    // 2) Try update by id == authUid (in case players use uuid as id)
-    const { error: err2 } = await supabase.from('players').update({ avatarUrl }).eq('id', authUid);
-    if (!err2) return;
+    // 2) Try update by slug (some tables use slug text identifiers)
+    const { error: err2, count: count2 } = await supabase
+      .from('players')
+      .update({ avatar_url: avatarUrl })
+      .eq('slug', authUid);
 
-    // 3) Fallback: upsert a player record using authUid as id so the avatar is associated
+    if (!err2 && (count2 ?? 0) > 0) return;
+
+    // 3) Fallback: upsert a player record using authUid as id so the avatar is associated (snake_case)
     const userRes = await supabase.auth.getUser();
     const user = userRes.data?.user ?? null;
     const name = user?.email ?? authUid;
-    const { error: upsertErr } = await supabase.from('players').upsert({ id: authUid, auth_uid: authUid, name, avatarUrl, level: 1 });
+    const payload: any = { id: authUid, name, avatar_url: avatarUrl, level: 1 };
+    // include slug so future lookups by slug may work
+    payload.slug = authUid;
+    const { error: upsertErr } = await supabase.from('players').upsert(payload);
     if (upsertErr) console.warn('Failed upserting player with avatar', upsertErr);
   } catch (err) {
     console.warn('Failed updating avatar in Supabase', err);
