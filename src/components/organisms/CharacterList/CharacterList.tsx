@@ -70,7 +70,7 @@ export default function CharacterList({ selectedId, onSelect }: Props) {
     <div className={styles.list} role="list">
       {active.map((c) => (
         <div key={c.id} role="listitem" className={styles.item}>
-          <CharacterCard character={c} selected={selectedId === c.id} onSelect={onSelect} onUploadSuccess={(id, url) => handleUploadSuccess(id)} />
+          <CharacterCard character={c} selected={selectedId === c.id} onSelect={onSelect} />
         </div>
       ))}
     </div>
