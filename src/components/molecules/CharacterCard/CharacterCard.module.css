@@ -2,6 +2,8 @@
 .card{display:flex;align-items:center;gap:0.9rem;border-radius:10px;padding:0.9rem;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));border:1px solid rgba(255,255,255,0.03);width:100%;text-align:left}
 .avatar{width:72px;height:72px;border-radius:10px;overflow:visible;flex-shrink:0;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;position:relative}
 .avatarImage{width:100%;height:100%;object-fit:cover}
+
+.avatarBadge{position:absolute;right:-8px;bottom:-8px;background:linear-gradient(90deg,#646cff,#535bf2);color:#fff;padding:0.25rem 0.6rem;border-radius:12px;font-weight:800;font-size:0.85rem;border:2px solid #0b0b0b;z-index:5}
 .avatarInner{font-weight:800;color:var(--muted);}
 .info{flex:1}
 .name{font-weight:800}
