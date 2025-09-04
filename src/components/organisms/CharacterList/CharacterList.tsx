@@ -1,8 +1,10 @@
 import React from 'react';
 import styles from './CharacterList.module.css';
-import charactersData from '../../../data/characters.json';
+import React, { useEffect, useState } from 'react';
+import styles from './CharacterList.module.css';
 import CharacterCard, { Character } from '../../molecules/CharacterCard/CharacterCard';
 import { usePlayer } from '../../../context/PlayerContext';
+import { fetchCharacters } from '../../../services/characters';
 
 type Props = {
   selectedId: string | null;
@@ -13,10 +15,36 @@ const ABSORBED_NAMES = new Set(['Zeta', 'Joaco', 'Emily']);
 
 export default function CharacterList({ selectedId, onSelect }: Props) {
   const { state } = usePlayer();
-  const characters: Character[] = charactersData as Character[];
+  const [characters, setCharacters] = useState<Character[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Only show active characters (filter out those in absorbed list)
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      setLoading(true);
+      const list = await fetchCharacters();
+      if (!mounted) return;
+      if (list.length === 0) {
+        // fallback: try importing local JSON dynamically
+        try {
+          const mod = await import('../../../data/characters.json');
+          setCharacters((mod as any).default ?? (mod as any));
+        } catch (e) {
+          setCharacters([]);
+        }
+      } else {
+        setCharacters(list);
+      }
+      setLoading(false);
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   const active = characters.filter((c) => !ABSORBED_NAMES.has(c.name));
+
+  if (loading) return <div className={styles.list}>Cargando personajes...</div>;
 
   return (
     <div className={styles.list} role="list">
