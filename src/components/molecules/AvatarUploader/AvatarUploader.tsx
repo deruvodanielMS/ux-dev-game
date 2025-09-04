@@ -17,6 +17,7 @@ export default function AvatarUploader({ userId: userIdProp, onUploadSuccess }: 
   const [loading, setLoading] = useState(false);
   const { notify } = useToast();
   const [userId, setUserId] = useState<string | undefined>(userIdProp);
+  const [resolvingUser, setResolvingUser] = useState(false);
 
   useEffect(() => {
     if (userIdProp) setUserId(userIdProp);
