@@ -7,6 +7,8 @@ import BattlePage from './pages/BattlePage/BattlePage';
 import ProgressMapPage from './pages/ProgressMapPage/ProgressMapPage';
 import Header from './components/organisms/Header/Header';
 import { PlayerProvider } from './context/PlayerContext';
+import { ModalProvider } from './context/ModalContext';
+import { ToastProvider } from './context/ToastContext';
 
 function App() {
   return (
