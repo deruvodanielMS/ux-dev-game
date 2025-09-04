@@ -119,7 +119,7 @@ export async function updatePlayerAvatar(authUid: string, avatarUrl: string): Pr
     const userRes = await supabase.auth.getUser();
     const user = userRes.data?.user ?? null;
     const name = user?.email ?? authUid;
-    const { error: upsertErr } = await supabase.from('players').upsert({ id: authUid, name, avatarUrl, level: 1 });
+    const { error: upsertErr } = await supabase.from('players').upsert({ id: authUid, auth_uid: authUid, name, avatarUrl, level: 1 });
     if (upsertErr) console.warn('Failed upserting player with avatar', upsertErr);
   } catch (err) {
     console.warn('Failed updating avatar in Supabase', err);
