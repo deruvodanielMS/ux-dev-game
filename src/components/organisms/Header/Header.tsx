@@ -78,11 +78,7 @@ export default function Header(){
           <input className={styles.volume} type="range" min={0} max={1} step={0.01} value={audio.volume} onChange={(e) => audio.setVolume(Number(e.target.value))} />
         </div>
 
-        <div className={styles.loginWrap}>
-          <button className={styles.loginBtn} onClick={() => showModal({ title: 'Acceso', body: <EmailLogin />, allowClose: true })}>Login</button>
-        </div>
-
-        <button className={styles.mapBtn} onClick={() => navigate('/progress')}>Mapa</button>
+        {/* Login and Map moved out of header - use profile dropdown and page navigation */}
 
         <div className={styles.avatarWrap}>
           <div className={styles.avatar} onClick={toggleDropdown} aria-haspopup="true" aria-expanded={open}>
