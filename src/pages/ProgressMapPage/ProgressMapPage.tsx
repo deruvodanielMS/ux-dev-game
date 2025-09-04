@@ -2,10 +2,15 @@ import React from 'react';
 import styles from './ProgressMapPage.module.css';
 import enemies from '../../data/enemies.json';
 import { usePlayer } from '../../context/PlayerContext';
+import Button from '../../components/atoms/Button/Button';
+import { useNavigate } from 'react-router-dom';
 
 export default function ProgressMapPage(){
   const { state } = usePlayer();
   const defeated = state.defeatedEnemies || [];
+  const navigate = useNavigate();
+
+  const allCleared = defeated.length >= (enemies as any[]).length;
 
   return (
     <div className={styles.page}>
@@ -32,6 +37,16 @@ export default function ProgressMapPage(){
 
         <div className={styles.summary}>
           <div>Derrotados: {defeated.length} / {(enemies as any[]).length}</div>
+          {/* Show next level button when at least one enemy defeated and not all cleared */}
+          {defeated.length > 0 && !allCleared && (
+            <div className={styles.nextWrap}>
+              <Button onClick={() => navigate('/battle')} ariaLabel="Ir al siguiente nivel">Siguiente Nivel</Button>
+            </div>
+          )}
+
+          {allCleared && (
+            <div className={styles.congrats}>¡Has despejado este mapa! Prepárate para el próximo desafío.</div>
+          )}
         </div>
       </main>
     </div>
