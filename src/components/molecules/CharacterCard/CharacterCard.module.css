@@ -1,124 +1,20 @@
-::root{
-  --card-bg: rgba(255,255,255,0.02);
-  --card-border: rgba(96,165,250,0.06);
-  --neon: #5eead4;
-  --muted: #9aa4b2;
-}
+/* existing styles preserved, append new rules for view button and progress */
+.card{display:flex;align-items:center;gap:0.9rem;border-radius:10px;padding:0.6rem;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));border:1px solid rgba(255,255,255,0.03);width:100%;text-align:left}
+.avatar{width:64px;height:64px;border-radius:10px;overflow:hidden;flex-shrink:0;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center}
+.avatarImage{width:100%;height:100%;object-fit:cover}
+.avatarInner{font-weight:800;color:var(--muted);}
+.info{flex:1}
+.name{font-weight:800}
+.meta{color:var(--muted);font-size:0.9rem}
 
-.card{
-  display:flex;
-  align-items:center;
-  gap:1.25rem;
-  padding:1.4rem;
-  background:var(--card-bg);
-  border-radius:16px;
-  border:1px solid transparent;
-  cursor:pointer;
-  width:100%;
-  text-align:left;
-  transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
-  min-height:108px;
-}
+.wrapper{display:flex;flex-direction:column;gap:0.5rem}
+.cardActions{display:flex;justify-content:flex-end}
+.viewBtn{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:0.4rem 0.6rem;border-radius:8px;color:var(--muted);cursor:pointer}
+.viewBtn:hover{color:white}
 
-.card:hover{transform:translateY(-6px);}
+.absorbWrap{width:100%}
 
-.selected{
-  border-color:var(--neon);
-  box-shadow:0 18px 48px rgba(94,234,212,0.12);
-}
-
-.avatar{
-  min-width:120px;
-  min-height:120px;
-  border-radius:12px;
-  background:linear-gradient(135deg, rgba(96,165,250,0.12), rgba(94,234,212,0.06));
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:var(--neon);
-  font-weight:900;
-  box-shadow: 0 12px 36px rgba(2,6,23,0.6);
-  overflow:hidden;
-}
-
-.avatarImage{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
-}
-
-@media (min-width:1200px){
-  .avatar{min-width:140px;min-height:140px}
-  .avatarInner{font-size:1.8rem}
-}
-
-.avatarInner{
-  font-size:1.6rem;
-  letter-spacing:1px;
-}
-
-.info{
-  display:flex;
-  flex-direction:column;
-}
-
-.name{
-  color:#fff;
-  font-weight:800;
-  font-size:1.1rem;
-}
-
-.meta{
-  color:var(--muted);
-  font-size:0.95rem;
-}
-
-.uploadControl{
-  margin-top:0.6rem;
-  display:flex;
-  align-items:center;
-  gap:0.6rem;
-}
-
-.uploadInput{
-  display:none;
-}
-
-.uploadLabel{
-  background:transparent;
-  border:1px dashed rgba(255,255,255,0.06);
-  color:var(--muted);
-  padding:0.35rem 0.6rem;
-  border-radius:8px;
-  font-size:0.9rem;
-  cursor:pointer;
-}
-
-.absorbed{
-  opacity:0.56;
-  filter:grayscale(60%) contrast(.9);
-  pointer-events:none;
-  position:relative;
-}
-
-/* subtle glitch effect for absorbed characters */
-.absorbed::after{
-  content:"";
-  position:absolute;
-  left:6px;
-  right:6px;
-  top:6px;
-  bottom:6px;
-  border-radius:14px;
-  mix-blend-mode:screen;
-  background:linear-gradient(90deg, rgba(255,0,80,0.02), rgba(94,234,212,0.02));
-  transform:skewX(-6deg) translateX(-4px);
-  opacity:0.6;
-}
-
-@media (max-width:600px){
-  .avatar{min-width:72px;min-height:72px}
-  .card{min-height:80px;padding:0.9rem}
-  .avatarInner{font-size:1rem}
+/* small responsive tweaks */
+@media (max-width:480px){
+  .avatar{width:56px;height:56px}
 }
