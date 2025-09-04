@@ -10,9 +10,10 @@ import Skeleton from '../../atoms/Skeleton/Skeleton';
 type Props = {
   userId?: string;
   onUploadSuccess?: (avatarUrl: string) => void;
+  initialAvatar?: string | null;
 };
 
-export default function AvatarUploader({ userId: userIdProp, onUploadSuccess }: Props){
+export default function AvatarUploader({ userId: userIdProp, onUploadSuccess, initialAvatar }: Props){
   const [preview, setPreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
