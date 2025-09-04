@@ -18,9 +18,9 @@
 
 .container{
   width:100%;
-  max-width:1400px;
+  max-width:none;
   display:grid;
-  grid-template-columns: 1fr 420px;
+  grid-template-columns: 560px 1fr;
   gap:2.4rem;
 }
 
