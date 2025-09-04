@@ -44,7 +44,7 @@ export default function CharacterList({ selectedId, onSelect }: Props) {
     };
   }, [load]);
 
-  const active = characters.filter((c) => !ABSORBED_NAMES.has(c.name));
+  const active = characters.filter((c) => !ABSORBED_NAMES.has(c.name)).sort((a,b)=> (b.level ?? 0) - (a.level ?? 0));
 
   async function handleUploadSuccess(id: string) {
     // refresh the list after an upload so the new avatar appears
