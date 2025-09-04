@@ -64,8 +64,27 @@ export default function Header(){
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.isLoggedIn]);
 
+  const avatarRef = React.useRef<HTMLDivElement | null>(null);
+  const mobileNavRef = React.useRef<HTMLElement | null>(null);
+  const hamburgerRef = React.useRef<HTMLButtonElement | null>(null);
+
   const toggleDropdown = () => setOpen((s) => !s);
   const toggleHamburger = () => setHamburgerOpen((s) => !s);
+
+  // close dropdowns when clicking outside
+  React.useEffect(() => {
+    function onDocDown(e: MouseEvent) {
+      const target = e.target as Node | null;
+      if (open && avatarRef.current && target && !avatarRef.current.contains(target)) {
+        setOpen(false);
+      }
+      if (hamburgerOpen && mobileNavRef.current && target && !mobileNavRef.current.contains(target) && hamburgerRef.current && !hamburgerRef.current.contains(target)) {
+        setHamburgerOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', onDocDown);
+    return () => document.removeEventListener('mousedown', onDocDown);
+  }, [open, hamburgerOpen]);
 
   const handleLogout = async () => {
     try {
