@@ -1,6 +1,10 @@
-import React, { ChangeEvent, useState } from 'react';
+import React from 'react';
 import styles from './CharacterCard.module.css';
 import { useToast } from '../../../context/ToastContext';
+import { useModal } from '../../../context/ModalContext';
+import { usePlayer } from '../../../context/PlayerContext';
+import { useNavigate } from 'react-router-dom';
+import StatusBar from '../../atoms/StatusBar/StatusBar';
 
 export type Character = {
   id: string;
