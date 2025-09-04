@@ -7,7 +7,7 @@ const CARD_INFO: Record<string, { title: string; desc: string }>= {
   'refactor': { title: 'Refactor', desc: 'Mejora el código y causa daño estable.' },
 };
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 export default function Card({ id, onPlay }: { id: string; onPlay: () => void }){
   const info = CARD_INFO[id] ?? { title: id, desc: '' };
