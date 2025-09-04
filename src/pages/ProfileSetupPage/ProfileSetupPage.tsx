@@ -44,6 +44,11 @@ export default function ProfileSetupPage(){
         </div>
 
         <div className={styles.row}>
+          <label className={styles.label} htmlFor="email">Email</label>
+          <input id="email" value={email} onChange={(e) => setEmail(e.target.value)} className={styles.input} placeholder="Tu email" />
+        </div>
+
+        <div className={styles.row}>
           <label className={styles.label}>Identidad Digital</label>
           <AvatarUploader userId={userId ?? undefined} initialAvatar={state.avatarUrl ?? null} initialLevel={state.level} onUploadSuccess={handleUploadSuccess} />
         </div>
