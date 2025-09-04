@@ -11,7 +11,7 @@
               linear-gradient(180deg, var(--bg) 0%, #070915 60%);
   color:#e6eef8;
   display:flex;
-  align-items:center;
+  align-items:flex-start; /* use full vertical space */
   justify-content:center;
   padding:3rem 1rem;
 }
@@ -20,7 +20,7 @@
   width:100%;
   max-width:none;
   display:grid;
-  grid-template-columns: 560px 1fr;
+  grid-template-columns: 1fr 560px; /* allow main section to expand and use space */
   gap:2.4rem;
 }
 
