@@ -95,9 +95,32 @@ export default function BattlePage(){
 
   const handlePlay = (card: string) => {
     dispatch({ type: 'PLAY_CARD', card });
-    // enemy responds after a short delay
-    setTimeout(() => dispatch({ type: 'ENEMY_ATTACK' }), 700);
+    // after playing, start enemy turn flow via effect
   };
+
+  // Enemy turn flow and regen handling
+  useEffect(() => {
+    // handle regen at start of any turn change
+    dispatch({ type: 'REGEN' });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [s.playerTurn]);
+
+  useEffect(() => {
+    if (!s.playerTurn) {
+      // enemy acts after a short delay
+      const t = setTimeout(() => {
+        // simple enemy action: attack when has stamina
+        if (s.enemyStamina >= 8) {
+          dispatch({ type: 'ENEMY_ATTACK' });
+        } else {
+          // enemy skips - regenerate next turn
+          dispatch({ type: 'REGEN' });
+          dispatch({ type: 'ENEMY_ATTACK' });
+        }
+      }, 900);
+      return () => clearTimeout(t);
+    }
+  }, [s.playerTurn, s.enemyStamina]);
 
   // Victory detection
   useEffect(() => {
@@ -111,7 +134,31 @@ export default function BattlePage(){
         if (go) navigate('/progress');
       }, 500);
     }
-  }, [s.enemyHealth, handledVictory, playerDispatch, enemy, navigate]);
+
+    if (s.playerHealth <= 0) {
+      // player defeat - visual handled by PlayerCard
+      setTimeout(() => alert('Has sido derrotado... reiniciando batalla.'), 600);
+      setTimeout(() => dispatch({ type: 'RESET' }), 1200);
+    }
+  }, [s.enemyHealth, handledVictory, playerDispatch, enemy, navigate, s.playerHealth]);
+
+  // generate damage numbers when enemy health decreases
+  const prevEnemyHp = React.useRef<number>(s.enemyHealth);
+  useEffect(() => {
+    const prev = prevEnemyHp.current;
+    if (s.enemyHealth < prev) {
+      const dmg = prev - s.enemyHealth;
+      const id = String(Date.now());
+      setDamageNumbers((ds) => [...ds, { id, value: dmg, top: 80, left: '50%' }]);
+    }
+    prevEnemyHp.current = s.enemyHealth;
+  }, [s.enemyHealth]);
+
+  // log auto-scroll
+  const logRef = React.useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (logRef.current) logRef.current.scrollTop = 0;
+  }, [s.battleLog]);
 
   return (
     <div className={styles.page}>
@@ -125,10 +172,10 @@ export default function BattlePage(){
         </div>
 
         <div className={styles.cardsArea}>
-          <CardHand cards={s.playerHand} onPlay={handlePlay} />
+          <CardHand cards={s.playerHand} onPlay={(card) => { handlePlay(card); }} />
         </div>
 
-        <div className={styles.log}>
+        <div className={styles.log} ref={logRef}>
           <h4>Registro</h4>
           <ul>
             {s.battleLog.map((l, i) => (<li key={i}>{l}</li>))}
@@ -138,6 +185,14 @@ export default function BattlePage(){
         <div className={styles.controls}>
           <Button onClick={() => dispatch({ type: 'RESET' })} ariaLabel="Reiniciar">Reiniciar</Button>
         </div>
+
+        {/* Damage numbers overlay */}
+        <div className={styles.damageLayer} aria-hidden>
+          {damageNumbers.map((d) => (
+            <DamageNumber key={d.id} id={d.id} value={d.value} onDone={(id) => setDamageNumbers((arr) => arr.filter((x) => x.id !== id))} top={d.top} left={typeof d.left === 'number' ? d.left : 0} />
+          ))}
+        </div>
+
       </div>
     </div>
   );
