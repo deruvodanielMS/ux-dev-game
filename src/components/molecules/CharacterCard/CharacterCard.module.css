@@ -41,6 +41,11 @@
   overflow:hidden;
 }
 
+@media (min-width:1200px){
+  .avatar{min-width:140px;min-height:140px}
+  .avatarInner{font-size:1.8rem}
+}
+
 .avatarInner{
   font-size:1.6rem;
   letter-spacing:1px;
