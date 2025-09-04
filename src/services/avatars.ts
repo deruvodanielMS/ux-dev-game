@@ -4,7 +4,8 @@ export async function uploadAvatar(file: File, userId: string): Promise<string> 
   if (!supabase) throw new Error('Supabase client not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.');
 
   const fileExt = file.name.split('.').pop() ?? 'png';
-  const fileName = `${userId}.${fileExt}`;
+  const timestamp = Date.now();
+  const fileName = `${userId}-${timestamp}.${fileExt}`; // unique filename to avoid caching collisions
   const filePath = `${userId}/${fileName}`;
 
   const { error: uploadError } = await supabase.storage
@@ -16,9 +17,8 @@ export async function uploadAvatar(file: File, userId: string): Promise<string> 
 
   if (uploadError) throw uploadError;
 
-  const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
-  if (!publicUrlData) throw new Error('Could not get public URL');
-  return publicUrlData.publicUrl;
+  // Return the storage path (not the public URL). Caller should resolve URL for display.
+  return filePath;
 }
 
 export async function uploadCharacterAvatar(file: File, characterId: string): Promise<string> {
