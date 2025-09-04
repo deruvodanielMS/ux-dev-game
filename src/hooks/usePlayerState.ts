@@ -81,18 +81,19 @@ export default function usePlayerState() {
     const createProfile = async (userId: string, email?: string | null) => {
       const base = {
         id: userId,
-        auth_uid: userId,
+        // store user id in slug as well when useful
+        slug: userId,
         name: email ?? userId,
-        avatarUrl: null,
+        avatar_url: null,
         level: 1,
         exp: 0,
         coins: 0,
-        softSkills: 10,
-        techSkills: 10,
-        coreValues: 10,
+        soft_skills: 10,
+        tech_skills: 10,
+        core_values: 10,
         creativity: 10,
-        aiLevel: 1,
-        characterId: null,
+        ai_level: 1,
+        character_id: null,
       };
       try {
         await supabase.from('players').insert(base);
