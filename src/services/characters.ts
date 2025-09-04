@@ -47,25 +47,28 @@ export async function fetchCharacters(): Promise<Character[]> {
 }
 
 export async function updateCharacterAvatar(characterId: string, avatarUrl: string): Promise<void> {
-  if (!supabase) return;
+  if (!supabase) throw new Error('Supabase not configured');
 
-  try {
-    // Try updating characters table
-    const { error: err1 } = await supabase
-      .from('characters')
-      .update({ avatarUrl })
-      .match({ id: characterId });
+  // Try updating characters table
+  const { error: err1, count: count1 } = await supabase
+    .from('characters')
+    .update({ avatarUrl })
+    .match({ id: characterId });
 
-    if (!err1) return;
+  if (!err1 && (count1 ?? 0) > 0) return;
 
-    // If updating characters failed, try players table (some projects store characters in players)
-    const { error: err2 } = await supabase.from('players').update({ avatarUrl }).eq('id', characterId);
-    if (!err2) return;
+  // Try players table (some projects store characters in players)
+  const { error: err2, count: count2 } = await supabase.from('players').update({ avatarUrl }).eq('id', characterId);
+  if (!err2 && (count2 ?? 0) > 0) return;
 
-    // As a last resort, attempt upsert into characters table
-    const { error: upsertErr } = await supabase.from('characters').upsert({ id: characterId, name: characterId, avatarUrl, level: 1 });
-    if (upsertErr) console.warn('Failed upserting character with avatar', upsertErr);
-  } catch (err) {
-    console.warn('Failed updating character avatar in Supabase', err);
+  // As a last resort, attempt upsert into characters table (ensure auth_uid if available)
+  const userRes = await supabase.auth.getUser();
+  const user = userRes.data?.user ?? null;
+  const upsertPayload: any = { id: characterId, name: characterId, avatarUrl, level: 1 };
+  if (user?.id) upsertPayload.auth_uid = user.id;
+  const { error: upsertErr } = await supabase.from('characters').upsert(upsertPayload);
+  if (upsertErr) {
+    // throw so caller can show a meaningful error to the user and we can debug RLS issues
+    throw upsertErr;
   }
 }
