@@ -25,7 +25,8 @@ export async function uploadCharacterAvatar(file: File, characterId: string): Pr
   if (!supabase) throw new Error('Supabase client not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.');
 
   const fileExt = file.name.split('.').pop() ?? 'png';
-  const fileName = `${characterId}.${fileExt}`;
+  const timestamp = Date.now();
+  const fileName = `${characterId}-${timestamp}.${fileExt}`;
   const attempts: { path: string; label: string }[] = [];
 
   // primary path: characters/<characterId>/<file>
@@ -37,7 +38,7 @@ export async function uploadCharacterAvatar(file: File, characterId: string): Pr
     const userId = userRes.data?.user?.id ?? null;
     if (userId) attempts.push({ path: `${userId}/${fileName}`, label: 'user folder' });
     // also try user/characters/<id>
-    if (userId) attempts.push({ path: `${userId}/characters/${characterId}.${fileExt}`, label: 'user characters folder' });
+    if (userId) attempts.push({ path: `${userId}/characters/${characterId}-${timestamp}.${fileExt}`, label: 'user characters folder' });
   } catch (e) {
     // ignore - we'll just try primary
   }
@@ -53,9 +54,8 @@ export async function uploadCharacterAvatar(file: File, characterId: string): Pr
         });
       if (uploadError) throw uploadError;
 
-      const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(attempt.path);
-      if (!publicUrlData) throw new Error('Could not get public URL for character avatar');
-      return publicUrlData.publicUrl;
+      // return storage path so it's stored in DB and later resolved for display
+      return attempt.path;
     } catch (err: any) {
       lastError = err;
       console.warn(`Upload to ${attempt.label} failed:`, err?.message || err);
