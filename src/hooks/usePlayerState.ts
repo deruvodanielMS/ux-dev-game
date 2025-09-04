@@ -81,6 +81,7 @@ export default function usePlayerState() {
     const createProfile = async (userId: string, email?: string | null) => {
       const base = {
         id: userId,
+        auth_uid: userId,
         name: email ?? userId,
         avatarUrl: null,
         level: 1,
