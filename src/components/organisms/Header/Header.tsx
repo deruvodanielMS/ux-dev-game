@@ -6,6 +6,19 @@ import { useModal } from '../../../context/ModalContext';
 import { useAudio } from '../../../context/AudioContext';
 import supabase from '../../../services/supabase';
 
+function SettingsBody(){
+  const audio = useAudio();
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <button className={styles.playBtn} onClick={() => audio.isPlaying ? audio.pause() : audio.play()} aria-label="Toggle music">{audio.isPlaying ? '⏸' : '⏵'}</button>
+        <label className={styles.volumeLabel}>Vol</label>
+        <input className={styles.volume} type="range" min={0} max={1} step={0.01} value={audio.volume} onChange={(e) => audio.setVolume(Number(e.target.value))} />
+      </div>
+    </div>
+  );
+}
+
 export default function Header(){
   const { state, dispatch } = usePlayer();
   const navigate = useNavigate();
