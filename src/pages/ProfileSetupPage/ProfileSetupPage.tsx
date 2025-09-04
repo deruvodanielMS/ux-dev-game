@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from './ProfileSetupPage.module.css';
 import AvatarUploader from '../../components/molecules/AvatarUploader/AvatarUploader';
+import StatDisplay from '../../components/molecules/StatDisplay/StatDisplay';
 import { usePlayer } from '../../context/PlayerContext';
 import Button from '../../components/atoms/Button/Button';
 import { useNavigate } from 'react-router-dom';
