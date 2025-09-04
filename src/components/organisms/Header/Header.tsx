@@ -73,6 +73,7 @@ export default function Header(){
 
       <div className={styles.right}>
         <div className={styles.controlsRow}>
+          <button className={styles.playBtn} onClick={() => audio.isPlaying ? audio.pause() : audio.play()} aria-label="Toggle music">{audio.isPlaying ? '⏸' : '⏵'}</button>
           <label className={styles.volumeLabel}>Vol</label>
           <input className={styles.volume} type="range" min={0} max={1} step={0.01} value={audio.volume} onChange={(e) => audio.setVolume(Number(e.target.value))} />
         </div>
