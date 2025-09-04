@@ -1,0 +1,3 @@
+.damage{position:absolute;color:#ff6b6b;font-weight:900;font-size:1.2rem;animation:floatUp 900ms ease forwards;text-shadow:0 6px 20px rgba(0,0,0,0.6)}
+
+@keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-32px) scale(1.08)}}

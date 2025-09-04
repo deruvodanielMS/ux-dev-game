@@ -1,0 +1,54 @@
+[
+  {
+    "id": "html-bug",
+    "name": "HTML Bug",
+    "type": "technology",
+    "difficulty": "easy",
+    "stats": {
+      "health": 50,
+      "attack": 10,
+      "defense": 5
+    },
+    "description": "Un error trivial que provoca desalineación y elementos invisibles. Se derrota con una estructura limpia y semántica.",
+    "avatar_url": "https://cdn.builder.io/api/v1/image/assets%2F18b71006d6404cecbe90ad5e2b850e0e%2F483352f1ff834cd18e0ba1b6c3a7206f?format=webp&width=800"
+  },
+  {
+    "id": "css-glitch",
+    "name": "CSS Glitch",
+    "type": "technology",
+    "difficulty": "easy",
+    "stats": {
+      "health": 70,
+      "attack": 15,
+      "defense": 10
+    },
+    "description": "Un error visual que rompe el diseño en diferentes navegadores. Se derrota con una estrategia de CSS Modules.",
+    "avatar_url": "https://cdn.builder.io/api/v1/image/assets%2F18b71006d6404cecbe90ad5e2b850e0e%2F0fb1013d496a49b781517115e4aca1fe?format=webp&width=800"
+    },
+  {
+    "id": "javascript-logic-error",
+    "name": "JS Logic Error",
+    "type": "technology",
+    "difficulty": "medium",
+    "stats": {
+      "health": 120,
+      "attack": 25,
+      "defense": 15
+    },
+    "description": "Un fallo de lógica que congela la interfaz y provoca comportamiento inesperado. Requiere un pensamiento algorítmico y buenas prácticas de 'hooks'.",
+    "avatar_url": "https://cdn.builder.io/api/v1/image/assets%2F18b71006d6404cecbe90ad5e2b850e0e%2Fddda0f3562a44039b6d43252060fbae0?format=webp&width=800"
+  },
+  {
+    "id": "react-reconciliation-glitch",
+    "name": "React Reconciliation Glitch",
+    "type": "technology",
+    "difficulty": "hard",
+    "stats": {
+      "health": 200,
+      "attack": 40,
+      "defense": 30
+    },
+    "description": "Un error en la actualización del DOM virtual que causa 're-renders' infinitos. Se derrota con optimización de componentes y 'memoization'.",
+    "avatar_url": "https://cdn.builder.io/api/v1/image/assets%2F18b71006d6404cecbe90ad5e2b850e0e%2F61990cd3666442f1a167c3906283431b?format=webp&width=800"
+  }
+]

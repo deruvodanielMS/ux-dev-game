@@ -1,0 +1,6 @@
+:root{--muted:#9aa4b2}
+
+.stats{display:flex;flex-direction:column;gap:0.45rem;padding:0.6rem;border-radius:8px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.03)}
+.row{display:flex;justify-content:space-between;align-items:center}
+.key{text-transform:capitalize;color:var(--muted)}
+.value{font-weight:800}

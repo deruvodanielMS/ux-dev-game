@@ -1,0 +1,9 @@
+:root{--muted:#9aa4b2}
+
+.card{padding:0.9rem;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent);cursor:pointer;min-width:160px;transition:transform .12s ease, box-shadow .12s ease}
+.title{font-weight:800}
+.desc{color:var(--muted);font-size:0.9rem;margin-top:0.4rem}
+
+.card:active{transform:translateY(1px)}
+
+.anim{transform:scale(1.06);box-shadow:0 12px 30px rgba(96,165,250,0.12)}
