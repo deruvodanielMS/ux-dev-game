@@ -13,6 +13,7 @@ export default function Header(){
   const audio = useAudio();
   const [open, setOpen] = React.useState(false);
   const [profile, setProfile] = React.useState<any | null>(null);
+  const [hamburgerOpen, setHamburgerOpen] = React.useState(false);
 
   const wasLoggedRef = React.useRef<boolean>(false);
 
@@ -51,6 +52,7 @@ export default function Header(){
   }, [state.isLoggedIn]);
 
   const toggleDropdown = () => setOpen((s) => !s);
+  const toggleHamburger = () => setHamburgerOpen((s) => !s);
 
   const handleLogout = async () => {
     try {
@@ -61,6 +63,7 @@ export default function Header(){
       dispatch({ type: 'SET_AVATAR', payload: null });
       setProfile(null);
       setOpen(false);
+      setHamburgerOpen(false);
     } catch (e) {
       // ignore
     }
@@ -68,7 +71,9 @@ export default function Header(){
 
   return (
     <header className={styles.header}>
-      <div className={styles.brand} onClick={() => navigate('/')}>UXDevsia</div>
+      <div className={styles.brandRow}>
+        <div className={styles.brand} onClick={() => navigate('/')}>UXDevsia</div>
+      </div>
 
       <div className={styles.right}>
         <div className={styles.controlsRow}>
@@ -77,7 +82,8 @@ export default function Header(){
           <input className={styles.volume} type="range" min={0} max={1} step={0.01} value={audio.volume} onChange={(e) => audio.setVolume(Number(e.target.value))} />
         </div>
 
-        {/* Login and Map moved out of header - use profile dropdown and page navigation */}
+        {/* hamburger for small screens */}
+        <button className={styles.hamburger} aria-label="Abrir menu" onClick={toggleHamburger} aria-expanded={hamburgerOpen}>{hamburgerOpen ? '✕' : '☰'}</button>
 
         <div className={styles.avatarWrap}>
           <div className={styles.avatar} onClick={toggleDropdown} aria-haspopup="true" aria-expanded={open}>
@@ -103,6 +109,15 @@ export default function Header(){
             </div>
           )}
         </div>
+
+        {/* mobile nav drawer */}
+        {hamburgerOpen && (
+          <nav className={styles.mobileNav} role="navigation">
+            <button className={styles.mobileItem} onClick={() => { navigate('/profile'); setHamburgerOpen(false); }}>Perfil</button>
+            <button className={styles.mobileItem} onClick={() => { setHamburgerOpen(false); showModal({ title: 'Ajustes', body: <div>Configuraciones</div>, allowClose: true }); }}>Ajustes</button>
+            <button className={styles.mobileItemGhost} onClick={handleLogout}>Cerrar sesión</button>
+          </nav>
+        )}
       </div>
     </header>
   );
