@@ -60,14 +60,24 @@ export default function AvatarUploader({ userId: userIdProp, onUploadSuccess, in
     setLoading(true);
     notify({ message: 'Iniciando subida...', level: 'info', duration: 2000 });
     try {
-      const avatarUrl = await uploadAvatar(file, userId);
-      // optimistically update UI/context
-      dispatch({ type: 'SET_AVATAR', payload: avatarUrl });
-      setPreview(avatarUrl);
-
-      // update players table and local storage
+      // upload returns storage path; resolve signed url for display
+      const storagePath = await uploadAvatar(file, userId);
+      let displayUrl = storagePath;
       try {
-        await updatePlayerAvatar(userId, avatarUrl);
+        const { resolveAvatarUrl } = await import('../../../services/avatars');
+        const resolved = await resolveAvatarUrl(storagePath);
+        if (resolved) displayUrl = resolved;
+      } catch (e) {
+        // ignore - fallback to storagePath (not ideal but will show something)
+      }
+
+      // optimistically update UI/context with signed URL
+      dispatch({ type: 'SET_AVATAR', payload: displayUrl });
+      setPreview(displayUrl);
+
+      // update players table and local storage with storagePath so DB stores path
+      try {
+        await updatePlayerAvatar(userId, storagePath);
       } catch (dbErr: any) {
         // surface db errors as actionable toasts
         const msg = dbErr?.message ?? String(dbErr);
