@@ -144,7 +144,7 @@ export default function Header(){
 
         {/* mobile nav drawer */}
         {hamburgerOpen && (
-          <nav className={styles.mobileNav} role="navigation">
+          <nav className={styles.mobileNav} role="navigation" ref={mobileNavRef}>
             <button className={styles.mobileItem} onClick={() => { navigate('/profile'); setHamburgerOpen(false); }}>Perfil</button>
             <button className={styles.mobileItem} onClick={() => { setHamburgerOpen(false); showModal({ title: 'Ajustes', body: <div>Configuraciones</div>, allowClose: true }); }}>Ajustes</button>
             <button className={styles.mobileItemGhost} onClick={handleLogout}>Cerrar sesión</button>
