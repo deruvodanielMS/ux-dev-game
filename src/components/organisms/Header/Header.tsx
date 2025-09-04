@@ -83,6 +83,7 @@ export default function Header(){
         <div className={styles.avatarWrap}>
           <div className={styles.avatar} onClick={toggleDropdown} aria-haspopup="true" aria-expanded={open}>
             {state.avatarUrl ? <img src={state.avatarUrl} alt="avatar" /> : <div className={styles.placeholder}>{(state.playerName || 'U').slice(0,2).toUpperCase()}</div>}
+            <div className={styles.avatarBadge}>Lv {profile?.level ?? state.level ?? 1}</div>
           </div>
 
           {open && (
