@@ -5,7 +5,7 @@ type Props = {
   label?: string;
   value: number; // current value
   max?: number; // max value
-  color?: 'green' | 'blue' | 'red';
+  color?: 'green' | 'blue' | 'red' | 'orange';
 };
 
 export default function StatusBar({ label, value, max = 100, color = 'green' }: Props){
