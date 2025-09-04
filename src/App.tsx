@@ -12,11 +12,13 @@ function App() {
     <PlayerProvider>
       <BrowserRouter>
         <div className="app-root">
+          <Header />
           <Routes>
             <Route path="/" element={<WelcomePage />} />
             <Route path="/home" element={<HomePage />} />
             <Route path="/profile" element={<ProfileSetupPage />} />
             <Route path="/battle" element={<BattlePage />} />
+            <Route path="/progress" element={<ProgressMapPage />} />
           </Routes>
         </div>
       </BrowserRouter>
