@@ -7,6 +7,7 @@ import { usePlayer } from '../../context/PlayerContext';
 import { useNavigate } from 'react-router-dom';
 import { useModal } from '../../context/ModalContext';
 import { useToast } from '../../context/ToastContext';
+import AppFooter from '../../components/organisms/AppFooter/AppFooter';
 
 export default function WelcomePage(){
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -79,6 +80,8 @@ export default function WelcomePage(){
         )}
 
       </main>
+
+      <AppFooter />
     </div>
   );
 }
