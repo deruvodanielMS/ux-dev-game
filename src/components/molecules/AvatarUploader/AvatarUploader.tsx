@@ -87,13 +87,13 @@ export default function AvatarUploader({ userId: userIdProp, onUploadSuccess, in
           notify({ message: msg, level: 'danger', duration: 6000 });
         }
         // still call onUploadSuccess with url so UI can reflect uploaded image if needed
-        onUploadSuccess?.(avatarUrl);
+        onUploadSuccess?.(displayUrl);
         setLoading(false);
         return;
       }
 
       notify({ message: 'Avatar subido y guardado correctamente.', level: 'success' });
-      onUploadSuccess?.(avatarUrl);
+      onUploadSuccess?.(displayUrl);
     } catch (err: any) {
       const msg = err?.message ?? String(err);
       if (msg.toLowerCase().includes('row-level') || msg.toLowerCase().includes('unauthorized')) {
