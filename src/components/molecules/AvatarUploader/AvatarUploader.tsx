@@ -1,17 +1,38 @@
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState, ChangeEvent, useEffect } from 'react';
 import styles from './AvatarUploader.module.css';
 import Button from '../../atoms/Button/Button';
-import { usePlayer } from '../../../context/PlayerContext';
 import { uploadAvatar } from '../../../services/avatars';
 import { updatePlayerAvatar } from '../../../services/players';
 import { useToast } from '../../../context/ToastContext';
+import supabase from '../../../services/supabase';
 
-export default function AvatarUploader(){
-  const { state, dispatch } = usePlayer();
-  const [preview, setPreview] = useState<string | null>(state.avatarUrl);
+type Props = {
+  userId?: string;
+  onUploadSuccess?: (avatarUrl: string) => void;
+};
+
+export default function AvatarUploader({ userId: userIdProp, onUploadSuccess }: Props){
+  const [preview, setPreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const { notify } = useToast();
+  const [userId, setUserId] = useState<string | undefined>(userIdProp);
+
+  useEffect(() => {
+    if (userIdProp) setUserId(userIdProp);
+    else {
+      (async () => {
+        try {
+          if (!supabase) return;
+          const { data } = await supabase.auth.getUser();
+          const u = data?.user ?? null;
+          if (u) setUserId(u.id);
+        } catch (e) {
+          // ignore
+        }
+      })();
+    }
+  }, [userIdProp]);
 
   function onFileChange(e: ChangeEvent<HTMLInputElement>){
     const f = e.target.files && e.target.files[0];
@@ -26,16 +47,18 @@ export default function AvatarUploader(){
       notify({ message: 'Selecciona una imagen antes de confirmar.', level: 'warning' });
       return;
     }
+    if (!userId){
+      notify({ message: 'Usuario no identificado.', level: 'danger' });
+      return;
+    }
 
     setLoading(true);
     try {
-      const userId = state.playerName?.trim() || 'guest';
       const avatarUrl = await uploadAvatar(file, userId);
-      // update local state
-      dispatch({ type: 'SET_AVATAR', payload: avatarUrl });
-      // update players storage / supabase
+      // update players table and local storage
       await updatePlayerAvatar(userId, avatarUrl);
       notify({ message: 'Avatar subido correctamente.', level: 'success' });
+      onUploadSuccess?.(avatarUrl);
     } catch (err: any) {
       notify({ message: err?.message || 'Error subiendo avatar.', level: 'danger' });
     } finally {
@@ -46,7 +69,7 @@ export default function AvatarUploader(){
   return (
     <div className={styles.uploader}>
       <div className={styles.left}>
-        <div className={styles.hint}>Sube tu avatar (generado por IA)</div>
+        <div className={styles.hint}>Sube tu avatar</div>
         <div className={styles.preview} aria-hidden>
           {preview ? <img src={preview} alt="avatar preview" /> : <div className={styles.placeholder}>Sin avatar</div>}
         </div>
