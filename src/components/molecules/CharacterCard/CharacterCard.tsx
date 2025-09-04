@@ -25,29 +25,7 @@ export default function CharacterCard({ character, selected = false, onSelect, a
     .join('')
     .toUpperCase();
 
-  const [loading, setLoading] = useState(false);
   const { notify } = useToast();
-
-  async function onFileChange(e: ChangeEvent<HTMLInputElement>){
-    const f = e.target.files && e.target.files[0];
-    if (!f) return;
-    setLoading(true);
-    try {
-      const url = await uploadCharacterAvatar(f, character.id);
-      await updateCharacterAvatar(character.id, url);
-      notify({ message: 'Imagen del personaje subida correctamente.', level: 'success' });
-      onUploadSuccess?.(character.id, url);
-    } catch (err: any) {
-      const msg = err?.message ?? String(err);
-      if (msg.toLowerCase().includes('row-level') || msg.toLowerCase().includes('unauthorized')) {
-        notify({ title: 'Error de permisos', message: 'La actualización fue bloqueada por las políticas del servidor (RLS). Revisa auth_uid o permisos del bucket.', level: 'danger', duration: 8000 });
-      } else {
-        notify({ message: msg || 'Error subiendo imagen del personaje.', level: 'danger' });
-      }
-    } finally {
-      setLoading(false);
-    }
-  }
 
   return (
     <button
