@@ -86,7 +86,6 @@ export default function WelcomePage(){
 
       </main>
 
-      <AppFooter />
     </div>
   );
 }
