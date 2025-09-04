@@ -9,6 +9,8 @@ import { useNavigate } from 'react-router-dom';
 export default function WelcomePage(){
   const [playerName, setPlayerName] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const { dispatch } = usePlayer();
+  const navigate = useNavigate();
 
   const characters: Character[] = charactersData as Character[];
 
@@ -22,8 +24,11 @@ export default function WelcomePage(){
       return;
     }
 
-    // Placeholder: integration point to start game flow
-    alert(`¡${playerName}! Has iniciado tu aventura con ${selectedId}.`);
+    // Save to global state and go to profile setup
+    dispatch({ type: 'SET_NAME', payload: playerName });
+    dispatch({ type: 'SET_SELECTED_CHARACTER', payload: selectedId });
+
+    navigate('/profile');
   };
 
   return (
