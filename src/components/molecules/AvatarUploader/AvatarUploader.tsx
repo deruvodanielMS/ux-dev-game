@@ -1,7 +1,7 @@
-import React, { useState, ChangeEvent, useEffect } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import styles from './AvatarUploader.module.css';
 import Button from '../../atoms/Button/Button';
-import { uploadAvatar } from '../../../services/avatars';
+import { uploadAvatar, resolveAvatarUrl } from '../../../services/avatars';
 import { updatePlayerAvatar } from '../../../services/players';
 import { useToast } from '../../../context/ToastContext';
 import supabase from '../../../services/supabase';
@@ -17,7 +17,6 @@ type Props = {
 
 export default function AvatarUploader({ userId: userIdProp, onUploadSuccess, initialAvatar, initialLevel }: Props){
   const [preview, setPreview] = useState<string | null>(null);
-  const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const { notify } = useToast();
   const [userId, setUserId] = useState<string | undefined>(userIdProp);
@@ -42,12 +41,13 @@ export default function AvatarUploader({ userId: userIdProp, onUploadSuccess, in
   function onFileChange(e: ChangeEvent<HTMLInputElement>){
     const f = e.target.files && e.target.files[0];
     if (!f) return;
-    setFile(f);
     const url = URL.createObjectURL(f);
     setPreview(url);
+    // auto-upload selected file
+    uploadFile(f);
   }
 
-  async function onConfirm(){
+  async function uploadFile(file: File){
     if (!file){
       notify({ message: 'Selecciona una imagen antes de confirmar.', level: 'warning' });
       return;
@@ -64,11 +64,10 @@ export default function AvatarUploader({ userId: userIdProp, onUploadSuccess, in
       const storagePath = await uploadAvatar(file, userId);
       let displayUrl = storagePath;
       try {
-        const { resolveAvatarUrl } = await import('../../../services/avatars');
         const resolved = await resolveAvatarUrl(storagePath);
         if (resolved) displayUrl = resolved;
       } catch (e) {
-        // ignore - fallback to storagePath (not ideal but will show something)
+        // ignore - fallback to storagePath
       }
 
       // optimistically update UI/context with signed URL
@@ -79,14 +78,12 @@ export default function AvatarUploader({ userId: userIdProp, onUploadSuccess, in
       try {
         await updatePlayerAvatar(userId, storagePath);
       } catch (dbErr: any) {
-        // surface db errors as actionable toasts
         const msg = dbErr?.message ?? String(dbErr);
         if (msg.toLowerCase().includes('row-level')) {
           notify({ title: 'Permisos insuficientes', message: 'No se pudo actualizar la base de datos por las políticas RLS. Contacta al administrador o revisa auth_uid en la tabla.', level: 'danger', duration: 8000 });
         } else {
           notify({ message: msg, level: 'danger', duration: 6000 });
         }
-        // still call onUploadSuccess with url so UI can reflect uploaded image if needed
         onUploadSuccess?.(displayUrl);
         setLoading(false);
         return;
@@ -132,7 +129,6 @@ export default function AvatarUploader({ userId: userIdProp, onUploadSuccess, in
       <div className={styles.controls}>
         <input disabled={loading} type="file" accept="image/*" id="avatarFile" onChange={onFileChange} className={styles.fileInput} />
         <label htmlFor="avatarFile" className={styles.choose}>{loading ? 'Cargando...' : 'Elegir imagen'}</label>
-        <Button onClick={onConfirm} ariaLabel="Confirmar avatar" loading={loading}>{loading ? 'Subiendo...' : 'Confirmar'}</Button>
       </div>
     </div>
   );
