@@ -47,13 +47,6 @@ export default function CharacterCard({ character, selected = false, onSelect, a
       <div className={styles.info}>
         <div className={styles.name}>{character.name}</div>
         <div className={styles.meta}>Nivel {character.level ?? 1}</div>
-
-        <div className={styles.uploadControl}>
-          <input type="file" accept="image/*" id={`char_upload_${character.id}`} onChange={onFileChange} className={styles.uploadInput} />
-          <label htmlFor={`char_upload_${character.id}`} className={styles.uploadLabel}>
-            {loading ? 'Subiendo...' : 'Subir imagen'}
-          </label>
-        </div>
       </div>
     </button>
   );
