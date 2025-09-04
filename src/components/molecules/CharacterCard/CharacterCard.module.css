@@ -1,20 +1,23 @@
-/* existing styles preserved, append new rules for view button and progress */
-.card{display:flex;align-items:center;gap:0.9rem;border-radius:10px;padding:0.6rem;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));border:1px solid rgba(255,255,255,0.03);width:100%;text-align:left}
-.avatar{width:64px;height:64px;border-radius:10px;overflow:hidden;flex-shrink:0;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center}
+:root{--muted:#9aa4b2}
+.card{display:flex;align-items:center;gap:0.9rem;border-radius:10px;padding:0.9rem;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));border:1px solid rgba(255,255,255,0.03);width:100%;text-align:left}
+.avatar{width:72px;height:72px;border-radius:10px;overflow:hidden;flex-shrink:0;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center}
 .avatarImage{width:100%;height:100%;object-fit:cover}
 .avatarInner{font-weight:800;color:var(--muted);}
 .info{flex:1}
 .name{font-weight:800}
-.meta{color:var(--muted);font-size:0.9rem}
+.meta{color:var(--muted);font-size:0.95rem;margin-top:4px}
 
 .wrapper{display:flex;flex-direction:column;gap:0.5rem}
-.cardActions{display:flex;justify-content:flex-end}
-.viewBtn{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:0.4rem 0.6rem;border-radius:8px;color:var(--muted);cursor:pointer}
-.viewBtn:hover{color:white}
+.actionsInline{display:flex;align-items:flex-start;gap:0.5rem;margin-left:1rem}
+.levelPill{background:linear-gradient(90deg,#646cff,#535bf2);color:#fff;padding:0.25rem 0.6rem;border-radius:12px;font-weight:800;font-size:0.85rem}
 
-.absorbWrap{width:100%}
+.absorbWrapInline{margin-top:10px}
+.absorbText{margin:6px 0 0 0;color:var(--muted);font-size:13px}
 
-/* small responsive tweaks */
+/* remove separate view button; entire card is clickable */
+.card:active{transform:translateY(1px)}
+
 @media (max-width:480px){
   .avatar{width:56px;height:56px}
+  .levelPill{padding:0.2rem 0.45rem}
 }
