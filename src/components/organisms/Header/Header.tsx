@@ -117,14 +117,14 @@ export default function Header(){
         {/* hamburger for small screens */}
         <button className={styles.hamburger} aria-label="Abrir menu" onClick={toggleHamburger} aria-expanded={hamburgerOpen}>{hamburgerOpen ? '✕' : '☰'}</button>
 
-        <div className={styles.avatarWrap}>
-          <div className={styles.avatar} onClick={toggleDropdown} aria-haspopup="true" aria-expanded={open}>
+        <div className={styles.avatarWrap} ref={avatarRef}>
+          <div className={styles.avatar} ref={avatarRef} onClick={toggleDropdown} aria-haspopup="true" aria-expanded={open}>
             {state.avatarUrl ? <img src={state.avatarUrl} alt="avatar" /> : <div className={styles.placeholder}>{(state.playerName || 'U').slice(0,2).toUpperCase()}</div>}
             <div className={styles.avatarBadge}>Lv {profile?.level ?? state.level ?? 1}</div>
           </div>
 
           {open && (
-            <div className={styles.dropdown} role="menu">
+            <div className={styles.dropdown} role="menu" ref={avatarRef}>
               <div className={styles.dropdownHeader}>
                 <div className={styles.dropAvatar}>{state.avatarUrl ? <img src={state.avatarUrl} alt="avatar" /> : <div className={styles.placeholder}>{(state.playerName || 'U').slice(0,2).toUpperCase()}</div>}</div>
                 <div>
