@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import styles from './CharacterList.module.css';
 import CharacterCard, { Character } from '../../molecules/CharacterCard/CharacterCard';
 import { fetchCharacters } from '../../../services/characters';
+import { useToast } from '../../../context/ToastContext';
 
 type Props = {
   selectedId: string | null;
