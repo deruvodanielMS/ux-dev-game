@@ -35,7 +35,7 @@ export async function fetchCharacters(): Promise<Character[]> {
       data.map(async (p: any) => {
         const raw = p.avatarUrl ?? p.avatar_url ?? p.avatar_path ?? undefined;
         const avatarUrl = raw ? (raw.startsWith('http') ? raw : await resolveAvatarUrl(raw)) : undefined;
-        return { id: p.id, name: p.name ?? p.playerName ?? p.id, level: p.level ?? 1, stats: p.stats ?? undefined, avatarUrl, last_pr_at: p.last_pr_at ?? p.lastPrAt ?? p.last_pr_date ?? p.last_pr_date } as Character;
+        return { id: p.id, name: p.name ?? p.playerName ?? p.id, level: p.level ?? 1, stats: p.stats ?? undefined, avatarUrl, last_pr_at: p.last_pr_at ?? p.lastPrAt ?? p.last_pr_date ?? p.last_pr_date, ai_level: p.ai_level ?? p.aiLevel ?? (p.stats?.ai_level ?? undefined) } as Character;
       })
     );
 
