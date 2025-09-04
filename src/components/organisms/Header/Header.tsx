@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Header.module.css';
 import { usePlayer } from '../../../context/PlayerContext';
-import GithubLogin from '../GithubLogin/GithubLogin';
+import EmailLogin from '../EmailLogin/EmailLogin';
 
 export default function Header(){
   const { state } = usePlayer();
