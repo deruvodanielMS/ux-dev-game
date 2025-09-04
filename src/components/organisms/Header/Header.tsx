@@ -109,6 +109,7 @@ export default function Header(){
       setProfile(null);
       setOpen(false);
       setHamburgerOpen(false);
+      navigate('/');
     } catch (e) {
       // ignore
     }
