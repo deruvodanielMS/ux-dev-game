@@ -5,6 +5,7 @@ import { uploadAvatar } from '../../../services/avatars';
 import { updatePlayerAvatar } from '../../../services/players';
 import { useToast } from '../../../context/ToastContext';
 import supabase from '../../../services/supabase';
+import Skeleton from '../../atoms/Skeleton/Skeleton';
 
 type Props = {
   userId?: string;
