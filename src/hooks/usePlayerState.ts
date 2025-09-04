@@ -120,19 +120,32 @@ export default function usePlayerState() {
       }
 
       if (finalProfile) {
-        setState((prev) => ({
-          ...prev,
-          playerName: finalProfile.name ?? prev.playerName,
-          avatarUrl: finalProfile.avatarUrl ?? prev.avatarUrl,
-          isLoggedIn: true,
-          stats: {
-            soft_skills: finalProfile.softSkills ?? prev.stats.soft_skills,
-            tech_skills: finalProfile.techSkills ?? prev.stats.tech_skills,
-            core_values: finalProfile.coreValues ?? prev.stats.core_values,
-            creativity: finalProfile.creativity ?? prev.stats.creativity,
-            ai_level: finalProfile.aiLevel ?? prev.stats.ai_level,
-          },
-        }));
+        (async () => {
+          let avatar = finalProfile.avatarUrl ?? finalProfile.avatar_url ?? finalProfile.avatar_path ?? finalProfile.avatarPath ?? null;
+          if (avatar && !(avatar as string).startsWith('http')) {
+            try {
+              const { resolveAvatarUrl } = await import('../services/avatars');
+              const resolved = await resolveAvatarUrl(avatar as string);
+              if (resolved) avatar = resolved;
+            } catch (e) {
+              console.warn('Failed resolving avatar url', e);
+            }
+          }
+
+          setState((prev) => ({
+            ...prev,
+            playerName: finalProfile.name ?? prev.playerName,
+            avatarUrl: (avatar as string) ?? prev.avatarUrl,
+            isLoggedIn: true,
+            stats: {
+              soft_skills: finalProfile.softSkills ?? prev.stats.soft_skills,
+              tech_skills: finalProfile.techSkills ?? prev.stats.tech_skills,
+              core_values: finalProfile.coreValues ?? prev.stats.core_values,
+              creativity: finalProfile.creativity ?? prev.stats.creativity,
+              ai_level: finalProfile.aiLevel ?? prev.stats.ai_level,
+            },
+          }));
+        })();
       }
     });
 
