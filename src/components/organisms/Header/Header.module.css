@@ -1,9 +1,9 @@
 ::root{--muted:#9aa4b2}
 
-.header{width:100%;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 1.2rem;background:transparent;border-bottom:1px solid rgba(255,255,255,0.02)}
-.brand{font-weight:900;cursor:pointer}
+.header{width:100%;height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 1.6rem;background:transparent;border-bottom:1px solid rgba(255,255,255,0.02)}
+.brand{font-weight:900;cursor:pointer;padding:0.25rem 0.5rem;border-radius:6px}
 .brandRow{display:flex;align-items:center;gap:1rem}
-.right{display:flex;align-items:center;gap:1rem}
+.right{display:flex;align-items:center;gap:1rem;padding:0.25rem 0.5rem;border-radius:6px}
 .loginWrap{display:flex;align-items:center}
 .loginBtn{background:linear-gradient(90deg,#646cff,#535bf2);color:#fff;padding:0.45rem 0.75rem;border-radius:8px;border:0;cursor:pointer}
 .mapBtn{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:0.45rem 0.75rem;border-radius:8px;color:var(--muted);cursor:pointer}
