@@ -1,0 +1,5 @@
+:root{--muted:#9aa4b2}
+
+.hand{grid-column:1 / -1;display:flex;gap:0.8rem;padding:0.8rem}
+
+@media (max-width:900px){.hand{flex-direction:column}}
