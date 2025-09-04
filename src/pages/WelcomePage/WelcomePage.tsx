@@ -36,7 +36,13 @@ export default function WelcomePage(){
       <main className={`${styles.container} ${step === 'select' ? styles.containerSingle : ''}`}>
 
         {step === 'hero' && (
-          <section className={`${styles.intro} ${styles.hero}`}> 
+          <section className={`${styles.intro} ${styles.hero}`}>
+            <div className={styles.heroRight}>
+              <div className={styles.finalMonsterWrap}>
+                <img className={styles.finalMonster} src="https://i.pinimg.com/736x/ab/25/f6/ab25f694780cc113fd8fd7814857afe3.jpg" alt="Monstruo IA Final" />
+              </div>
+            </div>
+
             <div className={styles.heroLeft}>
               <h1 className={styles.title}>Duelo de Código</h1>
               <p className={styles.mission}>
@@ -44,14 +50,10 @@ export default function WelcomePage(){
               </p>
 
               <div className={styles.heroActions}>
-                <Button onClick={() => setStep('select')} className={styles.primaryLarge} ariaLabel="Siguiente">Siguiente</Button>
-                <Button onClick={() => navigate('/progress')} variant="ghost" className={styles.ghostLarge} ariaLabel="Mapa">Mapa</Button>
-              </div>
-            </div>
-
-            <div className={styles.heroRight}>
-              <div className={styles.finalMonsterWrap}>
-                <img className={styles.finalMonster} src="https://i.pinimg.com/736x/ab/25/f6/ab25f694780cc113fd8fd7814857afe3.jpg" alt="Monstruo IA Final" />
+                <div className={styles.heroButtonsRight}>
+                  <Button onClick={() => setStep('select')} className={styles.primaryLarge} ariaLabel="Siguiente">Siguiente</Button>
+                  <Button onClick={() => navigate('/progress')} variant="ghost" className={styles.ghostLarge} ariaLabel="Mapa">Mapa</Button>
+                </div>
               </div>
             </div>
           </section>
