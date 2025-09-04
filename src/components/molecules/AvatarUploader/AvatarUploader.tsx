@@ -6,6 +6,7 @@ import { updatePlayerAvatar } from '../../../services/players';
 import { useToast } from '../../../context/ToastContext';
 import supabase from '../../../services/supabase';
 import Skeleton from '../../atoms/Skeleton/Skeleton';
+import { usePlayer } from '../../../context/PlayerContext';
 
 type Props = {
   userId?: string;
@@ -20,7 +21,7 @@ export default function AvatarUploader({ userId: userIdProp, onUploadSuccess, in
   const [loading, setLoading] = useState(false);
   const { notify } = useToast();
   const [userId, setUserId] = useState<string | undefined>(userIdProp);
-  const [resolvingUser, setResolvingUser] = useState(false);
+  const { dispatch } = usePlayer();
 
   useEffect(() => {
     if (userIdProp) setUserId(userIdProp);
@@ -60,6 +61,10 @@ export default function AvatarUploader({ userId: userIdProp, onUploadSuccess, in
     notify({ message: 'Iniciando subida...', level: 'info', duration: 2000 });
     try {
       const avatarUrl = await uploadAvatar(file, userId);
+      // optimistically update UI/context
+      dispatch({ type: 'SET_AVATAR', payload: avatarUrl });
+      setPreview(avatarUrl);
+
       // update players table and local storage
       try {
         await updatePlayerAvatar(userId, avatarUrl);
