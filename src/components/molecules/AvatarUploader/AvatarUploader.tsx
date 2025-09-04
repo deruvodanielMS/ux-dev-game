@@ -94,14 +94,20 @@ export default function AvatarUploader({ userId: userIdProp, onUploadSuccess }: 
       <div className={styles.left}>
         <div className={styles.hint}>Sube tu avatar</div>
         <div className={styles.preview} aria-hidden>
-          {preview ? <img src={preview} alt="avatar preview" /> : <div className={styles.placeholder}>Sin avatar</div>}
+          {loading ? (
+            <Skeleton width={120} height={120} className={styles.skel} />
+          ) : preview ? (
+            <img src={preview} alt="avatar preview" />
+          ) : (
+            <div className={styles.placeholder}>Sin avatar</div>
+          )}
         </div>
       </div>
 
       <div className={styles.controls}>
-        <input type="file" accept="image/*" id="avatarFile" onChange={onFileChange} className={styles.fileInput} />
-        <label htmlFor="avatarFile" className={styles.choose}>Elegir imagen</label>
-        <Button onClick={onConfirm} ariaLabel="Confirmar avatar">{loading ? 'Subiendo...' : 'Confirmar'}</Button>
+        <input disabled={loading} type="file" accept="image/*" id="avatarFile" onChange={onFileChange} className={styles.fileInput} />
+        <label htmlFor="avatarFile" className={styles.choose}>{loading ? 'Cargando...' : 'Elegir imagen'}</label>
+        <Button onClick={onConfirm} ariaLabel="Confirmar avatar" loading={loading}>{loading ? 'Subiendo...' : 'Confirmar'}</Button>
       </div>
     </div>
   );
