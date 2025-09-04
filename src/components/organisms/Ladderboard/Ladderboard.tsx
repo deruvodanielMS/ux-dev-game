@@ -4,7 +4,7 @@ import { usePlayers } from '../../../hooks/usePlayers';
 
 type Props = { className?: string };
 
-export default function Ladderboard({ className }: Props){
+export function Ladderboard({ className }: Props){
   const { ladder, loading, error } = usePlayers();
 
   return (
