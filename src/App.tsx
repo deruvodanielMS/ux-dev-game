@@ -16,17 +16,19 @@ function App() {
     <PlayerProvider>
       <ToastProvider>
         <ModalProvider>
-          <BrowserRouter>
-            <div className="app-root">
-              <Header />
-              <Routes>
-                <Route path="/" element={<WelcomePage />} />
-                <Route path="/profile" element={<ProfileSetupPage />} />
-                <Route path="/battle" element={<BattlePage />} />
-                <Route path="/progress" element={<ProgressMapPage />} />
-              </Routes>
-            </div>
-          </BrowserRouter>
+          <AudioProvider>
+            <BrowserRouter>
+              <div className="app-root">
+                <Header />
+                <Routes>
+                  <Route path="/" element={<WelcomePage />} />
+                  <Route path="/profile" element={<ProfileSetupPage />} />
+                  <Route path="/battle" element={<BattlePage />} />
+                  <Route path="/progress" element={<ProgressMapPage />} />
+                </Routes>
+              </div>
+            </BrowserRouter>
+          </AudioProvider>
         </ModalProvider>
       </ToastProvider>
     </PlayerProvider>
