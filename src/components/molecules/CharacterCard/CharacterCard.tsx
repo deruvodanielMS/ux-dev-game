@@ -41,7 +41,12 @@ export default function CharacterCard({ character, selected = false, onSelect, a
       notify({ message: 'Imagen del personaje subida correctamente.', level: 'success' });
       onUploadSuccess?.(character.id, url);
     } catch (err: any) {
-      notify({ message: err?.message || 'Error subiendo imagen del personaje.', level: 'danger' });
+      const msg = err?.message ?? String(err);
+      if (msg.toLowerCase().includes('row-level') || msg.toLowerCase().includes('unauthorized')) {
+        notify({ title: 'Error de permisos', message: 'La actualización fue bloqueada por las políticas del servidor (RLS). Revisa auth_uid o permisos del bucket.', level: 'danger', duration: 8000 });
+      } else {
+        notify({ message: msg || 'Error subiendo imagen del personaje.', level: 'danger' });
+      }
     } finally {
       setLoading(false);
     }
