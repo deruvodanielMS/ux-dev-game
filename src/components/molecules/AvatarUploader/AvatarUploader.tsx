@@ -23,8 +23,11 @@ export default function AvatarUploader(){
 
   return (
     <div className={styles.uploader}>
-      <div className={styles.preview} aria-hidden>
-        {preview ? <img src={preview} alt="avatar preview" /> : <div className={styles.placeholder}>Sin avatar</div>}
+      <div className={styles.left}>
+        <div className={styles.hint}>Sube tu avatar (generado por IA)</div>
+        <div className={styles.preview} aria-hidden>
+          {preview ? <img src={preview} alt="avatar preview" /> : <div className={styles.placeholder}>Sin avatar</div>}
+        </div>
       </div>
 
       <div className={styles.controls}>
