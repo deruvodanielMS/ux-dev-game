@@ -14,6 +14,9 @@
 .volumeLabel{color:var(--muted);font-size:0.85rem}
 .volume{width:90px}
 
+.playBtn{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:0.35rem 0.5rem;border-radius:8px;cursor:pointer}
+.playBtn:hover{color:white}
+
 .avatarWrap{position:relative}
 .dropdown{position:absolute;right:0;top:56px;background:#0b0b0b;padding:0.8rem;border-radius:10px;box-shadow:0 12px 36px rgba(2,6,23,0.6);min-width:220px}
 .dropdownHeader{display:flex;align-items:center;gap:0.75rem;padding-bottom:0.6rem;border-bottom:1px solid rgba(255,255,255,0.04)}
