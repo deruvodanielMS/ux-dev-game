@@ -110,6 +110,7 @@ export default function CharacterCard({ character, selected = false, onSelect, a
           ) : (
             <div className={styles.avatarInner}>{initials}</div>
           )}
+          <div className={styles.avatarBadge}>Lv {character.level ?? 1}</div>
         </div>
 
         <div className={styles.info}>
