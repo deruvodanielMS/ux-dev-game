@@ -43,7 +43,7 @@ export default function ProfileSetupPage(){
 
         <div className={styles.row}>
           <label className={styles.label}>Identidad Digital</label>
-          <AvatarUploader userId={userId ?? undefined} onUploadSuccess={handleUploadSuccess} />
+          <AvatarUploader userId={userId ?? undefined} initialAvatar={state.avatarUrl ?? null} onUploadSuccess={handleUploadSuccess} />
         </div>
 
         <div className={styles.row}>
