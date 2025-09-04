@@ -69,10 +69,36 @@ type ContextType = {
 
 const PlayerContext = createContext<ContextType | undefined>(undefined);
 
+const STORAGE_KEY = 'duelo_player_state_v1';
+
 export function PlayerProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, initialStateWithStorage());
+
+  // persist to localStorage on changes
+  React.useEffect(() => {
+    try {
+      if (typeof window === 'undefined') return;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (err) {
+      // ignore
+      // console.warn('Failed to persist player state', err);
+    }
+  }, [state]);
 
   return <PlayerContext.Provider value={{ state, dispatch }}>{children}</PlayerContext.Provider>;
+}
+
+function initialStateWithStorage(): PlayerState {
+  try {
+    if (typeof window === 'undefined') return initialState;
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return initialState;
+    const parsed = JSON.parse(raw) as Partial<PlayerState> | null;
+    if (!parsed) return initialState;
+    return { ...initialState, ...parsed, stats: { ...initialState.stats, ...(parsed.stats ?? {}) }, defeatedEnemies: parsed.defeatedEnemies ?? [] };
+  } catch (err) {
+    return initialState;
+  }
 }
 
 export function usePlayer() {
