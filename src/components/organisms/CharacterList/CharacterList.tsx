@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import styles from './CharacterList.module.css';
 import CharacterCard, { Character } from '../../molecules/CharacterCard/CharacterCard';
 import { fetchCharacters } from '../../../services/characters';
@@ -15,30 +15,38 @@ export default function CharacterList({ selectedId, onSelect }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const list = await fetchCharacters();
+      setCharacters(list);
+    } catch (err: any) {
+      console.warn('Error loading characters', err);
+      setError(err?.message ?? 'Error cargando personajes');
+      setCharacters([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     let mounted = true;
     (async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const list = await fetchCharacters();
-        if (!mounted) return;
-        setCharacters(list);
-      } catch (err: any) {
-        console.warn('Error loading characters', err);
-        if (!mounted) return;
-        setError(err?.message ?? 'Error cargando personajes');
-        setCharacters([]);
-      } finally {
-        if (mounted) setLoading(false);
-      }
+      if (!mounted) return;
+      await load();
     })();
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [load]);
 
   const active = characters.filter((c) => !ABSORBED_NAMES.has(c.name));
+
+  async function handleUploadSuccess(id: string) {
+    // refresh the list after an upload so the new avatar appears
+    await load();
+  }
 
   if (loading) return <div className={styles.list}>Cargando personajes...</div>;
   if (error) return <div className={styles.list}>{error}</div>;
@@ -48,7 +56,7 @@ export default function CharacterList({ selectedId, onSelect }: Props) {
     <div className={styles.list} role="list">
       {active.map((c) => (
         <div key={c.id} role="listitem" className={styles.item}>
-          <CharacterCard character={c} selected={selectedId === c.id} onSelect={onSelect} />
+          <CharacterCard character={c} selected={selectedId === c.id} onSelect={onSelect} onUploadSuccess={(id, url) => handleUploadSuccess(id)} />
         </div>
       ))}
     </div>
