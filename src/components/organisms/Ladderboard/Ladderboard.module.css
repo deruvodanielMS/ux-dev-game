@@ -30,11 +30,15 @@
 .coins{font-weight:800}
 
 @media (max-width:980px){
-  .row{grid-template-columns:32px 1fr 100px 100px}
+  /* slightly smaller padding */
+  .row td{padding:0.6rem}
 }
 
 @media (max-width:600px){
-  .row{grid-template-columns:28px 1fr;grid-template-rows:auto auto;align-items:start}
-  .levelBox{grid-column:2;justify-self:start;margin-top:0.25rem}
-  .coinsBox{grid-column:2;justify-self:start}
+  /* Stack table rows as cards */
+  .row{display:block;border-radius:10px;padding:0.8rem;margin-bottom:0.75rem}
+  .row td{display:block;padding:0}
+  .playerBox{margin-bottom:0.5rem}
+  .levelBox{margin-bottom:0.25rem}
+  .coinsBox{margin-bottom:0}
 }
