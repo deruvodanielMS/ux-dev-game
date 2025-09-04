@@ -43,11 +43,17 @@
 }
 
 .hero{padding:2rem}
-.heroLeft{flex:1}
+.heroLeft{flex:1;display:flex;flex-direction:column;align-items:flex-start}
 .heroRight{width:560px;display:flex;align-items:center;justify-content:center}
 
-.finalMonsterWrap{display:flex;justify-content:center;margin-top:1.2rem}
+.finalMonsterWrap{display:flex;justify-content:center;margin-top:0}
 .finalMonster{width:100%;max-width:560px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 12px 40px rgba(2,6,23,0.6);object-fit:cover}
+
+/* ensure buttons align to the right side of the hero area */
+.heroButtonsRight{display:flex;flex-direction:column;align-items:flex-end;gap:0.8rem}
+@media (min-width:800px){
+  .heroButtonsRight{flex-direction:column}
+}
 
 .title{
   margin:0 0 0.6rem 0;
