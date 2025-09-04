@@ -2,10 +2,14 @@
 
 .page{min-height:100vh;background:linear-gradient(180deg,#060712 0%,#070915 60%);color:#e6eef8;padding:2.4rem;display:flex;align-items:center;justify-content:center}
 
-.arena{width:100%;max-width:1100px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:1.6rem;border-radius:12px;border:1px solid rgba(96,165,250,0.04);display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.arena{width:100%;max-width:1200px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:1.6rem;border-radius:12px;border:1px solid rgba(96,165,250,0.04);display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:start}
 
-.log{grid-column:1 / -1;background:transparent;padding:0.8rem;border-radius:8px;border:1px solid rgba(255,255,255,0.03);max-height:160px;overflow:auto}
+.side{display:flex;align-items:flex-start;justify-content:center}
 
-.controls{grid-column:1 / -1;display:flex;justify-content:flex-end}
+.cardsArea{grid-column:1 / -1;display:flex;justify-content:center;margin-top:0.6rem}
 
-@media (max-width:900px){.arena{grid-template-columns:1fr}}
+.log{grid-column:1 / -1;background:transparent;padding:0.8rem;border-radius:8px;border:1px solid rgba(255,255,255,0.03);max-height:160px;overflow:auto;margin-top:0.6rem}
+
+.controls{grid-column:1 / -1;display:flex;justify-content:flex-end;margin-top:0.6rem}
+
+@media (max-width:900px){.arena{grid-template-columns:1fr}.cardsArea{order:3}}
