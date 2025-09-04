@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { supabase } from '../services/supabase';
 
 export type Stats = {
   soft_skills: number;
