@@ -10,7 +10,7 @@
       "defense": 5
     },
     "description": "Un error trivial que provoca desalineación y elementos invisibles. Se derrota con una estructura limpia y semántica.",
-    "avatar_url": "/enemies/html_bug.png"
+    "avatar_url": "https://cdn.builder.io/api/v1/image/assets%2F18b71006d6404cecbe90ad5e2b850e0e%2F483352f1ff834cd18e0ba1b6c3a7206f?format=webp&width=800"
   },
   {
     "id": "css-glitch",
