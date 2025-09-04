@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import styles from '../components/organisms/Toast/Toast.module.css';
 
 export type ToastLevel = 'info' | 'warning' | 'danger' | 'success';
 export type Toast = { id: string; title?: string; message: string; level?: ToastLevel; duration?: number };
@@ -40,28 +41,14 @@ export function ToastProvider({ children }: { children: React.ReactNode }){
   return (
     <ToastContext.Provider value={value}>
       {children}
-      <div aria-live="polite" aria-atomic className="toast-root">
+      <div aria-live="polite" aria-atomic className={styles.toastRoot}>
         {toasts.map((t) => (
-          <div className={`toast ${t.level ?? 'info'}`} key={t.id} onClick={() => dismiss(t.id)}>
-            {t.title && <div className="toast-title">{t.title}</div>}
-            <div className="toast-message">{t.message}</div>
+          <div className={`${styles.toast} ${styles[t.level ?? 'info']}`} key={t.id} onClick={() => dismiss(t.id)}>
+            {t.title && <div className={styles.toastTitle}>{t.title}</div>}
+            <div className={styles.toastMessage}>{t.message}</div>
           </div>
         ))}
       </div>
-      <style jsx>{`
-        .toast-root{position:fixed;right:1rem;bottom:1rem;display:flex;flex-direction:column;gap:0.5rem;z-index:1200}
-        .toast{min-width:200px;max-width:360px;padding:0.6rem 0.75rem;border-radius:10px;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,0.45);cursor:pointer}
-        .toast .toast-title{font-weight:800;margin-bottom:0.25rem}
-        .toast.info{background:linear-gradient(90deg,#3b82f6,#60a5fa)}
-        .toast.success{background:linear-gradient(90deg,#10b981,#34d399)}
-        .toast.warning{background:linear-gradient(90deg,#f59e0b,#f97316)}
-        .toast.danger{background:linear-gradient(90deg,#ef4444,#f97375)}
-
-        @media (max-width:600px){
-          .toast-root{left:50%;right:auto;transform:translateX(-50%);bottom:1rem}
-          .toast{min-width:280px}
-        }
-      `}</style>
     </ToastContext.Provider>
   );
 }
