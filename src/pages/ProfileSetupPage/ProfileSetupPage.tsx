@@ -85,7 +85,7 @@ export default function ProfileSetupPage(){
         </div>
 
         <div className={styles.actions}>
-          <Button onClick={() => navigate('/battle')} ariaLabel="Guardar y Continuar">Guardar y Continuar</Button>
+          <Button onClick={saveProfile} ariaLabel="Guardar y Continuar">Guardar y Continuar</Button>
         </div>
       </main>
     </div>
