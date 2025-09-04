@@ -91,22 +91,37 @@ export async function upsertPlayers(players: Player[]): Promise<Player[]> {
 // Update avatar URL for a player locally and in Supabase if available
 import supabase from './supabase';
 
-export async function updatePlayerAvatar(userId: string, avatarUrl: string): Promise<void> {
-  // Update local storage copy
+export async function updatePlayerAvatar(authUid: string, avatarUrl: string): Promise<void> {
+  // Update local storage copy if a local player with same id exists
   const current = readFromLocalStorage();
-  const idx = current.findIndex((p) => p.id === userId);
+  const idx = current.findIndex((p) => p.id === authUid);
   if (idx >= 0) {
     current[idx] = { ...current[idx], avatarUrl };
     writeToLocalStorage(current);
   }
 
-  // Try updating Supabase table 'players' if client exists
+  if (!supabase) return;
+
   try {
-    if (supabase) {
-      await supabase.from('players').update({ avatarUrl }).eq('id', userId);
-    }
+    // 1) Try update by auth_uid column (preferred when players linked to auth)
+    const { error: err1, count: count1 } = await supabase
+      .from('players')
+      .update({ avatarUrl })
+      .match({ auth_uid: authUid });
+
+    if (!err1 && (count1 ?? 0) > 0) return;
+
+    // 2) Try update by id == authUid (in case players use uuid as id)
+    const { error: err2 } = await supabase.from('players').update({ avatarUrl }).eq('id', authUid);
+    if (!err2) return;
+
+    // 3) Fallback: upsert a player record using authUid as id so the avatar is associated
+    const userRes = await supabase.auth.getUser();
+    const user = userRes.data?.user ?? null;
+    const name = user?.email ?? authUid;
+    const { error: upsertErr } = await supabase.from('players').upsert({ id: authUid, name, avatarUrl, level: 1 });
+    if (upsertErr) console.warn('Failed upserting player with avatar', upsertErr);
   } catch (err) {
-    // ignore supabase update errors for now
     console.warn('Failed updating avatar in Supabase', err);
   }
 }
