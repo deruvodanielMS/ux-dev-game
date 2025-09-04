@@ -99,6 +99,8 @@ export default function AvatarUploader({ userId: userIdProp, onUploadSuccess, in
             <Skeleton width={120} height={120} className={styles.skel} />
           ) : preview ? (
             <img src={preview} alt="avatar preview" />
+          ) : initialAvatar ? (
+            <img src={initialAvatar} alt="avatar current" />
           ) : (
             <div className={styles.placeholder}>Sin avatar</div>
           )}
