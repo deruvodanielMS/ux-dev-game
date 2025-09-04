@@ -15,6 +15,7 @@ export default function CharacterList({ selectedId, onSelect }: Props) {
   const [characters, setCharacters] = useState<Character[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { notify } = useToast();
 
   const load = useCallback(async () => {
     setLoading(true);
