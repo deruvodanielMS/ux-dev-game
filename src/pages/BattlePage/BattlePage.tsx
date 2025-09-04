@@ -20,6 +20,7 @@ type State = {
 type Action =
   | { type: 'PLAY_CARD'; card: string }
   | { type: 'ENEMY_ATTACK' }
+  | { type: 'REGEN' }
   | { type: 'RESET' };
 
 const initialState = (enemyHealth: number): State => ({
