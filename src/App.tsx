@@ -16,8 +16,8 @@ function App() {
   return (
     <PlayerProvider>
       <ToastProvider>
-        <ModalProvider>
-          <AudioProvider>
+        <AudioProvider>
+          <ModalProvider>
             <BrowserRouter>
               <div className="app-root">
                 <Header />
@@ -30,8 +30,8 @@ function App() {
                 <AppFooter />
               </div>
             </BrowserRouter>
-          </AudioProvider>
-        </ModalProvider>
+          </ModalProvider>
+        </AudioProvider>
       </ToastProvider>
     </PlayerProvider>
   );
