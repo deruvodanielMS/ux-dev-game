@@ -12,9 +12,10 @@ type Props = {
   character: Character;
   selected?: boolean;
   onSelect?: (id: string) => void;
+  absorbed?: boolean;
 };
 
-export default function CharacterCard({ character, selected = false, onSelect }: Props) {
+export default function CharacterCard({ character, selected = false, onSelect, absorbed = false }: Props) {
   const initials = character.name
     .split(' ')
     .map((n) => n[0])
@@ -25,13 +26,16 @@ export default function CharacterCard({ character, selected = false, onSelect }:
   return (
     <button
       type="button"
-      className={`${styles.card} ${selected ? styles.selected : ''}`}
-      onClick={() => onSelect && onSelect(character.id)}
+      className={`${styles.card} ${selected ? styles.selected : ''} ${absorbed ? styles.absorbed : ''}`}
+      onClick={() => !absorbed && onSelect && onSelect(character.id)}
       aria-pressed={selected}
+      aria-disabled={absorbed}
+      disabled={absorbed}
     >
       <div className={styles.avatar} aria-hidden>
-        {initials}
+        <div className={styles.avatarInner}>{initials}</div>
       </div>
+
       <div className={styles.info}>
         <div className={styles.name}>{character.name}</div>
         <div className={styles.meta}>Nivel {character.level ?? 1}</div>
