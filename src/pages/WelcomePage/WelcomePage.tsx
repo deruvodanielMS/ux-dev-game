@@ -24,7 +24,7 @@ export default function WelcomePage(){
 
   return (
     <div className={styles.page}>
-      <main className={styles.container}>
+      <main className={`${styles.container} ${step === 'select' ? styles.containerSingle : ''}`}>
 
         {step === 'hero' && (
           <section className={`${styles.intro} ${styles.hero}`}> 
