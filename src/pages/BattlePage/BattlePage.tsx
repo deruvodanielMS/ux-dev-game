@@ -70,6 +70,15 @@ function reducer(state: State, action: Action): State {
       const log = `El enemigo atacó y causó ${dmg} de daño.`;
       return { ...state, playerHealth: newPlayerHp, playerStamina: newPlayerSt, playerTurn: true, battleLog: [log, ...state.battleLog] };
     }
+    case 'REGEN': {
+      const regen = 8;
+      return {
+        ...state,
+        playerStamina: Math.min(100, state.playerStamina + regen),
+        enemyStamina: Math.min(100, state.enemyStamina + regen),
+        battleLog: [`Se regeneraron ${regen} de stamina.`, ...state.battleLog],
+      };
+    }
     case 'RESET':
       return initialState(50);
     default:
