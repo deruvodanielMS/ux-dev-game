@@ -88,6 +88,29 @@ export async function upsertPlayers(players: Player[]): Promise<Player[]> {
   }
 }
 
+// Update avatar URL for a player locally and in Supabase if available
+import supabase from './supabase';
+
+export async function updatePlayerAvatar(userId: string, avatarUrl: string): Promise<void> {
+  // Update local storage copy
+  const current = readFromLocalStorage();
+  const idx = current.findIndex((p) => p.id === userId);
+  if (idx >= 0) {
+    current[idx] = { ...current[idx], avatarUrl };
+    writeToLocalStorage(current);
+  }
+
+  // Try updating Supabase table 'players' if client exists
+  try {
+    if (supabase) {
+      await supabase.from('players').update({ avatarUrl }).eq('id', userId);
+    }
+  } catch (err) {
+    // ignore supabase update errors for now
+    console.warn('Failed updating avatar in Supabase', err);
+  }
+}
+
 export function sortPlayersForLadder(players: Player[]): Player[] {
   return [...players].sort((a, b) => {
     if (b.level !== a.level) return b.level - a.level;
