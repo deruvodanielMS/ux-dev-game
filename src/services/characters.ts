@@ -1,5 +1,6 @@
 import supabase from './supabase';
 import type { Character } from '../components/molecules/CharacterCard/CharacterCard';
+import { resolveAvatarUrl } from './avatars';
 
 export async function fetchCharacters(): Promise<Character[]> {
   if (!supabase) return [];
@@ -8,13 +9,14 @@ export async function fetchCharacters(): Promise<Character[]> {
   try {
     const { data, error } = await supabase.from('characters').select('*');
     if (!error && Array.isArray(data) && data.length > 0) {
-      return data.map((d: any) => ({
-        id: d.id,
-        name: d.name,
-        level: d.level ?? 1,
-        stats: d.stats ?? undefined,
-        avatarUrl: d.avatarUrl ?? d.avatar_url ?? undefined,
-      }));
+      const mapped = await Promise.all(
+        data.map(async (d: any) => {
+          const raw = d.avatarUrl ?? d.avatar_url ?? d.avatar_path ?? d.avatar_path_url ?? undefined;
+          const avatarUrl = raw ? (raw.startsWith('http') ? raw : await resolveAvatarUrl(raw)) : undefined;
+          return { id: d.id, name: d.name, level: d.level ?? 1, stats: d.stats ?? undefined, avatarUrl } as Character;
+        })
+      );
+      return mapped;
     }
   } catch (err) {
     console.warn('Error querying characters table:', err);
@@ -28,13 +30,16 @@ export async function fetchCharacters(): Promise<Character[]> {
       return [];
     }
     if (!Array.isArray(data) || data.length === 0) return [];
-    return data.map((p: any) => ({
-      id: p.id,
-      name: p.name ?? p.playerName ?? p.id,
-      level: p.level ?? 1,
-      stats: p.stats ?? undefined,
-      avatarUrl: p.avatarUrl ?? p.avatar_url ?? undefined,
-    }));
+
+    const mapped = await Promise.all(
+      data.map(async (p: any) => {
+        const raw = p.avatarUrl ?? p.avatar_url ?? p.avatar_path ?? undefined;
+        const avatarUrl = raw ? (raw.startsWith('http') ? raw : await resolveAvatarUrl(raw)) : undefined;
+        return { id: p.id, name: p.name ?? p.playerName ?? p.id, level: p.level ?? 1, stats: p.stats ?? undefined, avatarUrl } as Character;
+      })
+    );
+
+    return mapped;
   } catch (err) {
     console.warn('Failed to fetch players fallback', err);
     return [];
@@ -46,7 +51,7 @@ export async function updateCharacterAvatar(characterId: string, avatarUrl: stri
 
   try {
     // Try updating characters table
-    const { error: err1, count: count1 } = await supabase
+    const { error: err1 } = await supabase
       .from('characters')
       .update({ avatarUrl })
       .match({ id: characterId });
