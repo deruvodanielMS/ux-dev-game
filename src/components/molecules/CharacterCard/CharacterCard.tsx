@@ -87,7 +87,7 @@ export default function CharacterCard({ character, selected = false, onSelect, a
       ),
       actions: [
         { label: 'Cerrar', variant: 'ghost' },
-        { label: 'Ver ladder', onClick: () => { navigate('/progress'); }, variant: 'primary' },
+        { label: 'Ver ladder', onClick: () => { navigate('/ladder'); }, variant: 'primary' },
         ...(state.userId === character.id ? [{ label: 'Editar', onClick: () => { navigate('/profile'); }, variant: 'primary' }] : []),
       ],
       allowClose: true,
