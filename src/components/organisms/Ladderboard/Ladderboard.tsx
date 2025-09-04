@@ -48,3 +48,5 @@ export function Ladderboard({ className }: Props){
     </section>
   );
 }
+
+export default Ladderboard;
