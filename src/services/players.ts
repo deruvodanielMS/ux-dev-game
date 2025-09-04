@@ -133,6 +133,53 @@ export async function updatePlayerAvatar(authUid: string, avatarUrl: string): Pr
   }
 }
 
+export async function updatePlayerProfile(authUid: string, data: { name?: string | null; email?: string | null }): Promise<void> {
+  // Update local storage copy if a local player with same id exists
+  const current = readFromLocalStorage();
+  const idx = current.findIndex((p) => p.id === authUid);
+  if (idx >= 0) {
+    current[idx] = { ...current[idx], ...(data.name !== undefined ? { name: data.name } : {}), ...(data.email !== undefined ? { email: data.email } : {}) } as Player;
+    writeToLocalStorage(current);
+  }
+
+  if (!supabase) return;
+
+  let lastError: any = null;
+  try {
+    const payload: any = {};
+    if (data.name !== undefined) payload.name = data.name;
+    if (data.email !== undefined) payload.email = data.email;
+
+    if (Object.keys(payload).length === 0) return;
+
+    // 1) Try update by id
+    const res1 = await supabase.from('players').update(payload).eq('id', authUid);
+    if (!res1.error) return; // success
+    lastError = res1.error;
+
+    // 2) Try update by slug
+    const res2 = await supabase.from('players').update(payload).eq('slug', authUid);
+    if (!res2.error) return; // success
+    lastError = res2.error;
+
+    // 3) Fallback: upsert a player record using authUid as id
+    const userRes = await supabase.auth.getUser();
+    const user = userRes.data?.user ?? null;
+    const name = data.name ?? user?.email ?? authUid;
+    const upsertPayload: any = { id: authUid, name, email: data.email ?? user?.email ?? null, slug: authUid };
+    const upsertRes = await supabase.from('players').upsert(upsertPayload);
+    if (!upsertRes.error) return; // success
+    lastError = upsertRes.error;
+
+    // all attempts failed
+    const err = new Error(lastError?.message ?? 'Failed to update profile');
+    (err as any).original = lastError;
+    throw err;
+  } catch (err) {
+    throw err;
+  }
+}
+
 export function sortPlayersForLadder(players: Player[]): Player[] {
   return [...players].sort((a, b) => {
     if (b.level !== a.level) return b.level - a.level;
