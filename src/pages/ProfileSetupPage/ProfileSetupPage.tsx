@@ -12,7 +12,30 @@ import { updatePlayerProfile } from '../../services/players';
 export default function ProfileSetupPage(){
   const { state, dispatch } = usePlayer();
   const navigate = useNavigate();
+  const { notify } = useToast();
   const [userId, setUserId] = React.useState<string | null>(null);
+  const [email, setEmail] = React.useState<string>(state.email ?? '');
+
+  React.useEffect(() => {
+    setEmail(state.email ?? '');
+  }, [state.email]);
+
+  async function saveProfile() {
+    try {
+      if (!userId) {
+        notify({ message: 'Usuario no identificado.', level: 'danger' });
+        return;
+      }
+
+      await updatePlayerProfile(userId, { name: state.playerName, email: email || null });
+      dispatch({ type: 'SET_USER', payload: { playerName: state.playerName, email: email || null } });
+      notify({ message: 'Perfil actualizado correctamente.', level: 'success' });
+      navigate('/battle');
+    } catch (err: any) {
+      const msg = err?.message ?? String(err);
+      notify({ message: msg || 'Error actualizando perfil.', level: 'danger' });
+    }
+  }
 
   React.useEffect(() => {
     (async () => {
