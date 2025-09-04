@@ -13,8 +13,8 @@ import { ToastProvider } from './context/ToastContext';
 function App() {
   return (
     <PlayerProvider>
-      <ModalProvider>
-        <ToastProvider>
+      <ToastProvider>
+        <ModalProvider>
           <BrowserRouter>
             <div className="app-root">
               <Header />
@@ -26,8 +26,8 @@ function App() {
               </Routes>
             </div>
           </BrowserRouter>
-        </ToastProvider>
-      </ModalProvider>
+        </ModalProvider>
+      </ToastProvider>
     </PlayerProvider>
   );
 }
