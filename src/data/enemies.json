@@ -49,6 +49,6 @@
       "defense": 30
     },
     "description": "Un error en la actualización del DOM virtual que causa 're-renders' infinitos. Se derrota con optimización de componentes y 'memoization'.",
-    "avatar_url": "/enemies/react_glitch.png"
+    "avatar_url": "https://cdn.builder.io/api/v1/image/assets%2F18b71006d6404cecbe90ad5e2b850e0e%2F61990cd3666442f1a167c3906283431b?format=webp&width=800"
   }
 ]
