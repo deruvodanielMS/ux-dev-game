@@ -5,10 +5,31 @@ import StatDisplay from '../../components/molecules/StatDisplay/StatDisplay';
 import { usePlayer } from '../../context/PlayerContext';
 import Button from '../../components/atoms/Button/Button';
 import { useNavigate } from 'react-router-dom';
+import supabase from '../../services/supabase';
+import React from 'react';
 
 export default function ProfileSetupPage(){
   const { state, dispatch } = usePlayer();
   const navigate = useNavigate();
+  const [userId, setUserId] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    (async () => {
+      try {
+        if (!supabase) return;
+        const { data } = await supabase.auth.getUser();
+        const u = data?.user ?? null;
+        if (u) setUserId(u.id);
+      } catch (e) {
+        // ignore
+      }
+    })();
+  }, []);
+
+  const handleUploadSuccess = (url: string) => {
+    // optionally update UI
+    dispatch({ type: 'SET_AVATAR', payload: url });
+  };
 
   return (
     <div className={styles.page}>
@@ -23,7 +44,7 @@ export default function ProfileSetupPage(){
 
         <div className={styles.row}>
           <label className={styles.label}>Identidad Digital</label>
-          <AvatarUploader />
+          <AvatarUploader userId={userId ?? undefined} onUploadSuccess={handleUploadSuccess} />
         </div>
 
         <div className={styles.row}>
