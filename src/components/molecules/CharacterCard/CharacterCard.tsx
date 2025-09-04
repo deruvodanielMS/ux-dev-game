@@ -1,7 +1,5 @@
 import React, { ChangeEvent, useState } from 'react';
 import styles from './CharacterCard.module.css';
-import { uploadCharacterAvatar } from '../../../services/avatars';
-import { updateCharacterAvatar } from '../../../services/characters';
 import { useToast } from '../../../context/ToastContext';
 
 export type Character = {
@@ -17,10 +15,9 @@ type Props = {
   selected?: boolean;
   onSelect?: (id: string) => void;
   absorbed?: boolean;
-  onUploadSuccess?: (id: string, avatarUrl: string) => void;
 };
 
-export default function CharacterCard({ character, selected = false, onSelect, absorbed = false, onUploadSuccess }: Props) {
+export default function CharacterCard({ character, selected = false, onSelect, absorbed = false }: Props) {
   const initials = character.name
     .split(' ')
     .map((n) => n[0])
