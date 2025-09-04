@@ -1,0 +1,15 @@
+:root{
+  --gap: 1rem;
+}
+
+.list{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:var(--gap);
+}
+
+.item{width:100%}
+
+@media (max-width:600px){
+  .list{grid-template-columns:1fr}
+}
