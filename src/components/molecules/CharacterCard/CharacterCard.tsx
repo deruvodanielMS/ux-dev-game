@@ -41,12 +41,17 @@ export default function CharacterCard({ character, selected = false, onSelect, a
   const lastPr = character.last_pr_at ? new Date(character.last_pr_at).getTime() : 0;
   const daysSince = lastPr ? Math.floor((now - lastPr) / (1000 * 60 * 60 * 24)) : 9999;
   const daysLimit = 30;
-  const progress = Math.max(0, Math.min(100, Math.round(((daysLimit - Math.min(daysSince, daysLimit)) / daysLimit) * 100)));
+  // riskProgress: 0 when freshly PR'd, 100 when >= 30 days (at risk)
+  const riskProgress = Math.max(0, Math.min(100, Math.round((Math.min(daysSince, daysLimit) / daysLimit) * 100)));
   const willBeAbsorbed = daysSince >= daysLimit;
 
   const aiLevel = character.ai_level ?? character.stats?.ai_level ?? 0;
 
   function determineColor(): 'green' | 'blue' | 'red' | 'orange' {
+    // if at risk, prefer orange (highlight), but very high ai_level overrides to red
+    if (willBeAbsorbed) {
+      return aiLevel >= 7 ? 'red' : 'orange';
+    }
     if (aiLevel >= 7) return 'red';
     if (aiLevel >= 4) return 'orange';
     return 'blue';
