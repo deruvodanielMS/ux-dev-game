@@ -24,6 +24,12 @@
   gap:2.4rem;
 }
 
+/* when in selection mode use a single wide column so selection can use full width */
+.containerSingle{
+  grid-template-columns:1fr;
+  max-width:1400px;
+}
+
 /* Hero (first screen) */
 .intro{ /* reused for hero */
   background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
