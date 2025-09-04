@@ -99,9 +99,15 @@ export default function AvatarUploader({ userId: userIdProp, onUploadSuccess, in
           {loading ? (
             <Skeleton width={120} height={120} className={styles.skel} />
           ) : preview ? (
-            <img src={preview} alt="avatar preview" />
+            <>
+              <img src={preview} alt="avatar preview" />
+              {initialLevel && <div className={styles.levelBadge}>Lv {initialLevel}</div>}
+            </>
           ) : initialAvatar ? (
-            <img src={initialAvatar} alt="avatar current" />
+            <>
+              <img src={initialAvatar} alt="avatar current" />
+              {initialLevel && <div className={styles.levelBadge}>Lv {initialLevel}</div>}
+            </>
           ) : (
             <div className={styles.placeholder}>Sin avatar</div>
           )}
