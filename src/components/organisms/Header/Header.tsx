@@ -147,7 +147,7 @@ export default function Header(){
               <div className={styles.dropActions}>
                 <button className={styles.dropBtn} onClick={() => { navigate('/profile'); setOpen(false); }}>Editar perfil</button>
                 <button className={styles.dropBtnGhost} onClick={handleLogout}>Cerrar sesión</button>
-                <button className={styles.dropBtn} onClick={() => { setOpen(false); showModal({ title: 'Ajustes', body: <div>Configuraciones</div>, allowClose: true }); }}>Settings</button>
+                <button className={styles.dropBtn} onClick={() => { setOpen(false); showModal({ title: 'Ajustes', body: <SettingsBody />, allowClose: true }); }}>Settings</button>
               </div>
             </div>
           )}
@@ -157,7 +157,7 @@ export default function Header(){
         {hamburgerOpen && (
           <nav className={styles.mobileNav} role="navigation" ref={mobileNavRef}>
             <button className={styles.mobileItem} onClick={() => { navigate('/profile'); setHamburgerOpen(false); }}>Perfil</button>
-            <button className={styles.mobileItem} onClick={() => { setHamburgerOpen(false); showModal({ title: 'Ajustes', body: <div>Configuraciones</div>, allowClose: true }); }}>Ajustes</button>
+            <button className={styles.mobileItem} onClick={() => { setHamburgerOpen(false); showModal({ title: 'Ajustes', body: <SettingsBody />, allowClose: true }); }}>Ajustes</button>
             <button className={styles.mobileItemGhost} onClick={handleLogout}>Cerrar sesión</button>
           </nav>
         )}
