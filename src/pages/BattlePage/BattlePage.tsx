@@ -1,7 +1,5 @@
 import React, { useReducer, useEffect, useState } from 'react';
 import styles from './BattlePage.module.css';
-import PlayerHUD from '../../components/organisms/PlayerHUD/PlayerHUD';
-import EnemyHUD from '../../components/organisms/EnemyHUD/EnemyHUD';
 import CardHand from '../../components/organisms/CardHand/CardHand';
 import enemies from '../../data/enemies.json';
 import { usePlayer } from '../../context/PlayerContext';
