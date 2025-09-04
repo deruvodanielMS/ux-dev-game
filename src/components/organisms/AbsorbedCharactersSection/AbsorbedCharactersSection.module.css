@@ -1,0 +1,18 @@
+:root{
+  --muted: #9aa4b2;
+}
+
+.section{margin-top:1.4rem;padding:0.8rem 0}
+.title{color:#fff;font-weight:800;margin:0 0 0.2rem 0}
+.subtitle{color:var(--muted);margin:0 0 1rem 0;font-size:0.95rem}
+
+.row{display:flex;gap:1rem}
+.card{display:flex;flex-direction:column;align-items:center;gap:0.6rem;padding:0.6rem;border-radius:12px;background:rgba(255,255,255,0.02);min-width:100px;flex:1;opacity:0.6;filter:grayscale(60%);position:relative;overflow:hidden}
+.avatar{width:76px;height:76px;border-radius:10px;background:linear-gradient(135deg, rgba(255,80,120,0.04), rgba(94,234,212,0.04));display:flex;align-items:center;justify-content:center}
+.initials{font-weight:900;color:#fff}
+.name{color:var(--muted);font-weight:700}
+
+/* tiny glitch pulse */
+.card::before{content:"";position:absolute;left:0;right:0;top:0;height:6px;background:linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);mix-blend-mode:overlay;transform:translateX(-30%);opacity:0.6}
+
+@media (max-width:600px){.row{overflow:auto;gap:0.6rem}}
