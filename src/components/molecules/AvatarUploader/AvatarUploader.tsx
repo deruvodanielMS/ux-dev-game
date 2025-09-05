@@ -2,7 +2,6 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import styles from './AvatarUploader.module.css';
 import Button from '../../atoms/Button/Button';
 import { uploadAvatar, resolveAvatarUrl } from '../../../services/avatars';
-import { updatePlayerAvatar } from '../../../services/players';
 import { useToast } from '../../../context/ToastContext';
 import supabase from '../../../services/supabase';
 import Skeleton from '../../atoms/Skeleton/Skeleton';
