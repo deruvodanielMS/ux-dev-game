@@ -15,6 +15,7 @@ export default function ProfileSetupPage(){
   const { notify } = useToast();
   const [userId, setUserId] = React.useState<string | null>(null);
   const [email, setEmail] = React.useState<string>(state.email ?? '');
+  const [pendingAvatarPath, setPendingAvatarPath] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     setEmail(state.email ?? '');
@@ -28,6 +29,19 @@ export default function ProfileSetupPage(){
       }
 
       await updatePlayerProfile(userId, { name: state.playerName, email: email || null });
+
+      // if an avatar was uploaded to storage but DB update was skipped earlier, persist it now
+      if (pendingAvatarPath) {
+        try {
+          await import('../../services/players').then((m) => m.updatePlayerAvatar(userId!, pendingAvatarPath!));
+          // clear pending
+          setPendingAvatarPath(null);
+        } catch (avatarErr: any) {
+          const msg = avatarErr?.message ?? String(avatarErr);
+          notify({ message: `No se pudo guardar el avatar: ${msg}`, level: 'warning' });
+        }
+      }
+
       dispatch({ type: 'SET_USER', payload: { playerName: state.playerName, email: email || null } });
       notify({ message: 'Perfil actualizado correctamente.', level: 'success' });
       navigate('/battle');
