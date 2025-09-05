@@ -1,5 +1,4 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
-import React, { ChangeEvent, useEffect, useState } from 'react';
 import styles from './AvatarUploader.module.css';
 import { uploadAvatar, resolveAvatarUrl } from '../../../services/avatars';
 import { useToast } from '../../../context/ToastContext';
