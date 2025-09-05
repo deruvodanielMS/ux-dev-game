@@ -74,23 +74,9 @@ export default function AvatarUploader({ userId: userIdProp, onUploadSuccess, in
       dispatch({ type: 'SET_AVATAR', payload: displayUrl });
       setPreview(displayUrl);
 
-      // update players table and local storage with storagePath so DB stores path
-      try {
-        await updatePlayerAvatar(userId, storagePath);
-      } catch (dbErr: any) {
-        const msg = dbErr?.message ?? String(dbErr);
-        if (msg.toLowerCase().includes('row-level')) {
-          notify({ title: 'Permisos insuficientes', message: 'No se pudo actualizar la base de datos por las políticas RLS. Contacta al administrador o revisa auth_uid en la tabla.', level: 'danger', duration: 8000 });
-        } else {
-          notify({ message: msg, level: 'danger', duration: 6000 });
-        }
-        onUploadSuccess?.(displayUrl);
-        setLoading(false);
-        return;
-      }
-
-      notify({ message: 'Avatar subido y guardado correctamente.', level: 'success' });
-      onUploadSuccess?.(displayUrl);
+      // Inform parent about uploaded storage path so it can persist to DB on Save
+      onUploadSuccess?.(displayUrl, storagePath);
+      notify({ message: 'Avatar subido (pendiente de guardar).', level: 'success' });
     } catch (err: any) {
       const msg = err?.message ?? String(err);
       if (msg.toLowerCase().includes('row-level') || msg.toLowerCase().includes('unauthorized')) {
