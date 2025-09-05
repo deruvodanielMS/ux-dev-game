@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import styles from './AvatarUploader.module.css';
-import Button from '../../atoms/Button/Button';
 import { uploadAvatar, resolveAvatarUrl } from '../../../services/avatars';
 import { useToast } from '../../../context/ToastContext';
 import supabase from '../../../services/supabase';
