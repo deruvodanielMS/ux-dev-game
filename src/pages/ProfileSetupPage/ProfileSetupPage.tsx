@@ -64,9 +64,10 @@ export default function ProfileSetupPage(){
     })();
   }, []);
 
-  const handleUploadSuccess = (url: string) => {
-    // optionally update UI
+  const handleUploadSuccess = (url: string, storagePath?: string) => {
+    // update UI optimistically
     dispatch({ type: 'SET_AVATAR', payload: url });
+    if (storagePath) setPendingAvatarPath(storagePath);
   };
 
   return (
