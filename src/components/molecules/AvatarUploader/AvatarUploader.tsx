@@ -9,7 +9,7 @@ import { usePlayer } from '../../../context/PlayerContext';
 
 type Props = {
   userId?: string;
-  onUploadSuccess?: (avatarUrl: string) => void;
+  onUploadSuccess?: (avatarUrl: string, storagePath?: string) => void;
   initialAvatar?: string | null;
   initialLevel?: number | null;
 };
