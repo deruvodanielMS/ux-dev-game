@@ -1,5 +1,7 @@
 import supabase from './supabase';
 
+import supabase from './supabase';
+
 export async function uploadAvatar(file: File, userId: string): Promise<string> {
   if (!supabase) throw new Error('Supabase client not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.');
 
