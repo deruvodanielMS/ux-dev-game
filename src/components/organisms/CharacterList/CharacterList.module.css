@@ -4,7 +4,7 @@
 
 .list{
   display:grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap:var(--gap);
 }
 
@@ -17,3 +17,8 @@
 @media (max-width:600px){
   .list{grid-template-columns:1fr}
 }
+
+/* skeleton helpers */
+.skelRow{display:flex;align-items:center;gap:1rem;padding:1rem;border-radius:12px;background:linear-gradient(90deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));}
+.skelAvatar{width:120px;height:120px;border-radius:12px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.04));}
+.skelText{flex:1;height:18px;border-radius:8px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.04));}

@@ -11,17 +11,15 @@
               linear-gradient(180deg, var(--bg) 0%, #070915 60%);
   color:#e6eef8;
   display:flex;
-  align-items:center;
-  justify-content:center;
+  flex-direction:column; /* ensure footer sits at bottom */
+  justify-content:flex-start;
   padding:3rem 1rem;
 }
 
 .container{
   width:100%;
-  max-width:1400px;
-  display:grid;
-  grid-template-columns: 1fr 420px;
   gap:2.4rem;
+  flex:1; /* allow main to grow */
 }
 
 /* when in selection mode use a single wide column so selection can use full width */
@@ -43,11 +41,18 @@
 }
 
 .hero{padding:2rem}
-.heroLeft{flex:1}
-.heroRight{width:560px;display:flex;align-items:center;justify-content:center}
+.heroLeft{flex:1;display:flex;flex-direction:column;align-items:flex-start;width:100%}
+.heroRight{flex:1;display:flex;align-items:center;justify-content:center;width:100%}
 
-.finalMonsterWrap{display:flex;justify-content:center;margin-top:1.2rem}
-.finalMonster{width:100%;max-width:560px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 12px 40px rgba(2,6,23,0.6);object-fit:cover}
+.finalMonsterWrap{display:flex;justify-content:center;margin-top:0}
+.finalMonster{width:100%;max-width:none;border-radius:12px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 12px 40px rgba(2,6,23,0.6);object-fit:cover}
+
+/* ensure buttons align to the right side of the hero area */
+.heroButtonsRight{display:flex;flex-direction:column;align-items:flex-end;gap:0.8rem;width:100%}
+.heroButtonsRight .primaryLarge, .heroButtonsRight .ghostLarge{width:100%}
+@media (min-width:800px){
+  .heroButtonsRight{flex-direction:column}
+}
 
 .title{
   margin:0 0 0.6rem 0;
