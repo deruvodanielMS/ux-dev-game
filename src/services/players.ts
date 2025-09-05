@@ -118,7 +118,8 @@ export async function updatePlayerAvatar(authUid: string, avatarUrl: string): Pr
     const userRes = await supabase.auth.getUser();
     const user = userRes.data?.user ?? null;
     const name = user?.email ?? authUid;
-    const payload: any = { id: authUid, name, avatar_url: avatarUrl, level: 1, slug: authUid };
+    const email = user?.email ?? authUid;
+    const payload: any = { id: authUid, name, email, avatar_url: avatarUrl, level: 1, slug: authUid };
     const upsertRes = await supabase.from('players').upsert(payload);
     if (!upsertRes.error) return; // success
     lastError = upsertRes.error;
