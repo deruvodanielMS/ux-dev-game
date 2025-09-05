@@ -167,7 +167,8 @@ export async function updatePlayerProfile(authUid: string, data: { name?: string
     const userRes = await supabase.auth.getUser();
     const user = userRes.data?.user ?? null;
     const name = data.name ?? user?.email ?? authUid;
-    const upsertPayload: any = { id: authUid, name, email: data.email ?? user?.email ?? null, slug: authUid };
+    const emailVal = data.email ?? user?.email ?? authUid;
+    const upsertPayload: any = { id: authUid, name, email: emailVal, slug: authUid };
     const upsertRes = await supabase.from('players').upsert(upsertPayload);
     if (!upsertRes.error) return; // success
     lastError = upsertRes.error;
