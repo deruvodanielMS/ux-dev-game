@@ -7,7 +7,7 @@ import Button from '../../components/atoms/Button/Button';
 import { useNavigate } from 'react-router-dom';
 import supabase from '../../services/supabase';
 import { useToast } from '../../context/ToastContext';
-import { updatePlayerProfile } from '../../services/players';
+import { updatePlayerProfile, savePlayer } from '../../services/players';
 
 export default function ProfileSetupPage(){
   const { state, dispatch } = usePlayer();
