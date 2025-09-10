@@ -113,13 +113,13 @@ export default function Header(){
 
   const handleLogout = async () => {
     try {
-      // logout from Auth0
-      await auth0Logout({ returnTo: window.location.origin });
+      // auth0-react v2 expects logout with logoutParams
+      auth0Logout({ logoutParams: { returnTo: window.location.origin } });
     } catch (e) {
       // ignore
     }
 
-    // clear local state
+    // clear local state and navigate home
     dispatch({ type: 'SET_NAME', payload: '' });
     dispatch({ type: 'SET_AVATAR', payload: null });
     setProfile(null);
