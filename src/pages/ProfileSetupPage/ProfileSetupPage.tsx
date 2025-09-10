@@ -43,6 +43,28 @@ export default function ProfileSetupPage(){
       }
 
       dispatch({ type: 'SET_USER', payload: { playerName: state.playerName, email: email || null } });
+
+      // Add or update player in ladderboard list
+      try {
+        const player = {
+          id: userId,
+          name: state.playerName || email || userId || 'Player',
+          avatarUrl: state.avatarUrl ?? null,
+          level: state.level ?? 1,
+          exp: 0,
+          coins: 0,
+          softSkills: state.stats.soft_skills,
+          techSkills: state.stats.tech_skills,
+          coreValues: state.stats.core_values,
+          creativity: state.stats.creativity,
+          aiLevel: state.stats.ai_level,
+          characterId: state.selectedCharacter ?? userId ?? '',
+        } as any;
+        await savePlayer(player);
+      } catch (e) {
+        // ignore non-critical ladder update errors
+      }
+
       notify({ message: 'Perfil actualizado correctamente.', level: 'success' });
       navigate('/battle');
     } catch (err: any) {
