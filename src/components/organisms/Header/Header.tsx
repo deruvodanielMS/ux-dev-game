@@ -5,6 +5,9 @@ import { usePlayer } from '../../../context/PlayerContext';
 import { useModal } from '../../../context/ModalContext';
 import { useAudio } from '../../../context/AudioContext';
 import supabase from '../../../services/supabase';
+import { useAuth0 } from '@auth0/auth0-react';
+import { syncAuth0User } from '../../../services/auth';
+import AuthButton from '../AuthButton/AuthButton';
 
 function SettingsBody(){
   const audio = useAudio();
@@ -39,20 +42,29 @@ export default function Header(){
     wasLoggedRef.current = state.isLoggedIn;
   }, [state.isLoggedIn, navigate, hideModal]);
 
+  // Auth0 integration: when authenticated, sync user with Supabase and load profile
+  const { isAuthenticated, getAccessTokenSilently, logout: auth0Logout, user: auth0User } = useAuth0();
+
   React.useEffect(() => {
     let mounted = true;
     (async () => {
       try {
+        if (!isAuthenticated) return;
+        if (!getAccessTokenSilently) return;
+        const token = await getAccessTokenSilently();
+        if (!token) return;
+        // sync user to supabase (serverless endpoint will upsert using service role)
+        await syncAuth0User(token);
+
+        // now fetch player record from Supabase (using anon client)
         if (!supabase) return;
-        const { data } = await supabase.auth.getUser();
-        const user = data?.user ?? null;
-        if (!user) return;
-        // try fetch player by id or slug
-        const { data: p } = await supabase.from('players').select('*').or(`id.eq.${user.id},slug.eq.${user.id}`).limit(1).single();
+        // auth0 sub is the id we used when upserting
+        const auth0Id = auth0User?.sub ?? null;
+        if (!auth0Id) return;
+        const { data: p } = await supabase.from('players').select('*').or(`id.eq.${auth0Id},slug.eq.${auth0Id}`).limit(1).single();
         if (!mounted) return;
         if (p) {
           setProfile(p);
-          // sync to context
           dispatch({ type: 'SET_NAME', payload: p.name ?? state.playerName });
           // resolve avatar path to signed url if needed
           (async () => {
@@ -75,7 +87,7 @@ export default function Header(){
     })();
     return () => { mounted = false; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.isLoggedIn]);
+  }, [isAuthenticated, getAccessTokenSilently, auth0User]);
 
   const avatarRef = React.useRef<HTMLDivElement | null>(null);
   const mobileNavRef = React.useRef<HTMLElement | null>(null);
@@ -101,18 +113,19 @@ export default function Header(){
 
   const handleLogout = async () => {
     try {
-      if (!supabase) return;
-      await supabase.auth.signOut();
-      // clear local state
-      dispatch({ type: 'SET_NAME', payload: '' });
-      dispatch({ type: 'SET_AVATAR', payload: null });
-      setProfile(null);
-      setOpen(false);
-      setHamburgerOpen(false);
-      navigate('/');
+      // auth0-react v2 expects logout with logoutParams
+      auth0Logout({ logoutParams: { returnTo: window.location.origin } });
     } catch (e) {
       // ignore
     }
+
+    // clear local state and navigate home
+    dispatch({ type: 'SET_NAME', payload: '' });
+    dispatch({ type: 'SET_AVATAR', payload: null });
+    setProfile(null);
+    setOpen(false);
+    setHamburgerOpen(false);
+    navigate('/');
   };
 
   return (
@@ -124,6 +137,7 @@ export default function Header(){
       <div className={styles.right}>
         <div className={styles.controlsRow}>
           <button className={styles.playBtn} onClick={() => audio.isPlaying ? audio.pause() : audio.play()} aria-label="Toggle music">{audio.isPlaying ? '⏸' : '⏵'}</button>
+          <AuthButton />
         </div>
 
         {/* hamburger for small screens */}

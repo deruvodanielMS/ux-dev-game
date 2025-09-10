@@ -1,0 +1,61 @@
+import React from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
+import styles from './AuthButton.module.css';
+import { syncAuth0User } from '../../../services/auth';
+
+export default function AuthButton() {
+  const { loginWithPopup, loginWithRedirect, logout, user, getAccessTokenSilently, isAuthenticated } = useAuth0();
+
+  const handleLogin = async () => {
+    console.log('AuthButton: handleLogin clicked');
+    try {
+      if (loginWithPopup) {
+        console.log('Attempting loginWithPopup');
+        await loginWithPopup();
+      } else {
+        console.log('loginWithPopup not available, using redirect');
+        await loginWithRedirect();
+        return;
+      }
+
+      try {
+        const token = getAccessTokenSilently ? await getAccessTokenSilently() : null;
+        if (token) {
+          await syncAuth0User(token);
+        }
+      } catch (innerErr) {
+        console.error('Failed to get access token silently', innerErr);
+      }
+    } catch (err) {
+      console.error('loginWithPopup failed, falling back to redirect', err);
+      try {
+        await loginWithRedirect();
+      } catch (redirectErr) {
+        console.error('loginWithRedirect also failed', redirectErr);
+        alert('Login failed — revisa la consola para más detalles');
+      }
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      // auth0-react v2 expects logout with logoutParams
+      logout({ logoutParams: { returnTo: window.location.origin } });
+    } catch (e) {
+      console.error('logout error', e);
+    }
+  };
+
+  return (
+    <div className={styles.authWrapper}>
+      {isAuthenticated ? (
+        <>
+          <img className={styles.avatar} src={user?.picture} alt={user?.name || 'avatar'} />
+          <button className={styles.button} onClick={handleLogout} aria-label="Cerrar sesión">Cerrar</button>
+        </>
+      ) : (
+        <button className={styles.button} onClick={handleLogin} aria-label="Iniciar sesión">Login</button>
+      )}
+    </div>
+  );
+}
