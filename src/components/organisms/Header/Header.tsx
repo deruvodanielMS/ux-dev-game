@@ -5,6 +5,8 @@ import { usePlayer } from '../../../context/PlayerContext';
 import { useModal } from '../../../context/ModalContext';
 import { useAudio } from '../../../context/AudioContext';
 import supabase from '../../../services/supabase';
+import { useAuth0 } from '@auth0/auth0-react';
+import { syncAuth0User } from '../../../services/auth';
 
 function SettingsBody(){
   const audio = useAudio();
