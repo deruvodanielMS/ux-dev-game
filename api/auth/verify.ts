@@ -1,5 +1,4 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import fetch from 'node-fetch';
 import { createClient } from '@supabase/supabase-js';
 
 // Expected env vars in Vercel dashboard (do NOT commit secrets):
