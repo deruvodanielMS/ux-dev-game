@@ -137,6 +137,7 @@ export default function Header(){
       <div className={styles.right}>
         <div className={styles.controlsRow}>
           <button className={styles.playBtn} onClick={() => audio.isPlaying ? audio.pause() : audio.play()} aria-label="Toggle music">{audio.isPlaying ? '⏸' : '⏵'}</button>
+          <AuthButton />
         </div>
 
         {/* hamburger for small screens */}
