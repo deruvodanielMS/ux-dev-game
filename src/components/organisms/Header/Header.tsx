@@ -7,6 +7,7 @@ import { useAudio } from '../../../context/AudioContext';
 import supabase from '../../../services/supabase';
 import { useAuth0 } from '@auth0/auth0-react';
 import { syncAuth0User } from '../../../services/auth';
+import AuthButton from '../AuthButton/AuthButton';
 
 function SettingsBody(){
   const audio = useAudio();
