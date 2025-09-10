@@ -39,7 +39,8 @@ export default function AuthButton() {
 
   const handleLogout = async () => {
     try {
-      logout({ returnTo: window.location.origin });
+      // auth0-react v2 expects logout with logoutParams
+      logout({ logoutParams: { returnTo: window.location.origin } });
     } catch (e) {
       console.error('logout error', e);
     }
