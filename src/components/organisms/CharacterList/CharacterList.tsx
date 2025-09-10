@@ -45,7 +45,15 @@ export default function CharacterList({ selectedId, onSelect }: Props) {
     };
   }, [load]);
 
-  const active = characters.filter((c) => !ABSORBED_NAMES.has(c.name)).sort((a,b)=> (b.level ?? 0) - (a.level ?? 0));
+  const { state } = usePlayer();
+
+  // If user is logged in, restrict list to their own characters only
+  let visible = characters;
+  if (state.isLoggedIn && state.userId) {
+    visible = characters.filter((c) => c.id === state.userId);
+  }
+
+  const active = visible.filter((c) => !ABSORBED_NAMES.has(c.name)).sort((a,b)=> (b.level ?? 0) - (a.level ?? 0));
 
   async function handleUploadSuccess(id: string) {
     // refresh the list after an upload so the new avatar appears
