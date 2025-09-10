@@ -7,18 +7,42 @@ export default function AuthButton() {
   const { loginWithPopup, loginWithRedirect, logout, user, getAccessTokenSilently, isAuthenticated } = useAuth0();
 
   const handleLogin = async () => {
+    console.log('AuthButton: handleLogin clicked');
     try {
-      await loginWithPopup();
-      const token = await getAccessTokenSilently();
-      await syncAuth0User(token);
+      if (loginWithPopup) {
+        console.log('Attempting loginWithPopup');
+        await loginWithPopup();
+      } else {
+        console.log('loginWithPopup not available, using redirect');
+        await loginWithRedirect();
+        return;
+      }
+
+      try {
+        const token = getAccessTokenSilently ? await getAccessTokenSilently() : null;
+        if (token) {
+          await syncAuth0User(token);
+        }
+      } catch (innerErr) {
+        console.error('Failed to get access token silently', innerErr);
+      }
     } catch (err) {
-      // fallback to redirect if popup blocked
-      await loginWithRedirect();
+      console.error('loginWithPopup failed, falling back to redirect', err);
+      try {
+        await loginWithRedirect();
+      } catch (redirectErr) {
+        console.error('loginWithRedirect also failed', redirectErr);
+        alert('Login failed — revisa la consola para más detalles');
+      }
     }
   };
 
   const handleLogout = async () => {
-    logout({ returnTo: window.location.origin });
+    try {
+      logout({ returnTo: window.location.origin });
+    } catch (e) {
+      console.error('logout error', e);
+    }
   };
 
   return (
