@@ -3,6 +3,7 @@ import styles from './CharacterList.module.css';
 import CharacterCard, { Character } from '../../molecules/CharacterCard/CharacterCard';
 import { fetchCharacters } from '../../../services/characters';
 import { useToast } from '../../../context/ToastContext';
+import { usePlayer } from '../../../context/PlayerContext';
 
 type Props = {
   selectedId: string | null;
