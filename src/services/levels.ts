@@ -7,6 +7,18 @@ const enemies: Character[] = enemiesData.map((e) => ({
   id: e.id,
   name: e.name,
   avatar: e.avatar_url,
+  level: ((): number => {
+    switch (e.difficulty) {
+      case 'easy':
+        return 1;
+      case 'medium':
+        return 3;
+      case 'hard':
+        return 5;
+      default:
+        return 1;
+    }
+  })(),
   stats: {
     hp: e.stats.health,
     attack: e.stats.attack,

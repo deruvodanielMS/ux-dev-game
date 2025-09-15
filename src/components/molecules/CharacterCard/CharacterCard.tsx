@@ -109,7 +109,7 @@ export const CharacterCard = ({
             <div style={{ marginTop: 12 }}>
               <StatusBar
                 label="Tiempo hasta absorción"
-                value={riskProgress}
+                current={riskProgress}
                 max={100}
                 color={determineColor()}
               />
@@ -185,7 +185,7 @@ export const CharacterCard = ({
           <div className={styles.absorbWrapInline}>
             <StatusBar
               label={willBeAbsorbed ? 'En riesgo' : 'Tiempo para absorción'}
-              value={riskProgress}
+              current={riskProgress}
               max={100}
               color={determineColor()}
             />

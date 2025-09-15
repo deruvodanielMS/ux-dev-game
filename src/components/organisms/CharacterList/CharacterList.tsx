@@ -14,7 +14,7 @@ import type { Character } from '@/types';
 
 const ABSORBED_NAMES = new Set(['Zeta', 'Joaco', 'Emily']);
 
-export const CharacterList = ({ selectedId }: CharacterListProps) => {
+export const CharacterList = ({ selectedId, onSelect }: CharacterListProps) => {
   const [characters, setCharacters] = useState<Character[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -84,9 +84,14 @@ export const CharacterList = ({ selectedId }: CharacterListProps) => {
   return (
     <div className={styles.list} role="list">
       {active.map((c) => (
-        <div key={c.id} role="listitem" className={styles.item}>
+        <button
+          key={c.id}
+          type="button"
+          className={styles.item}
+          onClick={() => onSelect?.(c.id)}
+        >
           <CharacterCard character={c} selected={selectedId === c.id} />
-        </div>
+        </button>
       ))}
     </div>
   );

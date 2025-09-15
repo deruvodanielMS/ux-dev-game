@@ -39,8 +39,8 @@ export const PlayerCard = ({
       </div>
 
       <div className={styles.bars}>
-        <StatusBar label="Salud" value={health} color="green" />
-        <StatusBar label="Stamina" value={stamina} color="blue" />
+        <StatusBar label="Salud" current={health} max={100} color="green" />
+        <StatusBar label="Stamina" current={stamina} max={100} color="blue" />
       </div>
     </div>
   );
