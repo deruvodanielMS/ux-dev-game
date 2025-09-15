@@ -1,18 +1,20 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import styles from './CharacterList.module.css';
-import CharacterCard, { Character } from '../../molecules/CharacterCard/CharacterCard';
-import { fetchCharacters } from '../../../services/characters';
-import { useToast } from '../../../context/ToastContext';
-import { usePlayer } from '../../../context/PlayerContext';
+import { useCallback, useEffect, useState } from 'react';
 
-type Props = {
-  selectedId: string | null;
-  onSelect: (id: string) => void;
-};
+import type { CharacterListProps } from '@/types/components-character-list';
+
+import { CharacterCard } from '@/components/molecules/CharacterCard/CharacterCard';
+
+import { useGame } from '@/context/GameContext';
+import { useToast } from '@/context/ToastContext';
+import { getCharacters } from '@/services/characters';
+
+import styles from './CharacterList.module.css';
+
+import type { Character } from '@/types';
 
 const ABSORBED_NAMES = new Set(['Zeta', 'Joaco', 'Emily']);
 
-export default function CharacterList({ selectedId, onSelect }: Props) {
+export const CharacterList = ({ selectedId, onSelect }: CharacterListProps) => {
   const [characters, setCharacters] = useState<Character[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,17 +24,22 @@ export default function CharacterList({ selectedId, onSelect }: Props) {
     setLoading(true);
     setError(null);
     try {
-      const list = await fetchCharacters();
+      const list = await getCharacters();
       setCharacters(list);
-    } catch (err: any) {
-      console.warn('Error loading characters', err);
-      setError(err?.message ?? 'Error cargando personajes');
+    } catch (err: unknown) {
+      const error = err as Error;
+      console.warn('Error loading characters', error);
+      setError(error?.message ?? 'Error cargando personajes');
       setCharacters([]);
-      notify({ title: 'Error', message: err?.message ?? 'Error cargando personajes', level: 'danger' });
+      notify({
+        title: 'Error',
+        message: error?.message ?? 'Error cargando personajes',
+        level: 'danger',
+      });
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [notify]);
 
   useEffect(() => {
     let mounted = true;
@@ -45,43 +52,47 @@ export default function CharacterList({ selectedId, onSelect }: Props) {
     };
   }, [load]);
 
-  const { state } = usePlayer();
+  const { state } = useGame();
 
   // If user is logged in, restrict list to their own characters only
   let visible = characters;
-  if (state.isLoggedIn && state.userId) {
-    visible = characters.filter((c) => c.id === state.userId);
+  if (state.isLoggedIn && state.player?.id) {
+    visible = characters.filter((c) => c.id === state.player?.id);
   }
 
-  const active = visible.filter((c) => !ABSORBED_NAMES.has(c.name)).sort((a,b)=> (b.level ?? 0) - (a.level ?? 0));
+  const active = visible
+    .filter((c) => !ABSORBED_NAMES.has(c.name))
+    .sort((a, b) => (b.level ?? 0) - (a.level ?? 0));
 
-  async function handleUploadSuccess(id: string) {
-    // refresh the list after an upload so the new avatar appears
-    await load();
-  }
-
-  if (loading) return (
-    <div className={styles.list}>
-      {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className={styles.item}>
-          <div className={styles.skelRow}>
-            <div className={styles.skelAvatar} />
-            <div className={styles.skelText} />
+  if (loading)
+    return (
+      <div className={styles.list}>
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className={styles.item}>
+            <div className={styles.skelRow}>
+              <div className={styles.skelAvatar} />
+              <div className={styles.skelText} />
+            </div>
           </div>
-        </div>
-      ))}
-    </div>
-  );
+        ))}
+      </div>
+    );
   if (error) return <div className={styles.list}>{error}</div>;
-  if (active.length === 0) return <div className={styles.list}>No hay personajes disponibles.</div>;
+  if (active.length === 0)
+    return <div className={styles.list}>No hay personajes disponibles.</div>;
 
   return (
     <div className={styles.list} role="list">
       {active.map((c) => (
-        <div key={c.id} role="listitem" className={styles.item}>
-          <CharacterCard character={c} selected={selectedId === c.id} onSelect={onSelect} />
-        </div>
+        <button
+          key={c.id}
+          type="button"
+          className={styles.item}
+          onClick={() => onSelect?.(c.id)}
+        >
+          <CharacterCard character={c} selected={selectedId === c.id} />
+        </button>
       ))}
     </div>
   );
-}
+};

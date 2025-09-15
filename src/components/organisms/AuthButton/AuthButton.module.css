@@ -1,3 +1,19 @@
-.authWrapper{display:flex;align-items:center;gap:8px}
-.button{background:#0b5cff;color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
-.avatar{width:32px;height:32px;border-radius:50%;object-fit:cover}
+.authWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.button {
+  background: #0b5cff;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}

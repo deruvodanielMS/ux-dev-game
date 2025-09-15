@@ -14,7 +14,7 @@ export async function syncAuth0User(accessToken: string) {
     const data = await res.json().catch(() => null);
     if (!data) throw new Error('Invalid JSON response from auth verify');
     return data;
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('syncAuth0User error', err);
     throw err;
   }

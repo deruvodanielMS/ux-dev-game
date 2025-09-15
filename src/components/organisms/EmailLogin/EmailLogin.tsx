@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { supabase } from '../../../services/supabase';
+
+import { useToast } from '@/context/ToastContext';
+import { supabase } from '@/services/supabase';
+
 import styles from './EmailLogin.module.css';
-import { useToast } from '../../../context/ToastContext';
 
 export const EmailLogin: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -16,18 +18,27 @@ export const EmailLogin: React.FC = () => {
     try {
       if (!supabase) throw new Error('Supabase no configurado');
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
         if (error) throw error;
         setMessage('¡Sesión iniciada con éxito!');
         notify({ message: 'Sesión iniciada', level: 'success' });
       } else {
         const { error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
-        setMessage('¡Revisa tu correo para confirmar tu registro y luego inicia sesión!');
-        notify({ message: 'Registro creado. Revisa tu correo.', level: 'info' });
+        setMessage(
+          '¡Revisa tu correo para confirmar tu registro y luego inicia sesión!',
+        );
+        notify({
+          message: 'Registro creado. Revisa tu correo.',
+          level: 'info',
+        });
       }
-    } catch (err: any) {
-      const msg = err?.message ?? String(err);
+    } catch (err: unknown) {
+      const error = err as Error;
+      const msg = error?.message ?? String(err);
       setMessage(msg);
       notify({ message: msg, level: 'danger' });
     }
@@ -35,7 +46,9 @@ export const EmailLogin: React.FC = () => {
 
   return (
     <form onSubmit={handleAuth} className={styles.form}>
-      <h4 className={styles.title}>{isLogin ? 'Iniciar Sesión' : 'Registrarse'}</h4>
+      <h4 className={styles.title}>
+        {isLogin ? 'Iniciar Sesión' : 'Registrarse'}
+      </h4>
       <input
         className={styles.input}
         type="email"
@@ -53,8 +66,14 @@ export const EmailLogin: React.FC = () => {
         required
       />
       <div className={styles.row}>
-        <button type="submit" className={styles.submit}>{isLogin ? 'Login' : 'Registrar'}</button>
-        <button type="button" className={styles.toggle} onClick={() => setIsLogin(!isLogin)}>
+        <button type="submit" className={styles.submit}>
+          {isLogin ? 'Login' : 'Registrar'}
+        </button>
+        <button
+          type="button"
+          className={styles.toggle}
+          onClick={() => setIsLogin(!isLogin)}
+        >
           {isLogin ? 'No tengo una cuenta' : 'Ya tengo una cuenta'}
         </button>
       </div>
@@ -62,5 +81,3 @@ export const EmailLogin: React.FC = () => {
     </form>
   );
 };
-
-export default EmailLogin;

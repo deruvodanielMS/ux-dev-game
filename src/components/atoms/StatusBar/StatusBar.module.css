@@ -1,15 +1,47 @@
-:root{
-  --track-bg: rgba(255,255,255,0.04);
+:root {
+  --track-bg: rgba(255, 255, 255, 0.04);
   --label-color: #9aa4b2;
 }
 
-.wrapper{display:flex;flex-direction:column;gap:6px}
-.label{font-size:0.8rem;color:var(--label-color);text-transform:capitalize}
-.track{width:180px;height:10px;background:var(--track-bg);border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,0.02)}
-.fill{height:100%;border-radius:999px;transition:width 200ms ease}
-.green{background:linear-gradient(90deg,#10b981,#34d399)}
-.blue{background:linear-gradient(90deg,#3b82f6,#60a5fa)}
-.red{background:linear-gradient(90deg,#f43f5e,#fb7185)}
-.orange{background:linear-gradient(90deg,#f59e0b,#fb923c)}
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.label {
+  font-size: 0.8rem;
+  color: var(--label-color);
+  text-transform: capitalize;
+}
+.track {
+  width: 180px;
+  height: 10px;
+  background: var(--track-bg);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.02);
+}
+.fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 200ms ease;
+}
+.green {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+.blue {
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+.red {
+  background: linear-gradient(90deg, #f43f5e, #fb7185);
+}
+.orange {
+  background: linear-gradient(90deg, #f59e0b, #fb923c);
+}
 
-@media (max-width:600px){.track{width:140px;height:9px}}
+@media (max-width: 600px) {
+  .track {
+    width: 140px;
+    height: 9px;
+  }
+}

@@ -1,21 +1,14 @@
 import React, { createContext, useContext, useMemo, useState } from 'react';
-import styles from '../components/organisms/Modal/Modal.module.css';
 
-type ModalOptions = {
-  title?: string;
-  body?: React.ReactNode;
-  actions?: { label: string; onClick?: () => void; variant?: 'primary' | 'ghost' }[];
-  allowClose?: boolean;
-};
+import type { ModalContextType, ModalOptions } from '@/types/context/modal';
 
-type ModalContextType = {
-  showModal: (opts: ModalOptions) => void;
-  hideModal: () => void;
-};
+import styles from '@/components/organisms/Modal/Modal.module.css';
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
 
-export function ModalProvider({ children }: { children: React.ReactNode }) {
+export const ModalProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [open, setOpen] = useState(false);
   const [opts, setOpts] = useState<ModalOptions | null>(null);
 
@@ -35,13 +28,34 @@ export function ModalProvider({ children }: { children: React.ReactNode }) {
       {children}
       {opts && (
         <div data-modal-root id="modal-root">
-          <div className={`${styles.modalBackdrop} ${open ? styles.open : ''}`} onClick={() => opts.allowClose !== false && hideModal()} />
-          <div className={`${styles.modalWrap} ${open ? styles.open : ''}`} role="dialog" aria-modal>
+          <div
+            className={`${styles.modalBackdrop} ${open ? styles.open : ''}`}
+            onClick={() => opts.allowClose !== false && hideModal()}
+            onKeyDown={(e) =>
+              e.key === 'Escape' && opts.allowClose !== false && hideModal()
+            }
+            role="button"
+            tabIndex={-1}
+            aria-label="Close modal"
+          />
+          <div
+            className={`${styles.modalWrap} ${open ? styles.open : ''}`}
+            role="dialog"
+            aria-modal
+          >
             <div className={styles.modalCard}>
               <div className={styles.modalHeader}>
-                {opts.title && <h3 className={styles.modalTitle}>{opts.title}</h3>}
+                {opts.title && (
+                  <h3 className={styles.modalTitle}>{opts.title}</h3>
+                )}
                 {opts.allowClose !== false && (
-                  <button aria-label="Cerrar" className={styles.modalClose} onClick={hideModal}>&times;</button>
+                  <button
+                    aria-label="Cerrar"
+                    className={styles.modalClose}
+                    onClick={hideModal}
+                  >
+                    &times;
+                  </button>
                 )}
               </div>
 
@@ -67,9 +81,9 @@ export function ModalProvider({ children }: { children: React.ReactNode }) {
       )}
     </ModalContext.Provider>
   );
-}
+};
 
-export function useModal(){
+export function useModal() {
   const ctx = useContext(ModalContext);
   if (!ctx) throw new Error('useModal must be used within ModalProvider');
   return ctx;

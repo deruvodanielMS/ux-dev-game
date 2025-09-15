@@ -1,17 +1,22 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import styles from '../components/organisms/Toast/Toast.module.css';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
-export type ToastLevel = 'info' | 'warning' | 'danger' | 'success';
-export type Toast = { id: string; title?: string; message: string; level?: ToastLevel; duration?: number };
+import type { Toast, ToastContextType } from '@/types/context/toast';
 
-type ToastContextType = {
-  notify: (toast: Omit<Toast, 'id'>) => string;
-  dismiss: (id: string) => void;
-};
+import styles from '@/components/organisms/Toast/Toast.module.css';
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
-export function ToastProvider({ children }: { children: React.ReactNode }){
+export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const counter = useRef(0);
 
@@ -43,7 +48,14 @@ export function ToastProvider({ children }: { children: React.ReactNode }){
       {children}
       <div aria-live="polite" aria-atomic className={styles.toastRoot}>
         {toasts.map((t) => (
-          <div className={`${styles.toast} ${styles[t.level ?? 'info']}`} key={t.id} onClick={() => dismiss(t.id)}>
+          <div
+            className={`${styles.toast} ${styles[t.level ?? 'info']}`}
+            key={t.id}
+            onClick={() => dismiss(t.id)}
+            onKeyDown={(e) => e.key === 'Enter' && dismiss(t.id)}
+            role="button"
+            tabIndex={0}
+          >
             {t.title && <div className={styles.toastTitle}>{t.title}</div>}
             <div className={styles.toastMessage}>{t.message}</div>
           </div>
@@ -51,9 +63,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }){
       </div>
     </ToastContext.Provider>
   );
-}
+};
 
-export function useToast(){
+export function useToast() {
   const ctx = useContext(ToastContext);
   if (!ctx) throw new Error('useToast must be used within ToastProvider');
   return ctx;

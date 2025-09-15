@@ -24,7 +24,7 @@
     },
     "description": "Un error visual que rompe el diseño en diferentes navegadores. Se derrota con una estrategia de CSS Modules.",
     "avatar_url": "https://cdn.builder.io/api/v1/image/assets%2F18b71006d6404cecbe90ad5e2b850e0e%2F0fb1013d496a49b781517115e4aca1fe?format=webp&width=800"
-    },
+  },
   {
     "id": "javascript-logic-error",
     "name": "JS Logic Error",

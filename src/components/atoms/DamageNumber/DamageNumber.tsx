@@ -1,7 +1,16 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
+
+import type { DamageNumberProps } from '@/types/components-damage-number';
+
 import styles from './DamageNumber.module.css';
 
-export default function DamageNumber({ id, value, onDone, top = 0, left = 0 }: { id: string; value: number; onDone: (id: string) => void; top?: number; left?: number }){
+export const DamageNumber = ({
+  id,
+  value,
+  onDone,
+  top = 0,
+  left = 0,
+}: DamageNumberProps) => {
   useEffect(() => {
     const t = setTimeout(() => onDone(id), 900);
     return () => clearTimeout(t);
@@ -12,4 +21,4 @@ export default function DamageNumber({ id, value, onDone, top = 0, left = 0 }: {
       {value}
     </div>
   );
-}
+};

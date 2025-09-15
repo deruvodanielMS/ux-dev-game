@@ -1,24 +1,27 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import { type ChangeEvent, useEffect, useState } from 'react';
+
+import type { AvatarUploaderProps } from '@/types/components-avatar-uploader';
+
+import { Skeleton } from '@/components/atoms/Skeleton/Skeleton';
+
+import { useGame } from '@/context/GameContext';
+import { useToast } from '@/context/ToastContext';
+import { resolveAvatarUrl, uploadAvatar } from '@/services/avatars';
+import { supabase } from '@/services/supabase';
+
 import styles from './AvatarUploader.module.css';
-import { uploadAvatar, resolveAvatarUrl } from '../../../services/avatars';
-import { useToast } from '../../../context/ToastContext';
-import supabase from '../../../services/supabase';
-import Skeleton from '../../atoms/Skeleton/Skeleton';
-import { usePlayer } from '../../../context/PlayerContext';
 
-type Props = {
-  userId?: string;
-  onUploadSuccess?: (avatarUrl: string, storagePath?: string) => void;
-  initialAvatar?: string | null;
-  initialLevel?: number | null;
-};
-
-export default function AvatarUploader({ userId: userIdProp, onUploadSuccess, initialAvatar, initialLevel }: Props){
+export const AvatarUploader = ({
+  userId: userIdProp,
+  onUploadSuccess,
+  initialAvatar,
+  initialLevel,
+}: AvatarUploaderProps) => {
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const { notify } = useToast();
   const [userId, setUserId] = useState<string | undefined>(userIdProp);
-  const { dispatch } = usePlayer();
+  const { dispatch } = useGame();
 
   useEffect(() => {
     if (userIdProp) setUserId(userIdProp);
@@ -29,28 +32,31 @@ export default function AvatarUploader({ userId: userIdProp, onUploadSuccess, in
           const { data } = await supabase.auth.getUser();
           const u = data?.user ?? null;
           if (u) setUserId(u.id);
-        } catch (e) {
+        } catch {
           // ignore
         }
       })();
     }
   }, [userIdProp]);
 
-  function onFileChange(e: ChangeEvent<HTMLInputElement>){
+  const onFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files && e.target.files[0];
     if (!f) return;
     const url = URL.createObjectURL(f);
     setPreview(url);
     // auto-upload selected file
     uploadFile(f);
-  }
+  };
 
-  async function uploadFile(file: File){
-    if (!file){
-      notify({ message: 'Selecciona una imagen antes de confirmar.', level: 'warning' });
+  async function uploadFile(file: File) {
+    if (!file) {
+      notify({
+        message: 'Selecciona una imagen antes de confirmar.',
+        level: 'warning',
+      });
       return;
     }
-    if (!userId){
+    if (!userId) {
       notify({ message: 'Usuario no identificado.', level: 'danger' });
       return;
     }
@@ -64,7 +70,7 @@ export default function AvatarUploader({ userId: userIdProp, onUploadSuccess, in
       try {
         const resolved = await resolveAvatarUrl(storagePath);
         if (resolved) displayUrl = resolved;
-      } catch (e) {
+      } catch {
         // ignore - fallback to storagePath
       }
 
@@ -74,11 +80,23 @@ export default function AvatarUploader({ userId: userIdProp, onUploadSuccess, in
 
       // Inform parent about uploaded storage path so it can persist to DB on Save
       onUploadSuccess?.(displayUrl, storagePath);
-      notify({ message: 'Avatar subido (pendiente de guardar).', level: 'success' });
-    } catch (err: any) {
-      const msg = err?.message ?? String(err);
-      if (msg.toLowerCase().includes('row-level') || msg.toLowerCase().includes('unauthorized')) {
-        notify({ title: 'Error de permisos', message: 'No autorizado: la subida o actualización fue bloqueada por las políticas del servidor (RLS). Revisa auth_uid o ajusta políticas.', level: 'danger', duration: 8000 });
+      notify({
+        message: 'Avatar subido (pendiente de guardar).',
+        level: 'success',
+      });
+    } catch (err: unknown) {
+      const msg = (err as Error)?.message ?? String(err);
+      if (
+        msg.toLowerCase().includes('row-level') ||
+        msg.toLowerCase().includes('unauthorized')
+      ) {
+        notify({
+          title: 'Error de permisos',
+          message:
+            'No autorizado: la subida o actualización fue bloqueada por las políticas del servidor (RLS). Revisa auth_uid o ajusta políticas.',
+          level: 'danger',
+          duration: 8000,
+        });
       } else {
         notify({ message: msg || 'Error subiendo avatar.', level: 'danger' });
       }
@@ -97,12 +115,16 @@ export default function AvatarUploader({ userId: userIdProp, onUploadSuccess, in
           ) : preview ? (
             <>
               <img src={preview} alt="avatar preview" />
-              {initialLevel && <div className={styles.levelBadge}>Lv {initialLevel}</div>}
+              {initialLevel && (
+                <div className={styles.levelBadge}>Lv {initialLevel}</div>
+              )}
             </>
           ) : initialAvatar ? (
             <>
               <img src={initialAvatar} alt="avatar current" />
-              {initialLevel && <div className={styles.levelBadge}>Lv {initialLevel}</div>}
+              {initialLevel && (
+                <div className={styles.levelBadge}>Lv {initialLevel}</div>
+              )}
             </>
           ) : (
             <div className={styles.placeholder}>Sin avatar</div>
@@ -111,9 +133,18 @@ export default function AvatarUploader({ userId: userIdProp, onUploadSuccess, in
       </div>
 
       <div className={styles.controls}>
-        <input disabled={loading} type="file" accept="image/*" id="avatarFile" onChange={onFileChange} className={styles.fileInput} />
-        <label htmlFor="avatarFile" className={styles.choose}>{loading ? 'Cargando...' : 'Elegir imagen'}</label>
+        <input
+          disabled={loading}
+          type="file"
+          accept="image/*"
+          id="avatarFile"
+          onChange={onFileChange}
+          className={styles.fileInput}
+        />
+        <label htmlFor="avatarFile" className={styles.choose}>
+          {loading ? 'Cargando...' : 'Elegir imagen'}
+        </label>
       </div>
     </div>
   );
-}
+};

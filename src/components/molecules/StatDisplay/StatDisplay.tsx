@@ -1,8 +1,10 @@
-import React from 'react';
-import styles from './StatDisplay.module.css';
-import { Stats } from '../../../context/PlayerContext';
+import type { StatDisplayProps } from '@/types/components-stat-display';
 
-export default function StatDisplay({ stats }: { stats: Stats }){
+import styles from './StatDisplay.module.css';
+
+import type { Stats } from '@/types';
+
+export const StatDisplay = ({ stats }: StatDisplayProps) => {
   const entries = Object.entries(stats) as [keyof Stats, number][];
   return (
     <div className={styles.stats}>
@@ -14,4 +16,4 @@ export default function StatDisplay({ stats }: { stats: Stats }){
       ))}
     </div>
   );
-}
+};

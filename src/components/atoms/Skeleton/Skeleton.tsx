@@ -1,14 +1,20 @@
-import React from 'react';
 import styles from './Skeleton.module.css';
 
-type Props = {
-  width?: string | number;
-  height?: string | number;
-  className?: string;
-  circle?: boolean;
-};
+import type { SkeletonProps } from '@/types';
 
-export default function Skeleton({ width = '100%', height = 16, className = '', circle = false }: Props){
-  const style: React.CSSProperties = { width, height };
-  return <div className={`${styles.skeleton} ${circle ? styles.circle : ''} ${className}`} style={style} />;
-}
+export const Skeleton = ({
+  width = 80,
+  height = 16,
+  circle = false,
+  className = '',
+}: SkeletonProps) => {
+  return (
+    <div
+      className={[styles.skeleton, circle ? styles.circle : '', className].join(
+        ' ',
+      )}
+      style={{ width, height }}
+      aria-hidden
+    />
+  );
+};

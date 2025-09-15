@@ -1,23 +1,28 @@
-import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
-type AudioContextType = {
-  volume: number;
-  setVolume: (v: number) => void;
-  play: () => void;
-  pause: () => void;
-  setSource: (src?: string | null) => void;
-  isPlaying: boolean;
-};
+import type { AudioContextType } from '@/types/context/audio';
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
 
-export function AudioProvider({ children }: { children: React.ReactNode }) {
+export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [volume, setVolumeState] = useState<number>(() => {
     try {
       const v = localStorage.getItem('app_volume');
       return v ? Number(v) : 0.7;
-    } catch { return 0.7; }
+    } catch {
+      return 0.7;
+    }
   });
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -35,50 +40,67 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       try {
         audioRef.current?.pause();
         audioRef.current = null;
-      } catch (e) {}
+      } catch {
+        // ignore
+      }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (audioRef.current) audioRef.current.volume = volume;
-    try { localStorage.setItem('app_volume', String(volume)); } catch {}
-  }, [volume]);
-
-  const setSource = (src?: string | null) => {
-    if (!audioRef.current) return;
-    if (!src) {
-      audioRef.current.pause();
-      audioRef.current.src = '';
-      setIsPlaying(false);
-      return;
-    }
-    if (audioRef.current.src !== src) {
-      audioRef.current.src = src;
-    }
-  };
-
-  const play = async () => {
     try {
-      if (!audioRef.current) return;
-      await audioRef.current.play();
-    } catch (e) {
-      console.warn('Audio play failed', e);
+      localStorage.setItem('app_volume', String(volume));
+    } catch {
+      // ignore
     }
-  };
-  const pause = () => {
-    try { audioRef.current?.pause(); } catch (e) { console.warn(e); }
-  };
+  }, [volume]);
 
   const setVolume = (v: number) => setVolumeState(Math.max(0, Math.min(1, v)));
 
-  const value = useMemo(() => ({ volume, setVolume, play, pause, setSource, isPlaying }), [volume, isPlaying]);
+  const play = useCallback(() => {
+    audioRef.current?.play();
+  }, []);
 
-  return <AudioContext.Provider value={value}>{children}</AudioContext.Provider>;
-}
+  const pause = useCallback(() => {
+    audioRef.current?.pause();
+  }, []);
 
-export function useAudio(){
+  const setSource = (src?: string | null) => {
+    if (audioRef.current) {
+      audioRef.current.src = src ?? '';
+    }
+  };
+
+  const playSound = useCallback(
+    (sound: string) => {
+      const audio = new Audio(sound);
+      audio.volume = volume;
+      audio.play();
+    },
+    [volume],
+  );
+
+  const value = useMemo(
+    () => ({
+      volume,
+      setVolume,
+      play,
+      pause,
+      setSource,
+      isPlaying,
+      playSound,
+    }),
+    [volume, isPlaying, playSound, play, pause],
+  );
+
+  return (
+    <AudioContext.Provider value={value}>{children}</AudioContext.Provider>
+  );
+};
+
+export const useAudio = () => {
   const ctx = useContext(AudioContext);
   if (!ctx) throw new Error('useAudio must be used within AudioProvider');
   return ctx;
-}
+};

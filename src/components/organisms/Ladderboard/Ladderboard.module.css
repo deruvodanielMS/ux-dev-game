@@ -1,44 +1,167 @@
-:root{--muted:#9aa4b2}
-
-.board{width:100%;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:1rem}
-.headerRow{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem}
-.title{margin:0;font-size:1.25rem}
-.state{padding:1rem;color:var(--muted);text-align:center}
-
-.tableWrap{overflow:auto}
-.table{width:100%;border-collapse:separate;border-spacing:0;border-radius:10px;overflow:hidden}
-.table thead{display:table-header-group;background:transparent}
-.table th{text-align:left;padding:0.75rem;color:var(--muted);font-weight:700}
-.table tbody{display:table-row-group}
-.row{display:table-row;background:rgba(255,255,255,0.02);border-bottom:1px solid rgba(255,255,255,0.04)}
-.row td{display:table-cell;padding:0.75rem;vertical-align:middle}
-
-.topRow{background:linear-gradient(135deg,rgba(255,215,0,0.16),rgba(255,255,255,0.04));}
-.rank{font-weight:800;text-align:center;width:40px}
-
-.playerBox{display:flex;align-items:center;gap:0.75rem;min-width:0}
-.avatarWrap{width:40px;height:40px;border-radius:999px;overflow:hidden;background:linear-gradient(135deg,rgba(96,165,250,0.12),rgba(94,234,212,0.06));display:flex;align-items:center;justify-content:center}
-.avatar{width:100%;height:100%;object-fit:cover}
-.placeholder{color:var(--muted);font-weight:800}
-.identity{min-width:0}
-.name{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.meta{font-size:0.85rem;color:var(--muted)}
-
-.levelBox{justify-self:end;color:#e5e7eb}
-.coinsBox{justify-self:end;display:flex;align-items:center;gap:0.4rem}
-.coinIcon{opacity:0.85}
-.coins{font-weight:800}
-
-@media (max-width:980px){
-  /* slightly smaller padding */
-  .row td{padding:0.6rem}
+:root {
+  --muted: #9aa4b2;
 }
 
-@media (max-width:600px){
+.board {
+  width: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.02),
+    rgba(255, 255, 255, 0.01)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 1rem;
+}
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+.title {
+  margin: 0;
+  font-size: 1.25rem;
+}
+.state {
+  padding: 1rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.tableWrap {
+  overflow: auto;
+}
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.table thead {
+  display: table-header-group;
+  background: transparent;
+}
+.table th {
+  text-align: left;
+  padding: 0.75rem;
+  color: var(--muted);
+  font-weight: 700;
+}
+.table tbody {
+  display: table-row-group;
+}
+.row {
+  display: table-row;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+.row td {
+  display: table-cell;
+  padding: 0.75rem;
+  vertical-align: middle;
+}
+
+.topRow {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 215, 0, 0.16),
+    rgba(255, 255, 255, 0.04)
+  );
+}
+.rank {
+  font-weight: 800;
+  text-align: center;
+  width: 40px;
+}
+
+.playerBox {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+.avatarWrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    rgba(96, 165, 250, 0.12),
+    rgba(94, 234, 212, 0.06)
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.placeholder {
+  color: var(--muted);
+  font-weight: 800;
+}
+.identity {
+  min-width: 0;
+}
+.name {
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.meta {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.levelBox {
+  justify-self: end;
+  color: #e5e7eb;
+}
+.coinsBox {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.coinIcon {
+  opacity: 0.85;
+}
+.coins {
+  font-weight: 800;
+}
+
+@media (max-width: 980px) {
+  /* slightly smaller padding */
+  .row td {
+    padding: 0.6rem;
+  }
+}
+
+@media (max-width: 600px) {
   /* Stack table rows as cards */
-  .row{display:block;border-radius:10px;padding:0.8rem;margin-bottom:0.75rem}
-  .row td{display:block;padding:0}
-  .playerBox{margin-bottom:0.5rem}
-  .levelBox{margin-bottom:0.25rem}
-  .coinsBox{margin-bottom:0}
+  .row {
+    display: block;
+    border-radius: 10px;
+    padding: 0.8rem;
+    margin-bottom: 0.75rem;
+  }
+  .row td {
+    display: block;
+    padding: 0;
+  }
+  .playerBox {
+    margin-bottom: 0.5rem;
+  }
+  .levelBox {
+    margin-bottom: 0.25rem;
+  }
+  .coinsBox {
+    margin-bottom: 0;
+  }
 }

@@ -1,6 +1,15 @@
-import React from 'react';
-import Button from '../Button/Button';
+import type { AttackButtonProps } from '@/types/components-attack-button';
 
-export default function AttackButton({ children, onClick, ariaLabel }: { children: React.ReactNode; onClick?: () => void; ariaLabel?: string }){
-  return <Button onClick={onClick} ariaLabel={ariaLabel}>{children}</Button>;
-}
+import { Button } from '@/components/atoms/Button/Button';
+
+export const AttackButton = ({
+  children,
+  onClick,
+  ariaLabel,
+}: AttackButtonProps) => {
+  return (
+    <Button onClick={onClick} ariaLabel={ariaLabel}>
+      {children}
+    </Button>
+  );
+};
