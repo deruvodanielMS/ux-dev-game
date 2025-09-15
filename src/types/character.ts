@@ -1,4 +1,5 @@
 export interface Character {
+  level: number;
   id: string;
   name: string;
   avatar: string;

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { type CharacterListProps } from '@/types/components-character-list';
+import type { CharacterListProps } from '@/types/components-character-list';
 
 import { CharacterCard } from '@/components/molecules/CharacterCard/CharacterCard';
 
@@ -9,6 +9,8 @@ import { useToast } from '@/context/ToastContext';
 import { getCharacters } from '@/services/characters';
 
 import styles from './CharacterList.module.css';
+
+import type { Character } from '@/types';
 
 const ABSORBED_NAMES = new Set(['Zeta', 'Joaco', 'Emily']);
 
