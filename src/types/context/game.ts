@@ -2,6 +2,7 @@
 import type { Character, Level, Player } from '@/types';
 
 export interface GameState {
+  userId: string;
   player: Player | null;
   currentLevel: Level | null;
   allCharacters: Character[];

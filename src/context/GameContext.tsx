@@ -23,6 +23,7 @@ const initialState: GameState = {
   loading: true,
   error: null,
   isLoggedIn: false,
+  userId: '',
 };
 
 // --- Reducer ---
