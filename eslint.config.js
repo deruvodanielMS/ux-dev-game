@@ -40,29 +40,41 @@ export default tseslint.config(
         'error',
         {
           groups: [
-            // 1. Paquetes externos (react primero)
+            // 1. External packages
             ['^react$', '^react-dom$', '^@?\\w'],
-            // 2. Imports de tipos (TypeScript "import type")
+            // 2. Type-only imports (handled by plugin prefix)
             ['^type:'],
-            // 3. Tipos del proyecto (cualquier ruta que termine o contenga /types)
-            ['^.+/types$', '^.+/types/.*', '^types$'],
-            // 4. Componentes (atoms|molecules|organisms|templates|pages)
+            // 3. Project Types via alias or direct path
             [
-              '^.+/components/atoms/.*',
-              '^.+/components/molecules/.*',
-              '^.+/components/organisms/.*',
-              '^.+/components/templates/.*',
-              '^.+/pages/.*',
+              '^@/types$',
+              '^@/types/.*',
+              '^.+/types$',
+              '^.+/types/.*',
+              '^types$',
+            ],
+            // 4. UI Components & Pages via alias
+            [
+              '^@/components/atoms/.*',
+              '^@/components/molecules/.*',
+              '^@/components/organisms/.*',
+              '^@/components/templates/.*',
+              '^@/pages/.*',
               '^.+/components/.*',
             ],
-            // 5. Otros imports internos relativos (excluye styles)
+            // 5. Other internal modules via alias (context, hooks, services, utils, data)
+            ['^@/(context|hooks|services|utils|data)/.*'],
+            // 6. Relative imports (non-style)
             ['^\\.(?!.*\\.css$)', '^\\.\\.(?!.*\\.css$)'],
-            // 6. Estilos (siempre al final)
+            // 7. Styles
             ['^.+\\.css$'],
           ],
         },
       ],
       'simple-import-sort/exports': 'error',
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
+        { prefer: 'type-imports', fixStyle: 'inline-type-imports' },
+      ],
     },
     settings: {
       react: {

@@ -1,8 +1,8 @@
 import React from 'react';
 
-import type { LadderboardProps } from '../../../types/components/ladderboard';
+import type { LadderboardProps } from '@/types/components/ladderboard';
 
-import { usePlayers } from '../../../hooks/usePlayers';
+import { usePlayers } from '@/hooks/usePlayers';
 
 import styles from './Ladderboard.module.css';
 

@@ -1,4 +1,4 @@
-import { TurnIndicatorProps } from '../../../types/components-turn-indicator';
+import type { TurnIndicatorProps } from '@/types/components-turn-indicator';
 
 import styles from './TurnIndicator.module.css';
 

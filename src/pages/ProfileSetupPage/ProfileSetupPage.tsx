@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Player, Stats } from '../../types';
+import { Button } from '@/components/atoms/Button/Button';
+import { AvatarUploader } from '@/components/molecules/AvatarUploader/AvatarUploader';
+import { StatDisplay } from '@/components/molecules/StatDisplay/StatDisplay';
 
-import { Button } from '../../components/atoms/Button/Button';
-import { AvatarUploader } from '../../components/molecules/AvatarUploader/AvatarUploader';
-import { StatDisplay } from '../../components/molecules/StatDisplay/StatDisplay';
-
-import { useGame } from '../../context/GameContext';
-import { useToast } from '../../context/ToastContext';
-import { savePlayer, updatePlayerProfile } from '../../services/players';
-import { supabase } from '../../services/supabase';
+import { useGame } from '@/context/GameContext';
+import { useToast } from '@/context/ToastContext';
+import { savePlayer, updatePlayerProfile } from '@/services/players';
+import { supabase } from '@/services/supabase';
 
 import styles from './ProfileSetupPage.module.css';
+
+import type { Player, Stats } from '@/types';
 
 export const ProfileSetupPage = () => {
   const { state: gameState, dispatch: gameDispatch } = useGame();

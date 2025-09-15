@@ -12,9 +12,10 @@ export interface ButtonProps {
 
 export interface StatusBarProps {
   label?: string;
-  value: number;
-  max?: number;
-  color?: 'green' | 'blue' | 'red' | 'orange';
+  current: number;
+  max: number;
+  color?: string;
+  className?: string;
 }
 
 export interface SkeletonProps {

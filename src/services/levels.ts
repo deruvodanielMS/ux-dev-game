@@ -1,6 +1,6 @@
-import { Character, Level } from '../types';
+import { type Character, type Level } from '@/types';
 
-import enemiesData from '../data/enemies.json';
+import enemiesData from '@/data/enemies.json';
 
 // Mapea los datos de enemigos al tipo Character
 const enemies: Character[] = enemiesData.map((e) => ({

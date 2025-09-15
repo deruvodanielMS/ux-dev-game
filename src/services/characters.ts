@@ -1,6 +1,7 @@
-import { resolveAvatarUrl } from './avatars';
-import { supabase } from './supabase';
-import type { Character } from '../types';
+import { resolveAvatarUrl } from '@/services/avatars';
+import { supabase } from '@/services/supabase';
+
+import type { Character } from '@/types';
 
 // Shape coming from DB rows (loose) before mapping to Character
 type RawCharacterRow = {

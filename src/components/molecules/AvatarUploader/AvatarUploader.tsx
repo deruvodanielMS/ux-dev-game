@@ -1,12 +1,13 @@
-import { ChangeEvent, useEffect, useState } from 'react';
+import { type ChangeEvent, useEffect, useState } from 'react';
 
-import { AvatarUploaderProps } from '../../../types/components-avatar-uploader';
+import type { AvatarUploaderProps } from '@/types/components-avatar-uploader';
 
-import { useGame } from '../../../context/GameContext';
-import { useToast } from '../../../context/ToastContext';
-import { resolveAvatarUrl, uploadAvatar } from '../../../services/avatars';
-import { supabase } from '../../../services/supabase';
-import { Skeleton } from '../../atoms/Skeleton/Skeleton';
+import { Skeleton } from '@/components/atoms/Skeleton/Skeleton';
+
+import { useGame } from '@/context/GameContext';
+import { useToast } from '@/context/ToastContext';
+import { resolveAvatarUrl, uploadAvatar } from '@/services/avatars';
+import { supabase } from '@/services/supabase';
 
 import styles from './AvatarUploader.module.css';
 

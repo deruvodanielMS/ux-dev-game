@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { DamageNumberProps } from '../../../types/components-damage-number';
+import type { DamageNumberProps } from '@/types/components-damage-number';
 
 import styles from './DamageNumber.module.css';
 

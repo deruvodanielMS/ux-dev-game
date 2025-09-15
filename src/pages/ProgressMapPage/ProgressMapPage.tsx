@@ -1,12 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 
-import { Button } from '../../components/atoms/Button/Button';
-import { Skeleton } from '../../components/atoms/Skeleton/Skeleton';
-import { ProgressMapTemplate } from '../../components/templates/ProgressMapTemplate/ProgressMapTemplate';
+import { Button } from '@/components/atoms/Button/Button';
+import { Skeleton } from '@/components/atoms/Skeleton/Skeleton';
+import { ProgressMapTemplate } from '@/components/templates/ProgressMapTemplate/ProgressMapTemplate';
 
-import { useGame } from '../../context/GameContext';
+import { useGame } from '@/context/GameContext';
 
-import styles from './ProgressMapPage.module.css';
+import './ProgressMapPage.module.css';
 
 export const ProgressMapPage = () => {
   const { state } = useGame();
@@ -30,32 +30,29 @@ export const ProgressMapPage = () => {
 
   return (
     <ProgressMapTemplate
-      title={<h1 className={styles.title}>Mapa de Progreso</h1>}
+      title={<h1 className="title">Mapa de Progreso</h1>}
       subtitle={
-        <p className={styles.subtitle}>
+        <p className="subtitle">
           Tu camino contra las tecnologías corrompidas. Derrota a los enemigos
           para avanzar.
         </p>
       }
       map={
-        <div className={styles.map}>
+        <div className="map">
           {currentLevel.enemies.map((e) => {
             const done = defeated.includes(e.id);
             return (
-              <div
-                key={e.id}
-                className={`${styles.node} ${done ? styles.done : ''}`}
-              >
-                <div className={styles.nodeContent}>
-                  <div className={styles.avatar}>
+              <div key={e.id} className={`node ${done ? 'done' : ''}`}>
+                <div className="nodeContent">
+                  <div className="avatar">
                     {e.avatar ? (
                       <img src={e.avatar} alt={e.name} />
                     ) : (
-                      <div className={styles.placeholder}>?</div>
+                      <div className="placeholder">?</div>
                     )}
                   </div>
-                  <div className={styles.name}>{e.name}</div>
-                  {done && <div className={styles.check}>✔</div>}
+                  <div className="name">{e.name}</div>
+                  {done && <div className="check">✔</div>}
                 </div>
               </div>
             );
@@ -63,13 +60,13 @@ export const ProgressMapPage = () => {
         </div>
       }
       summary={
-        <div className={styles.summary}>
+        <div className="summary">
           <div>
             Derrotados: {defeated.length} / {currentLevel.enemies.length}
           </div>
           {defeated.length > 0 &&
             defeated.length < currentLevel.enemies.length && (
-              <div className={styles.nextWrap}>
+              <div className="nextWrap">
                 <Button
                   onClick={() => navigate('/battle')}
                   ariaLabel="Ir al siguiente nivel"
@@ -79,7 +76,7 @@ export const ProgressMapPage = () => {
               </div>
             )}
           {defeated.length === currentLevel.enemies.length && (
-            <div className={styles.congrats}>
+            <div className="congrats">
               ¡Has despejado este mapa! Prepárate para el próximo desafío.
             </div>
           )}

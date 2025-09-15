@@ -2,10 +2,11 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import {
   fetchPlayers,
-  type Player,
   savePlayer,
   sortPlayersForLadder,
-} from '../services/players';
+} from '@/services/players';
+
+import type { Player } from '@/types';
 
 export type UsePlayersState = {
   players: Player[];
@@ -51,5 +52,3 @@ export const usePlayers = () => {
 
   return { players, ladder, loading, error, refresh: load, upsert } as const;
 };
-
-export type { Player };

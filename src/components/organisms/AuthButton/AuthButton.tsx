@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 
-import { syncAuth0User } from '../../../services/auth';
+import { syncAuth0User } from '@/services/auth';
 
 import styles from './AuthButton.module.css';
 

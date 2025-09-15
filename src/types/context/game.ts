@@ -1,5 +1,5 @@
 // Game context related types
-import type { Character, Level, Player } from '../domain';
+import type { Character, Level, Player } from '@/types';
 
 export interface GameState {
   player: Player | null;

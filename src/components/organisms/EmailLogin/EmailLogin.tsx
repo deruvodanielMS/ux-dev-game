@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
-import { useToast } from '../../../context/ToastContext';
-import { supabase } from '../../../services/supabase';
+import { useToast } from '@/context/ToastContext';
+import { supabase } from '@/services/supabase';
 
 import styles from './EmailLogin.module.css';
 

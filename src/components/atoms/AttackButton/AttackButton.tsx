@@ -1,6 +1,6 @@
-import { AttackButtonProps } from '../../../types/components-attack-button';
+import type { AttackButtonProps } from '@/types/components-attack-button';
 
-import { Button } from '../Button/Button';
+import { Button } from '@/components/atoms/Button/Button';
 
 export const AttackButton = ({
   children,

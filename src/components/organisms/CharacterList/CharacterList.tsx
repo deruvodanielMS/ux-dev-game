@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { CharacterListProps } from '../../../types/components-character-list';
+import { type CharacterListProps } from '@/types/components-character-list';
 
-import { useGame } from '../../../context/GameContext';
-import { useToast } from '../../../context/ToastContext';
-import { getCharacters } from '../../../services/characters';
-import { CharacterCard } from '../../molecules/CharacterCard/CharacterCard';
+import { CharacterCard } from '@/components/molecules/CharacterCard/CharacterCard';
+
+import { useGame } from '@/context/GameContext';
+import { useToast } from '@/context/ToastContext';
+import { getCharacters } from '@/services/characters';
 
 import styles from './CharacterList.module.css';
 

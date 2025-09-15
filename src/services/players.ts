@@ -1,4 +1,6 @@
-import { Player } from '../types';
+import { supabase } from '@/services/supabase';
+
+import type { Player } from '@/types';
 
 const API_URL = '/api/players';
 const LS_KEY = 'duelo_players_v1';
@@ -109,8 +111,6 @@ export async function upsertPlayers(players: Player[]): Promise<Player[]> {
 }
 
 // Update avatar URL for a player locally and in Supabase if available
-import { supabase } from './supabase';
-
 export async function updatePlayerAvatar(
   authUid: string,
   avatarUrl: string,

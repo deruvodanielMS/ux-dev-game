@@ -1,8 +1,8 @@
 import React from 'react';
 
-import type { CardHandProps } from '../../../types/components/card-hand';
+import type { CardHandProps } from '@/types/components/card-hand';
 
-import { Card } from '../../molecules/Card/Card';
+import { Card } from '@/components/molecules/Card/Card';
 
 import styles from './CardHand.module.css';
 

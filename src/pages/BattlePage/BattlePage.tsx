@@ -5,17 +5,17 @@ import type {
   BattleAction as Action,
   BattleState as State,
   Enemy,
-} from '../../types/pages/battle';
+} from '@/types/pages/battle';
 
-import { Button } from '../../components/atoms/Button/Button';
-import { DamageNumber } from '../../components/atoms/DamageNumber/DamageNumber';
-import { TurnIndicator } from '../../components/atoms/TurnIndicator/TurnIndicator';
-import { PlayerCard } from '../../components/molecules/PlayerCard/PlayerCard';
-import { CardHand } from '../../components/organisms/CardHand/CardHand';
+import { Button } from '@/components/atoms/Button/Button';
+import { DamageNumber } from '@/components/atoms/DamageNumber/DamageNumber';
+import { TurnIndicator } from '@/components/atoms/TurnIndicator/TurnIndicator';
+import { PlayerCard } from '@/components/molecules/PlayerCard/PlayerCard';
+import { CardHand } from '@/components/organisms/CardHand/CardHand';
 
-import { useAudio } from '../../context/AudioContext';
-import { useGame } from '../../context/GameContext';
-import enemies from '../../data/enemies.json';
+import { useAudio } from '@/context/AudioContext';
+import { useGame } from '@/context/GameContext';
+import enemies from '@/data/enemies.json';
 
 import styles from './BattlePage.module.css';
 

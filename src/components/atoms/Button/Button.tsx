@@ -1,6 +1,6 @@
-import { ButtonProps } from '../../../types';
-
 import styles from './Button.module.css';
+
+import type { ButtonProps } from '@/types';
 
 export const Button = ({
   children,

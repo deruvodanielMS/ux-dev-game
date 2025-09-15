@@ -1,22 +1,18 @@
-import React, {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useReducer,
-} from 'react';
-import { User } from '@supabase/supabase-js';
+import React, { createContext, useContext, useEffect, useReducer } from 'react';
+import type { User } from '@supabase/supabase-js';
+import type { ReactNode } from 'react';
 
 import type {
   GameAction,
   GameContextType,
   GameState,
-} from '../types/context/game';
+} from '@/types/context/game';
 
-import { getCharacters } from '../services/characters';
-import { getLevel } from '../services/levels';
-import { supabase } from '../services/supabase';
-import type { Player } from '../types';
+import { getCharacters } from '@/services/characters';
+import { getLevel } from '@/services/levels';
+import { supabase } from '@/services/supabase';
+
+import type { Player } from '@/types';
 
 // --- State and Initial State ---
 

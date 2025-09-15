@@ -1,9 +1,6 @@
 import { useState } from 'react';
 
-import {
-  BattleCardInfo,
-  BattleCardProps,
-} from '../../../types/components-card';
+import type { BattleCardInfo, BattleCardProps } from '@/types/components-card';
 
 import styles from './Card.module.css';
 

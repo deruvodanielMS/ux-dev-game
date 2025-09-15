@@ -1,6 +1,6 @@
-import { PlayerCardProps } from '../../../types/components-player-card';
+import type { PlayerCardProps } from '@/types/components-player-card';
 
-import { StatusBar } from '../../atoms/StatusBar/StatusBar';
+import { StatusBar } from '@/components/atoms/StatusBar/StatusBar';
 
 import styles from './PlayerCard.module.css';
 

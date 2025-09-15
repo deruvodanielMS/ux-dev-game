@@ -1,10 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 
-import { CharacterCardProps } from '../../../types/components-character-card';
+import type { CharacterCardProps } from '@/types/components-character-card';
 
-import { useGame } from '../../../context/GameContext';
-import { useModal } from '../../../context/ModalContext';
-import { StatusBar } from '../../atoms/StatusBar/StatusBar';
+import { StatusBar } from '@/components/atoms/StatusBar/StatusBar';
+
+import { useGame } from '@/context/GameContext';
+import { useModal } from '@/context/ModalContext';
 
 import styles from './CharacterCard.module.css';
 

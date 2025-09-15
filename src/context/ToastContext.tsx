@@ -8,9 +8,9 @@ import React, {
   useState,
 } from 'react';
 
-import type { Toast, ToastContextType } from '../types/context/toast';
+import type { Toast, ToastContextType } from '@/types/context/toast';
 
-import styles from '../components/organisms/Toast/Toast.module.css';
+import styles from '@/components/organisms/Toast/Toast.module.css';
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 

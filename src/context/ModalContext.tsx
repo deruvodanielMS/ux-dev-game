@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useMemo, useState } from 'react';
 
-import type { ModalContextType, ModalOptions } from '../types/context/modal';
+import type { ModalContextType, ModalOptions } from '@/types/context/modal';
 
-import styles from '../components/organisms/Modal/Modal.module.css';
+import styles from '@/components/organisms/Modal/Modal.module.css';
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
 

@@ -1,4 +1,4 @@
-import { ProgressMapTemplateProps } from '../../../types/components-progress-map-template';
+import type { ProgressMapTemplateProps } from '@/types/components-progress-map-template';
 
 import styles from './ProgressMapTemplate.module.css';
 

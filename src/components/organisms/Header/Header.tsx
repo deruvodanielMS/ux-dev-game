@@ -2,14 +2,15 @@ import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useNavigate } from 'react-router-dom';
 
-import type { PlayerProfile } from '../../../types/components/header';
+import type { PlayerProfile } from '@/types/components/header';
 
-import { useAudio } from '../../../context/AudioContext';
-import { useGame } from '../../../context/GameContext';
-import { useModal } from '../../../context/ModalContext';
-import { syncAuth0User } from '../../../services/auth';
-import { supabase } from '../../../services/supabase';
-import { AuthButton } from '../AuthButton/AuthButton';
+import { AuthButton } from '@/components/organisms/AuthButton/AuthButton';
+
+import { useAudio } from '@/context/AudioContext';
+import { useGame } from '@/context/GameContext';
+import { useModal } from '@/context/ModalContext';
+import { syncAuth0User } from '@/services/auth';
+import { supabase } from '@/services/supabase';
 
 import styles from './Header.module.css';
 
@@ -112,9 +113,7 @@ export const Header: React.FC = () => {
                   avatarVal.startsWith('https://')
                 )
               ) {
-                const { resolveAvatarUrl } = await import(
-                  '../../../services/avatars'
-                );
+                const { resolveAvatarUrl } = await import('@/services/avatars');
                 const resolved = await resolveAvatarUrl(avatarVal);
                 if (resolved) avatarVal = resolved;
               }

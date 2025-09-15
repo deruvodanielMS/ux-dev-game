@@ -1,4 +1,4 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 // Define types for request and response to avoid 'any'
 interface ApiRequest {

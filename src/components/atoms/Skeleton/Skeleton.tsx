@@ -1,18 +1,20 @@
-import { SkeletonProps } from '../../../types';
-
 import styles from './Skeleton.module.css';
 
+import type { SkeletonProps } from '@/types';
+
 export const Skeleton = ({
-  width = '100%',
+  width = 80,
   height = 16,
-  className = '',
   circle = false,
+  className = '',
 }: SkeletonProps) => {
-  const style = { width, height } as const;
   return (
     <div
-      className={`${styles.skeleton} ${circle ? styles.circle : ''} ${className}`}
-      style={style}
+      className={[styles.skeleton, circle ? styles.circle : '', className].join(
+        ' ',
+      )}
+      style={{ width, height }}
+      aria-hidden
     />
   );
 };

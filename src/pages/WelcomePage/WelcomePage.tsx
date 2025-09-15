@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Button } from '../../components/atoms/Button/Button';
-import { AbsorbedCharactersSection } from '../../components/organisms/AbsorbedCharactersSection/AbsorbedCharactersSection';
-import { CharacterList } from '../../components/organisms/CharacterList/CharacterList';
-import { EmailLogin } from '../../components/organisms/EmailLogin/EmailLogin';
+import { Button } from '@/components/atoms/Button/Button';
+import { AbsorbedCharactersSection } from '@/components/organisms/AbsorbedCharactersSection/AbsorbedCharactersSection';
+import { CharacterList } from '@/components/organisms/CharacterList/CharacterList';
+import { EmailLogin } from '@/components/organisms/EmailLogin/EmailLogin';
 
-import { useGame } from '../../context/GameContext';
-import { useModal } from '../../context/ModalContext';
-import { useToast } from '../../context/ToastContext';
+import { useGame } from '@/context/GameContext';
+import { useModal } from '@/context/ModalContext';
+import { useToast } from '@/context/ToastContext';
 
 import styles from './WelcomePage.module.css';
 

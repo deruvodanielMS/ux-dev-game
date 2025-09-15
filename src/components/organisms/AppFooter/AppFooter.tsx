@@ -1,7 +1,8 @@
 import React from 'react';
 
-import { useModal } from '../../../context/ModalContext';
-import { Button } from '../../atoms/Button/Button';
+import { Button } from '@/components/atoms/Button/Button';
+
+import { useModal } from '@/context/ModalContext';
 
 import styles from './AppFooter.module.css';
 

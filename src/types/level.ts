@@ -1,6 +1,6 @@
-import { Card } from './card';
-import { Character } from './character';
-import { Item } from './item';
+import { type Card } from './card';
+import { type Character } from './character';
+import { type Item } from './item';
 
 export interface Level {
   id: string;
