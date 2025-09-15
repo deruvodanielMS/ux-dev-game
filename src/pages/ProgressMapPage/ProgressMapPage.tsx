@@ -82,10 +82,6 @@ export const ProgressMapPage = () => {
           )}
         </div>
       }
-      playerName={player.name || 'Jugador'}
-      currentLevelName={currentLevel.name}
-      levelDescription={currentLevel.description}
-      rewards={{ experience: currentLevel.rewards.experience }}
     />
   );
 };
