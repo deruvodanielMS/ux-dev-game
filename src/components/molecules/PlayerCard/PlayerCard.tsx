@@ -1,8 +1,10 @@
-import React from 'react';
-import styles from './PlayerCard.module.css';
-import StatusBar from '../../atoms/StatusBar/StatusBar';
+import { PlayerCardProps } from '../../../types/components-player-card';
 
-export default function PlayerCard({
+import { StatusBar } from '../../atoms/StatusBar/StatusBar';
+
+import styles from './PlayerCard.module.css';
+
+export const PlayerCard = ({
   name,
   avatarUrl,
   level = 1,
@@ -10,20 +12,25 @@ export default function PlayerCard({
   stamina = 100,
   isActive = false,
   variant = 'player',
-}: {
-  name: string;
-  avatarUrl?: string | null;
-  level?: number;
-  health?: number;
-  stamina?: number;
-  isActive?: boolean;
-  variant?: 'player' | 'enemy';
-}){
+}: PlayerCardProps) => {
   return (
-    <div className={`${styles.card} ${isActive ? styles.active : ''} ${variant === 'enemy' ? styles.enemy : ''}`}>
+    <div
+      className={`${styles.card} ${isActive ? styles.active : ''} ${variant === 'enemy' ? styles.enemy : ''}`}
+    >
       <div className={styles.top}>
         <div className={styles.avatar}>
-          {avatarUrl ? <img src={avatarUrl} alt={`${name} avatar`} /> : <div className={styles.placeholder}>{name.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase()}</div>}
+          {avatarUrl ? (
+            <img src={avatarUrl} alt={`${name} avatar`} />
+          ) : (
+            <div className={styles.placeholder}>
+              {name
+                .split(' ')
+                .map((n) => n[0])
+                .slice(0, 2)
+                .join('')
+                .toUpperCase()}
+            </div>
+          )}
         </div>
         <div className={styles.info}>
           <div className={styles.name}>{name}</div>
@@ -37,4 +44,4 @@ export default function PlayerCard({
       </div>
     </div>
   );
-}
+};

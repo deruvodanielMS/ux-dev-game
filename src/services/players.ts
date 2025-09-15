@@ -1,17 +1,4 @@
-export interface Player {
-  id: string;
-  name: string;
-  avatarUrl: string;
-  level: number;
-  exp: number;
-  coins: number;
-  softSkills: number;
-  techSkills: number;
-  coreValues: number;
-  creativity: number;
-  aiLevel: number;
-  characterId: string;
-}
+import { Player } from '../types';
 
 const API_URL = '/api/players';
 const LS_KEY = 'duelo_players_v1';
@@ -38,9 +25,35 @@ function writeToLocalStorage(players: Player[]): void {
   }
 }
 
+export async function getPlayer(id: string): Promise<Player | null> {
+  const players = await fetchPlayers();
+  const player = players.find((p) => p.id === id);
+  // Mock player data if not found for demonstration
+  if (!player) {
+    return {
+      id: '1',
+      name: 'Dev Player',
+      level: 1,
+      experience: 0,
+      characters: [],
+      inventory: {
+        items: [],
+        cards: [],
+      },
+      progress: {
+        currentLevelId: '1',
+        completedLevels: [],
+      },
+    };
+  }
+  return player || null;
+}
+
 export async function fetchPlayers(): Promise<Player[]> {
   try {
-    const res = await fetch(API_URL, { headers: { 'Accept': 'application/json' } });
+    const res = await fetch(API_URL, {
+      headers: { Accept: 'application/json' },
+    });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = (await res.json()) as Player[];
     return Array.isArray(data) ? data : [];
@@ -53,7 +66,10 @@ export async function savePlayer(player: Player): Promise<Player> {
   try {
     const res = await fetch(API_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
       body: JSON.stringify(player),
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -62,7 +78,8 @@ export async function savePlayer(player: Player): Promise<Player> {
   } catch {
     const existing = readFromLocalStorage();
     const idx = existing.findIndex((p) => p.id === player.id);
-    if (idx >= 0) existing[idx] = player; else existing.push(player);
+    if (idx >= 0) existing[idx] = player;
+    else existing.push(player);
     writeToLocalStorage(existing);
     return player;
   }
@@ -72,7 +89,10 @@ export async function upsertPlayers(players: Player[]): Promise<Player[]> {
   try {
     const res = await fetch(API_URL, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
       body: JSON.stringify(players),
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -89,9 +109,12 @@ export async function upsertPlayers(players: Player[]): Promise<Player[]> {
 }
 
 // Update avatar URL for a player locally and in Supabase if available
-import supabase from './supabase';
+import { supabase } from './supabase';
 
-export async function updatePlayerAvatar(authUid: string, avatarUrl: string): Promise<void> {
+export async function updatePlayerAvatar(
+  authUid: string,
+  avatarUrl: string,
+): Promise<void> {
   // Update local storage copy if a local player with same id exists
   const current = readFromLocalStorage();
   const idx = current.findIndex((p) => p.id === authUid);
@@ -102,90 +125,120 @@ export async function updatePlayerAvatar(authUid: string, avatarUrl: string): Pr
 
   if (!supabase) return;
 
-  let lastError: any = null;
-  try {
-    // 1) Try update by id (uuid) using snake_case avatar_url
-    const res1 = await supabase.from('players').update({ avatar_url: avatarUrl }).eq('id', authUid);
-    if (!res1.error) return; // success
-    lastError = res1.error;
+  let lastError: Error | null = null;
+  // 1) Try update by id (uuid) using snake_case avatar_url
+  const res1 = await supabase
+    .from('players')
+    .update({ avatar_url: avatarUrl })
+    .eq('id', authUid);
+  if (!res1.error) return; // success
+  lastError = res1.error;
 
-    // 2) Try update by slug (some tables use slug text identifiers)
-    const res2 = await supabase.from('players').update({ avatar_url: avatarUrl }).eq('slug', authUid);
-    if (!res2.error) return; // success
-    lastError = res2.error;
+  // 2) Try update by slug (some tables use slug text identifiers)
+  const res2 = await supabase
+    .from('players')
+    .update({ avatar_url: avatarUrl })
+    .eq('slug', authUid);
+  if (!res2.error) return; // success
+  lastError = res2.error;
 
-    // 3) Fallback: upsert a player record using authUid as id so the avatar is associated (snake_case)
-    const userRes = await supabase.auth.getUser();
-    const user = userRes.data?.user ?? null;
-    const name = user?.email ?? authUid;
-    const email = user?.email ?? authUid;
-    const payload: any = { id: authUid, name, email, avatar_url: avatarUrl, level: 1, slug: authUid };
-    const upsertRes = await supabase.from('players').upsert(payload);
-    if (!upsertRes.error) return; // success
-    lastError = upsertRes.error;
+  // 3) Fallback: upsert a player record using authUid as id so the avatar is associated (snake_case)
+  const userRes = await supabase.auth.getUser();
+  const user = userRes.data?.user ?? null;
+  const name = user?.email ?? authUid;
+  const email = user?.email ?? authUid;
+  const payload = {
+    id: authUid,
+    name,
+    email,
+    avatar_url: avatarUrl,
+    level: 1,
+    slug: authUid,
+  };
+  const upsertRes = await supabase.from('players').upsert(payload);
+  if (!upsertRes.error) return; // success
+  lastError = upsertRes.error;
 
-    // all attempts failed
-    const err = new Error(lastError?.message ?? 'Failed to update avatar');
-    (err as any).original = lastError;
-    throw err;
-  } catch (err) {
-    // surface error to caller
-    throw err;
-  }
+  // all attempts failed
+  const err = new Error(lastError?.message ?? 'Failed to update avatar');
+  throw err;
 }
 
-export async function updatePlayerProfile(authUid: string, data: { name?: string | null; email?: string | null }): Promise<void> {
+export async function updatePlayerProfile(
+  authUid: string,
+  data: { name?: string | null; email?: string | null },
+): Promise<void> {
   // Update local storage copy if a local player with same id exists
   const current = readFromLocalStorage();
   const idx = current.findIndex((p) => p.id === authUid);
   if (idx >= 0) {
-    current[idx] = { ...current[idx], ...(data.name !== undefined ? { name: data.name } : {}), ...(data.email !== undefined ? { email: data.email } : {}) } as Player;
+    current[idx] = {
+      ...current[idx],
+      ...(data.name !== undefined ? { name: data.name } : {}),
+      ...(data.email !== undefined ? { email: data.email } : {}),
+    } as Player;
     writeToLocalStorage(current);
   }
 
   if (!supabase) return;
 
-  let lastError: any = null;
-  try {
-    const payload: any = {};
-    if (data.name !== undefined) payload.name = data.name;
-    if (data.email !== undefined) payload.email = data.email;
+  let lastError: Error | null = null;
+  const payload: { name?: string | null; email?: string | null } = {};
+  if (data.name !== undefined) payload.name = data.name;
+  if (data.email !== undefined) payload.email = data.email;
 
-    if (Object.keys(payload).length === 0) return;
+  if (Object.keys(payload).length === 0) return;
 
-    // 1) Try update by id
-    const res1 = await supabase.from('players').update(payload).eq('id', authUid);
-    if (!res1.error) return; // success
-    lastError = res1.error;
+  // 1) Try update by id
+  const res1 = await supabase.from('players').update(payload).eq('id', authUid);
+  if (!res1.error) return; // success
+  lastError = res1.error;
 
-    // 2) Try update by slug
-    const res2 = await supabase.from('players').update(payload).eq('slug', authUid);
-    if (!res2.error) return; // success
-    lastError = res2.error;
+  // 2) Try update by slug
+  const res2 = await supabase
+    .from('players')
+    .update(payload)
+    .eq('slug', authUid);
+  if (!res2.error) return; // success
+  lastError = res2.error;
 
-    // 3) Fallback: upsert a player record using authUid as id
-    const userRes = await supabase.auth.getUser();
-    const user = userRes.data?.user ?? null;
-    const name = data.name ?? user?.email ?? authUid;
-    const emailVal = data.email ?? user?.email ?? authUid;
-    const upsertPayload: any = { id: authUid, name, email: emailVal, slug: authUid };
-    const upsertRes = await supabase.from('players').upsert(upsertPayload);
-    if (!upsertRes.error) return; // success
-    lastError = upsertRes.error;
+  // 3) Fallback: upsert a player record using authUid as id
+  const userRes = await supabase.auth.getUser();
+  const user = userRes.data?.user ?? null;
+  const name = data.name ?? user?.email ?? authUid;
+  const emailVal = data.email ?? user?.email ?? authUid;
+  const upsertPayload = {
+    id: authUid,
+    name,
+    email: emailVal,
+    slug: authUid,
+  };
+  const upsertRes = await supabase.from('players').upsert(upsertPayload);
+  if (!upsertRes.error) return; // success
+  lastError = upsertRes.error;
 
-    // all attempts failed
-    const err = new Error(lastError?.message ?? 'Failed to update profile');
-    (err as any).original = lastError;
-    throw err;
-  } catch (err) {
-    throw err;
-  }
+  // all attempts failed
+  const err = new Error(lastError?.message ?? 'Failed to update profile');
+  throw err;
+}
+
+export function sortPlayers(players: Player[]): Player[] {
+  return players.sort((a, b) => {
+    if (b.level !== a.level) return b.level - a.level;
+    if (b.experience !== a.experience) return b.experience - a.experience;
+    return a.name.localeCompare(b.name);
+  });
 }
 
 export function sortPlayersForLadder(players: Player[]): Player[] {
   return [...players].sort((a, b) => {
     if (b.level !== a.level) return b.level - a.level;
-    if (b.exp !== a.exp) return b.exp - a.exp;
+    if (b.experience !== a.experience) return b.experience - a.experience;
     return a.name.localeCompare(b.name);
   });
+}
+
+export function getTopPlayers(players: Player[], n: number): Player[] {
+  const sorted = sortPlayers(players);
+  return sorted.slice(0, n);
 }

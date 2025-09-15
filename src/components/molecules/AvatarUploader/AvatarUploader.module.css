@@ -1,57 +1,89 @@
-:root{
+:root {
   --muted: #9aa4b2;
-  --surface: rgba(255,255,255,0.02);
+  --surface: rgba(255, 255, 255, 0.02);
 }
 
-.uploader{
-  display:flex;
-  gap:1rem;
-  align-items:center;
+.uploader {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
 }
 
-.left{display:flex;flex-direction:column;gap:0.6rem;align-items:flex-start}
-
-.hint{color:var(--muted);font-size:0.9rem}
-
-.preview{
-  width:120px;
-  height:120px;
-  border-radius:12px;
-  background:var(--surface);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:visible; /* allow badge to be displayed outside image box */
-  border:1px solid rgba(255,255,255,0.03);
-  position:relative;
+.left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-items: flex-start;
 }
 
-.levelBadge{position:absolute;right:-10px;bottom:-14px;background:linear-gradient(90deg,#646cff,#535bf2);color:white;padding:0.25rem 0.5rem;border-radius:14px;font-weight:800;font-size:0.78rem;border:2px solid #0b0b0b;z-index:5}
+.hint {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.preview {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible; /* allow badge to be displayed outside image box */
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  position: relative;
+}
+
+.levelBadge {
+  position: absolute;
+  right: -10px;
+  bottom: -14px;
+  background: linear-gradient(90deg, #646cff, #535bf2);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 14px;
+  font-weight: 800;
+  font-size: 0.78rem;
+  border: 2px solid #0b0b0b;
+  z-index: 5;
+}
 
 /* ensure uploader has bottom spacing so badge doesn't overlap surrounding content */
-.left{display:flex;flex-direction:column;gap:0.6rem;align-items:flex-start;padding-bottom:14px}
-
-.preview img{width:100%;height:100%;object-fit:cover}
-
-.placeholder{
-  color:var(--muted);
-  font-size:0.85rem;
+.left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-items: flex-start;
+  padding-bottom: 14px;
 }
 
-.controls{
-  display:flex;
-  gap:0.6rem;
-  align-items:center;
+.preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.fileInput{display:none}
+.placeholder {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
 
-.choose{
-  padding:0.6rem 0.9rem;
-  background:transparent;
-  border-radius:8px;
-  border:1px solid rgba(255,255,255,0.04);
-  color:var(--muted);
-  cursor:pointer;
-  font-size:0.95rem;
+.controls {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.fileInput {
+  display: none;
+}
+
+.choose {
+  padding: 0.6rem 0.9rem;
+  background: transparent;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.95rem;
 }

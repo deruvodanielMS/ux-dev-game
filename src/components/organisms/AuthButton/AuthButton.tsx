@@ -1,10 +1,19 @@
 import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
-import styles from './AuthButton.module.css';
+
 import { syncAuth0User } from '../../../services/auth';
 
-export default function AuthButton() {
-  const { loginWithPopup, loginWithRedirect, logout, user, getAccessTokenSilently, isAuthenticated } = useAuth0();
+import styles from './AuthButton.module.css';
+
+export const AuthButton: React.FC = () => {
+  const {
+    loginWithPopup,
+    loginWithRedirect,
+    logout,
+    user,
+    getAccessTokenSilently,
+    isAuthenticated,
+  } = useAuth0();
 
   const handleLogin = async () => {
     console.log('AuthButton: handleLogin clicked');
@@ -19,7 +28,9 @@ export default function AuthButton() {
       }
 
       try {
-        const token = getAccessTokenSilently ? await getAccessTokenSilently() : null;
+        const token = getAccessTokenSilently
+          ? await getAccessTokenSilently()
+          : null;
         if (token) {
           await syncAuth0User(token);
         }
@@ -50,12 +61,28 @@ export default function AuthButton() {
     <div className={styles.authWrapper}>
       {isAuthenticated ? (
         <>
-          <img className={styles.avatar} src={user?.picture} alt={user?.name || 'avatar'} />
-          <button className={styles.button} onClick={handleLogout} aria-label="Cerrar sesión">Cerrar</button>
+          <img
+            className={styles.avatar}
+            src={user?.picture}
+            alt={user?.name || 'avatar'}
+          />
+          <button
+            className={styles.button}
+            onClick={handleLogout}
+            aria-label="Cerrar sesión"
+          >
+            Cerrar
+          </button>
         </>
       ) : (
-        <button className={styles.button} onClick={handleLogin} aria-label="Iniciar sesión">Login</button>
+        <button
+          className={styles.button}
+          onClick={handleLogin}
+          aria-label="Iniciar sesión"
+        >
+          Login
+        </button>
       )}
     </div>
   );
-}
+};

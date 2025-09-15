@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { fetchPlayers, savePlayer, sortPlayersForLadder, type Player } from '../services/players';
+
+import {
+  fetchPlayers,
+  type Player,
+  savePlayer,
+  sortPlayersForLadder,
+} from '../services/players';
 
 export type UsePlayersState = {
   players: Player[];
@@ -8,7 +14,11 @@ export type UsePlayersState = {
 };
 
 export const usePlayers = () => {
-  const [{ players, loading, error }, setState] = useState<UsePlayersState>({ players: [], loading: true, error: null });
+  const [{ players, loading, error }, setState] = useState<UsePlayersState>({
+    players: [],
+    loading: true,
+    error: null,
+  });
 
   const load = useCallback(async () => {
     setState((s) => ({ ...s, loading: true, error: null }));
@@ -30,7 +40,8 @@ export const usePlayers = () => {
     setState((s) => {
       const idx = s.players.findIndex((p) => p.id === saved.id);
       const next = [...s.players];
-      if (idx >= 0) next[idx] = saved; else next.push(saved);
+      if (idx >= 0) next[idx] = saved;
+      else next.push(saved);
       return { ...s, players: next };
     });
     return saved;

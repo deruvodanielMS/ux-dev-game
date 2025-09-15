@@ -1,13 +1,49 @@
-.toastRoot{position:fixed;right:1rem;bottom:1rem;display:flex;flex-direction:column;gap:0.5rem;z-index:1200}
-.toast{min-width:200px;max-width:360px;padding:0.6rem 0.75rem;border-radius:10px;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,0.45);cursor:pointer}
-.toastTitle{font-weight:800;margin-bottom:0.25rem}
-.toastMessage{font-size:0.95rem}
-.toast.info{background:linear-gradient(90deg,#3b82f6,#60a5fa)}
-.toast.success{background:linear-gradient(90deg,#10b981,#34d399)}
-.toast.warning{background:linear-gradient(90deg,#f59e0b,#f97316)}
-.toast.danger{background:linear-gradient(90deg,#ef4444,#f97375)}
+.toastRoot {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 1200;
+}
+.toast {
+  min-width: 200px;
+  max-width: 360px;
+  padding: 0.6rem 0.75rem;
+  border-radius: 10px;
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+}
+.toastTitle {
+  font-weight: 800;
+  margin-bottom: 0.25rem;
+}
+.toastMessage {
+  font-size: 0.95rem;
+}
+.toast.info {
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+.toast.success {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+.toast.warning {
+  background: linear-gradient(90deg, #f59e0b, #f97316);
+}
+.toast.danger {
+  background: linear-gradient(90deg, #ef4444, #f97375);
+}
 
-@media (max-width:600px){
-  .toastRoot{left:50%;right:auto;transform:translateX(-50%);bottom:1rem}
-  .toast{min-width:280px}
+@media (max-width: 600px) {
+  .toastRoot {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    bottom: 1rem;
+  }
+  .toast {
+    min-width: 280px;
+  }
 }

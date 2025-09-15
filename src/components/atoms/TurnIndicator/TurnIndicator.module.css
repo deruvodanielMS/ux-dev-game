@@ -1,3 +1,16 @@
-.indicator{padding:0.4rem 0.8rem;border-radius:999px;background:rgba(255,255,255,0.03);color:#cfeff7;font-weight:700;display:inline-block}
-.indicator[data-turn="player"]{box-shadow:0 8px 30px rgba(94,234,212,0.08);border:1px solid rgba(94,234,212,0.12)}
-.indicator[data-turn="enemy"]{box-shadow:0 8px 30px rgba(250,96,165,0.06);border:1px solid rgba(250,96,165,0.08)}
+.indicator {
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  color: #cfeff7;
+  font-weight: 700;
+  display: inline-block;
+}
+.indicator[data-turn='player'] {
+  box-shadow: 0 8px 30px rgba(94, 234, 212, 0.08);
+  border: 1px solid rgba(94, 234, 212, 0.12);
+}
+.indicator[data-turn='enemy'] {
+  box-shadow: 0 8px 30px rgba(250, 96, 165, 0.06);
+  border: 1px solid rgba(250, 96, 165, 0.08);
+}
