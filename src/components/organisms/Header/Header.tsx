@@ -9,7 +9,6 @@ import { AuthButton } from '@/components/organisms/AuthButton/AuthButton';
 import { useAudio } from '@/context/AudioContext';
 import { useGame } from '@/context/GameContext';
 import { useModal } from '@/context/ModalContext';
-import { syncAuth0User } from '@/services/auth';
 import { supabase } from '@/services/supabase';
 
 import styles from './Header.module.css';
@@ -80,21 +79,31 @@ export const Header: React.FC = () => {
 
   React.useEffect(() => {
     let mounted = true;
+
     (async () => {
       try {
+        console.log(isAuthenticated);
         if (!isAuthenticated || !getAccessTokenSilently) return;
         const token = await getAccessTokenSilently();
         if (!token) return;
-        await syncAuth0User(token);
+
         if (!supabase) return;
-        const auth0Id = auth0User?.sub ?? null;
-        if (!auth0Id) return;
+        const email = auth0User?.email ?? null;
+        if (!email) return;
         const { data: p } = await supabase
+          // .schema('private')
           .from('players')
           .select('*')
-          .or(`id.eq.${auth0Id},slug.eq.${auth0Id}`)
+          .eq(`email`, email)
           .limit(1)
           .single();
+        console.log('Fetched player profile from Supabase:', p);
+        if (!p) {
+          console.error('No player profile found');
+          await supabase
+            .from('players')
+            .insert({ email, name: auth0User?.name ?? email });
+        }
         if (!mounted) return;
         if (p) {
           setProfile(p);
