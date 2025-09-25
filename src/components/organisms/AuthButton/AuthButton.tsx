@@ -1,8 +1,6 @@
 import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 
-import { syncAuth0User } from '@/services/auth';
-
 import styles from './AuthButton.module.css';
 
 export const AuthButton: React.FC = () => {
@@ -31,9 +29,7 @@ export const AuthButton: React.FC = () => {
         const token = getAccessTokenSilently
           ? await getAccessTokenSilently()
           : null;
-        if (token) {
-          await syncAuth0User(token);
-        }
+        console.log('Access token obtained:', token);
       } catch (innerErr) {
         console.error('Failed to get access token silently', innerErr);
       }
