@@ -8,7 +8,6 @@ export interface GameState {
   allCharacters: Character[];
   loading: boolean;
   error: Error | null;
-  isLoggedIn: boolean;
 }
 
 export type GameAction =

@@ -4,6 +4,8 @@ import { type Item } from './item';
 
 export interface Player {
   id: string;
+  // slug: identificador externo (Auth0 sub) cuando id es numérico en DB
+  slug?: string | null;
   name: string;
   avatarUrl?: string | null;
   level: number;
@@ -17,12 +19,10 @@ export interface Player {
     currentLevelId: string;
     completedLevels: string[];
   };
-  // Auth related / legacy compatibility fields
   email?: string | null;
-  userId?: string | null;
+
   selectedCharacter?: string | null;
   githubPRs?: number;
   stats?: Record<string, number>;
   defeatedEnemies?: string[];
-  isLoggedIn?: boolean;
 }

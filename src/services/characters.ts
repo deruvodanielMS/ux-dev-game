@@ -9,8 +9,6 @@ type RawCharacterRow = {
   name?: string | null;
   avatarUrl?: string | null;
   avatar_url?: string | null;
-  avatar_path?: string | null;
-  avatar_path_url?: string | null;
   stats?: Character['stats'];
   abilities?: Character['abilities'];
 };
@@ -20,8 +18,6 @@ type RawPlayerRow = {
   name?: string | null;
   avatarUrl?: string | null;
   avatar_url?: string | null;
-  avatar_path?: string | null;
-  avatar_path_url?: string | null;
   stats?: Character['stats'];
   abilities?: Character['abilities'];
 };
@@ -40,8 +36,7 @@ export async function getCharacters(): Promise<Character[]> {
     if (!error && Array.isArray(data) && data.length > 0) {
       const mapped = await Promise.all(
         (data as RawCharacterRow[]).map(async (d) => {
-          const raw =
-            d.avatarUrl ?? d.avatar_url ?? d.avatar_path ?? d.avatar_path_url;
+          const raw = d.avatarUrl ?? d.avatar_url;
           let avatarUrl = extractAvatar(raw);
           if (!avatarUrl && raw) {
             try {
@@ -75,8 +70,7 @@ export async function getCharacters(): Promise<Character[]> {
     if (Array.isArray(data)) {
       const mapped = await Promise.all(
         (data as RawPlayerRow[]).map(async (p) => {
-          const raw =
-            p.avatarUrl ?? p.avatar_url ?? p.avatar_path ?? p.avatar_path_url;
+          const raw = p.avatarUrl ?? p.avatar_url;
           let avatarUrl = extractAvatar(raw);
           if (!avatarUrl && raw) {
             try {
@@ -126,8 +120,6 @@ export async function updateCharacterAvatar(
   if (!err2 && (count2 ?? 0) > 0) return;
 
   // As a last resort, attempt upsert into characters table
-  const userRes = await supabase.auth.getUser();
-  const user = userRes.data?.user ?? null;
   const upsertPayload: {
     id: string;
     name: string;
@@ -140,7 +132,7 @@ export async function updateCharacterAvatar(
     avatar_url: avatarUrl,
     level: 1,
   };
-  if (user?.id) upsertPayload.slug = characterId;
+  // slug assignment skipped (Auth provider decoupled)
   const { error: err3 } = await supabase
     .from('characters')
     .upsert(upsertPayload);

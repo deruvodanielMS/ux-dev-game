@@ -7,6 +7,9 @@ import type {
   GameState,
 } from '@/types/context/game';
 
+import { useAuth } from '@/context/AuthContext';
+import { publicAvatarUrlFor } from '@/services/avatars';
+
 import type { Player } from '@/types';
 
 // --- State and Initial State ---
@@ -17,7 +20,6 @@ const initialState: GameState = {
   allCharacters: [],
   loading: true,
   error: null,
-  isLoggedIn: false,
   userId: '',
 };
 
@@ -35,11 +37,10 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         player: action.payload.player,
         currentLevel: action.payload.level,
         allCharacters: action.payload.characters,
-        isLoggedIn: !!action.payload.player,
         loading: false,
       };
     case 'SET_PLAYER':
-      return { ...state, player: action.payload, isLoggedIn: !!action.payload };
+      return { ...state, player: action.payload };
     case 'UPDATE_PLAYER_DATA': {
       if (!state.player) return state;
       const partial = action.payload as Partial<Player> & {
@@ -54,12 +55,20 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         },
       };
     }
-    case 'SET_AVATAR':
+    case 'SET_AVATAR': {
       if (!state.player) return state;
+      const raw = action.payload; // ahora la convención es almacenar siempre URL completa
+      let normalized: string | null = raw || null;
+      if (normalized && !/^https?:\/\//i.test(normalized)) {
+        // convertir path relativo a URL completa
+        normalized = publicAvatarUrlFor(normalized);
+      }
+      const avatarUrl = normalized || state.player.avatarUrl || null;
       return {
         ...state,
-        player: { ...state.player, avatarUrl: action.payload },
+        player: { ...state.player, avatarUrl },
       };
+    }
     case 'ADD_DEFEATED_ENEMY':
       if (!state.player) return state;
       if (state.player.defeatedEnemies?.includes(action.payload)) return state;
@@ -100,6 +109,7 @@ function readFromStorage(): Player | null {
 export const GameProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
+  const auth = useAuth();
   const [state, dispatch] = useReducer(gameReducer, {
     ...initialState,
     player: readFromStorage(),
@@ -115,13 +125,36 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
     }
   }, [state.player]);
 
-  // Auth0 flow: initial data load can be deferred until after Auth0 user mapping (handled elsewhere)
+  // When auth user changes, if we have an authenticated user and no player yet or email differs, seed a basic player shell.
   useEffect(() => {
-    // For now just mark not loading if no Supabase sync.
+    if (auth.loading) return; // wait until auth resolves
+    if (!auth.isAuthenticated) {
+      // clear user-related state but keep loading false
+      dispatch({ type: 'CLEAR_USER' });
+      return;
+    }
+    const authUser = auth.user;
+    if (authUser) {
+      const existing = state.player;
+      if (!existing || existing.email !== authUser.email) {
+        const shell = {
+          id: existing?.id || authUser.id || 'local-' + Date.now().toString(36),
+          // prefer previously persisted id to keep continuity with localStorage
+          name: existing?.name || authUser.name || 'Sin nombre',
+          email: authUser.email || existing?.email || '',
+          level: existing?.level || 1,
+          stats: existing?.stats || {},
+          defeatedEnemies: existing?.defeatedEnemies || [],
+          avatarUrl: existing?.avatarUrl || authUser.picture || null,
+        } satisfies Partial<Player> as Player; // minimal shell cast to Player until server sync
+        dispatch({ type: 'SET_PLAYER', payload: shell });
+      }
+    }
     if (state.loading) {
       dispatch({ type: 'SET_LOADING', payload: false });
     }
-  }, [state.loading]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth.user, auth.isAuthenticated, auth.loading]);
 
   return (
     <GameContext.Provider value={{ state, dispatch }}>

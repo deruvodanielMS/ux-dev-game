@@ -1,8 +1,9 @@
+import { publicAvatarUrlFor } from '@/services/avatars';
 import { supabase } from '@/services/supabase';
 
 import type { Player } from '@/types';
 
-const API_URL = '/api/players';
+// Removed API_URL; direct Supabase access (read-only) is used now.
 const LS_KEY = 'duelo_players_v1';
 
 function readFromLocalStorage(): Player[] {
@@ -52,121 +53,144 @@ export async function getPlayer(id: string): Promise<Player | null> {
 }
 
 export async function fetchPlayers(): Promise<Player[]> {
+  // Attempt direct Supabase read (anon public RLS must allow SELECT or a policy for public stats)
   try {
-    const res = await fetch(API_URL, {
-      headers: { Accept: 'application/json' },
+    if (!supabase) throw new Error('Supabase client not configured');
+    const { data, error } = await supabase
+      .from('players')
+      .select('id, slug, name, level, experience, avatar_url, defeated_enemies')
+      .limit(200);
+    if (error) throw error;
+    if (!data) return readFromLocalStorage();
+    // Map fields to Player shape partially; preserve unknown fields gracefully
+    type PlayerRow = {
+      id: string;
+      slug?: string | null;
+      name?: string | null;
+      level?: number | null;
+      experience?: number | null;
+      avatar_url?: string | null;
+      defeated_enemies?: string[] | null;
+    };
+    return data.map((row: PlayerRow) => {
+      const existing = readFromLocalStorage().find((p) => p.id === row.id);
+      let avatarUrl = row.avatar_url || existing?.avatarUrl || null;
+      // Normalize: if rawPath exists and looks relative, build full URL and overwrite path with full URL (new convention)
+      if (avatarUrl && !/^https?:\/\//i.test(avatarUrl)) {
+        const full = publicAvatarUrlFor(avatarUrl);
+        if (full) {
+          if (!avatarUrl) avatarUrl = full;
+        }
+      }
+
+      return {
+        id: row.id,
+        slug: row.slug || existing?.slug || null,
+        name: row.name || existing?.name || 'Jugador',
+        level: row.level || existing?.level || 1,
+        experience: row.experience || existing?.experience || 0,
+
+        avatarUrl,
+        defeatedEnemies:
+          row.defeated_enemies || existing?.defeatedEnemies || [],
+        characters: existing?.characters || [],
+        inventory: existing?.inventory || { items: [], cards: [] },
+        progress: existing?.progress || {
+          currentLevelId: '1',
+          completedLevels: [],
+        },
+        stats: existing?.stats || {},
+      } as Player;
     });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = (await res.json()) as Player[];
-    return Array.isArray(data) ? data : [];
   } catch {
     return readFromLocalStorage();
   }
 }
 
 export async function savePlayer(player: Player): Promise<Player> {
-  try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify(player),
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const saved = (await res.json()) as Player;
-    return saved;
-  } catch {
-    const existing = readFromLocalStorage();
-    const idx = existing.findIndex((p) => p.id === player.id);
-    if (idx >= 0) existing[idx] = player;
-    else existing.push(player);
-    writeToLocalStorage(existing);
-    return player;
-  }
+  // No backend write; just persist locally (Supabase write restricted without auth session)
+  const existing = readFromLocalStorage();
+  const idx = existing.findIndex((p) => p.id === player.id);
+  if (idx >= 0) existing[idx] = player;
+  else existing.push(player);
+  writeToLocalStorage(existing);
+  return player;
 }
 
 export async function upsertPlayers(players: Player[]): Promise<Player[]> {
-  try {
-    const res = await fetch(API_URL, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify(players),
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const saved = (await res.json()) as Player[];
-    return Array.isArray(saved) ? saved : players;
-  } catch {
-    const current = readFromLocalStorage();
-    const map = new Map<string, Player>(current.map((p) => [p.id, p]));
-    for (const p of players) map.set(p.id, p);
-    const merged = Array.from(map.values());
-    writeToLocalStorage(merged);
-    return merged;
-  }
+  // Local merge only (no backend upsert)
+  const current = readFromLocalStorage();
+  const map = new Map<string, Player>(current.map((p) => [p.id, p]));
+  for (const p of players) map.set(p.id, p);
+  const merged = Array.from(map.values());
+  writeToLocalStorage(merged);
+  return merged;
+}
+
+function isNumericId(value: string): boolean {
+  return /^\d+$/.test(value);
 }
 
 // Update avatar URL for a player locally and in Supabase if available
 export async function updatePlayerAvatar(
-  authUid: string,
-  avatarUrl: string,
+  id: string,
+  uploadedPathOrUrl: string,
 ): Promise<void> {
-  // Update local storage copy if a local player with same id exists
+  // actualizar localStorage si existe
   const current = readFromLocalStorage();
-  const idx = current.findIndex((p) => p.id === authUid);
+  const idx = current.findIndex((p) => p.id === id);
+  let fullUrl = uploadedPathOrUrl;
+  if (uploadedPathOrUrl && !/^https?:\/\//i.test(uploadedPathOrUrl)) {
+    const built = publicAvatarUrlFor(uploadedPathOrUrl);
+    if (built) fullUrl = built;
+  }
   if (idx >= 0) {
-    current[idx] = { ...current[idx], avatarUrl };
+    current[idx] = {
+      ...current[idx],
+      slug: current[idx].slug || id, // mantener slug para usuarios creados por slug
+      avatarPath: fullUrl,
+      avatarUrl: fullUrl,
+    } as Player;
     writeToLocalStorage(current);
   }
-
   if (!supabase) return;
-
-  let lastError: Error | null = null;
-  // 1) Try update by id (uuid) using snake_case avatar_url
-  const res1 = await supabase
+  // Evitar 403 de RLS: si no hay sesión autenticada en supabase (usamos Auth0) no intentamos escribir.
+  try {
+    const session = await supabase.auth.getSession();
+    if (!session.data.session) return; // sin sesión -> skip silencioso
+  } catch {
+    return;
+  }
+  // If id column in DB is BIGINT and id is non-numeric (Auth0 sub), avoid casting error by skipping direct id update.
+  const updatePayload = { avatar_url: fullUrl };
+  if (isNumericId(id)) {
+    const { error } = await supabase
+      .from('players')
+      .update(updatePayload)
+      .eq('id', id);
+    if (!error) return;
+    // fallback to slug if error persists
+  }
+  // Attempt slug match (requires a text slug column storing external auth id)
+  const { error: slugErr } = await supabase
     .from('players')
-    .update({ avatar_url: avatarUrl })
-    .eq('id', authUid);
-  if (!res1.error) return; // success
-  lastError = res1.error;
-
-  // 2) Try update by slug (some tables use slug text identifiers)
-  const res2 = await supabase
-    .from('players')
-    .update({ avatar_url: avatarUrl })
-    .eq('slug', authUid);
-  if (!res2.error) return; // success
-  lastError = res2.error;
-
-  // 3) Fallback: upsert a player record using authUid as id so the avatar is associated (snake_case)
-  const userRes = await supabase.auth.getUser();
-  const user = userRes.data?.user ?? null;
-  const name = user?.email ?? authUid;
-  const email = user?.email ?? authUid;
-  const payload = {
-    id: authUid,
-    name,
-    email,
-    avatar_url: avatarUrl,
-    level: 1,
-    slug: authUid,
-  };
-  const upsertRes = await supabase.from('players').upsert(payload);
-  if (!upsertRes.error) return; // success
-  lastError = upsertRes.error;
-
-  // all attempts failed
-  const err = new Error(lastError?.message ?? 'Failed to update avatar');
-  throw err;
+    .update(updatePayload)
+    .eq('slug', id);
+  if (slugErr) {
+    // As last resort try upsert (will still fail if schema incompatible)
+    await supabase
+      .from('players')
+      .upsert({ slug: id, ...updatePayload }, { onConflict: 'slug' });
+  }
 }
 
 export async function updatePlayerProfile(
   authUid: string,
-  data: { name?: string | null; email?: string | null },
+  data: {
+    name?: string | null;
+    email?: string | null;
+    avatarUrl?: string | null;
+  },
 ): Promise<void> {
   // Update local storage copy if a local player with same id exists
   const current = readFromLocalStorage();
@@ -181,20 +205,34 @@ export async function updatePlayerProfile(
   }
 
   if (!supabase) return;
+  // Intentamos escribir siempre; políticas RLS deben permitir update/upsert público controlado.
+  // Si la política requiere sesión y no la hay, simplemente fallará y capturamos.
 
   let lastError: Error | null = null;
-  const payload: { name?: string | null; email?: string | null } = {};
+  const payload: {
+    name?: string | null;
+    email?: string | null;
+    avatar_url?: string | null;
+  } = {};
   if (data.name !== undefined) payload.name = data.name;
   if (data.email !== undefined) payload.email = data.email;
+  if (data.avatarUrl !== undefined) {
+    payload.avatar_url = data.avatarUrl;
+  }
 
   if (Object.keys(payload).length === 0) return;
 
-  // 1) Try update by id
-  const res1 = await supabase.from('players').update(payload).eq('id', authUid);
-  if (!res1.error) return; // success
-  lastError = res1.error;
+  // 1) Try update by id (only if numeric to avoid BIGINT cast error)
+  if (isNumericId(authUid)) {
+    const res1 = await supabase
+      .from('players')
+      .update(payload)
+      .eq('id', authUid);
+    if (!res1.error) return; // success
+    lastError = res1.error;
+  }
 
-  // 2) Try update by slug
+  // 2) Try update by slug (external auth id)
   const res2 = await supabase
     .from('players')
     .update(payload)
@@ -202,20 +240,15 @@ export async function updatePlayerProfile(
   if (!res2.error) return; // success
   lastError = res2.error;
 
-  // 3) Fallback: upsert a player record using authUid as id
-  const userRes = await supabase.auth.getUser();
-  const user = userRes.data?.user ?? null;
-  const name = data.name ?? user?.email ?? authUid;
-  const emailVal = data.email ?? user?.email ?? authUid;
-  const upsertPayload = {
-    id: authUid,
-    name,
-    email: emailVal,
-    slug: authUid,
-  };
-  const upsertRes = await supabase.from('players').upsert(upsertPayload);
-  if (!upsertRes.error) return; // success
-  lastError = upsertRes.error;
+  // 3) Fallback: intentar upsert (creará registro si no existe) usando authUid como id
+  const upsertPayload = isNumericId(authUid)
+    ? { id: authUid, slug: authUid, ...payload }
+    : { slug: authUid, ...payload };
+  const res3 = await supabase
+    .from('players')
+    .upsert(upsertPayload, { onConflict: 'slug' });
+  if (!res3.error) return;
+  lastError = res3.error;
 
   // all attempts failed
   const err = new Error(lastError?.message ?? 'Failed to update profile');

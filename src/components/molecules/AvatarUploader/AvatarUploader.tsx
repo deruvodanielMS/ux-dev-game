@@ -1,118 +1,55 @@
-import { type ChangeEvent, useEffect, useState } from 'react';
+import { type ChangeEvent, useState } from 'react';
 
 import type { AvatarUploaderProps } from '@/types/components-avatar-uploader';
-
-import { Skeleton } from '@/components/atoms/Skeleton/Skeleton';
-
-import { useGame } from '@/context/GameContext';
-import { useToast } from '@/context/ToastContext';
-import { resolveAvatarUrl, uploadAvatar } from '@/services/avatars';
-import { supabase } from '@/services/supabase';
 
 import styles from './AvatarUploader.module.css';
 
 export const AvatarUploader = ({
-  userId: userIdProp,
-  onUploadSuccess,
+  onFileSelected,
   initialAvatar,
   initialLevel,
+  onValidationError,
+  onError,
+  maxSizeMB = 2,
+  acceptedTypes = ['image/png', 'image/jpeg', 'image/webp'],
 }: AvatarUploaderProps) => {
   const [preview, setPreview] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const { notify } = useToast();
-  const [userId, setUserId] = useState<string | undefined>(userIdProp);
-  const { dispatch } = useGame();
+  // dispatch ya no requerido para actualizar avatar inmediatamente
 
-  useEffect(() => {
-    if (userIdProp) setUserId(userIdProp);
-    else {
-      (async () => {
-        try {
-          if (!supabase) return;
-          const { data } = await supabase.auth.getUser();
-          const u = data?.user ?? null;
-          if (u) setUserId(u.id);
-        } catch {
-          // ignore
-        }
-      })();
-    }
-  }, [userIdProp]);
+  // user id now derived from props or GameContext (Auth0 seeded)
 
   const onFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files && e.target.files[0];
     if (!f) return;
+    // Validaciones
+    try {
+      if (f.size > maxSizeMB * 1024 * 1024) {
+        const msg = `La imagen excede ${maxSizeMB}MB.`;
+        onValidationError?.(msg);
+        return;
+      }
+      if (acceptedTypes.length && !acceptedTypes.includes(f.type)) {
+        const msg = 'Tipo de archivo no permitido.';
+        onValidationError?.(msg);
+        return;
+      }
+    } catch (err) {
+      onError?.(err);
+      return;
+    }
     const url = URL.createObjectURL(f);
     setPreview(url);
-    // auto-upload selected file
-    uploadFile(f);
+    onFileSelected?.(f);
   };
 
-  async function uploadFile(file: File) {
-    if (!file) {
-      notify({
-        message: 'Selecciona una imagen antes de confirmar.',
-        level: 'warning',
-      });
-      return;
-    }
-    if (!userId) {
-      notify({ message: 'Usuario no identificado.', level: 'danger' });
-      return;
-    }
-
-    setLoading(true);
-    notify({ message: 'Iniciando subida...', level: 'info', duration: 2000 });
-    try {
-      // upload returns storage path; resolve signed url for display
-      const storagePath = await uploadAvatar(file, userId);
-      let displayUrl = storagePath;
-      try {
-        const resolved = await resolveAvatarUrl(storagePath);
-        if (resolved) displayUrl = resolved;
-      } catch {
-        // ignore - fallback to storagePath
-      }
-
-      // optimistically update UI/context with signed URL
-      dispatch({ type: 'SET_AVATAR', payload: displayUrl });
-      setPreview(displayUrl);
-
-      // Inform parent about uploaded storage path so it can persist to DB on Save
-      onUploadSuccess?.(displayUrl, storagePath);
-      notify({
-        message: 'Avatar subido (pendiente de guardar).',
-        level: 'success',
-      });
-    } catch (err: unknown) {
-      const msg = (err as Error)?.message ?? String(err);
-      if (
-        msg.toLowerCase().includes('row-level') ||
-        msg.toLowerCase().includes('unauthorized')
-      ) {
-        notify({
-          title: 'Error de permisos',
-          message:
-            'No autorizado: la subida o actualización fue bloqueada por las políticas del servidor (RLS). Revisa auth_uid o ajusta políticas.',
-          level: 'danger',
-          duration: 8000,
-        });
-      } else {
-        notify({ message: msg || 'Error subiendo avatar.', level: 'danger' });
-      }
-    } finally {
-      setLoading(false);
-    }
-  }
+  // Subida eliminada de este componente.
 
   return (
     <div className={styles.uploader}>
       <div className={styles.left}>
         <div className={styles.hint}>Sube tu avatar</div>
         <div className={styles.preview} aria-hidden>
-          {loading ? (
-            <Skeleton width={120} height={120} className={styles.skel} />
-          ) : preview ? (
+          {preview ? (
             <>
               <img src={preview} alt="avatar preview" />
               {initialLevel && (
@@ -134,7 +71,6 @@ export const AvatarUploader = ({
 
       <div className={styles.controls}>
         <input
-          disabled={loading}
           type="file"
           accept="image/*"
           id="avatarFile"
@@ -142,7 +78,7 @@ export const AvatarUploader = ({
           className={styles.fileInput}
         />
         <label htmlFor="avatarFile" className={styles.choose}>
-          {loading ? 'Cargando...' : 'Elegir imagen'}
+          Elegir imagen
         </label>
       </div>
     </div>
