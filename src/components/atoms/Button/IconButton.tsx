@@ -1,31 +1,33 @@
 import React from 'react';
 
-import styles from './Button.module.css';
+import styles from './IconButton.module.css';
 
-import type { ButtonProps } from '@/types';
+import type { IconButtonProps } from '@/types';
 
-export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
   (
     {
-      children,
-      onClick,
-      variant = 'primary',
-      className = '',
+      icon,
       ariaLabel,
-      loading = false,
+      onClick,
+      className = '',
+      size = 'md',
+      variant = 'ghost',
       disabled = false,
-      type = 'button',
       title,
+      type = 'button',
     },
     ref,
   ) => {
     const classNames = [
-      styles.button,
+      styles.iconButton,
+      styles[`size-${size}`],
       variant === 'primary'
         ? styles.primary
         : variant === 'ghost'
           ? styles.ghost
           : styles.plain,
+      disabled ? styles.disabled : '',
       className,
     ]
       .filter(Boolean)
@@ -35,16 +37,15 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         type={type}
+        aria-label={ariaLabel}
         className={classNames}
         onClick={onClick}
-        aria-label={ariaLabel}
         title={title}
-        disabled={loading || disabled}
+        disabled={disabled}
       >
-        {loading ? <span className={styles.spinner} aria-hidden /> : null}
-        <span className={styles.label}>{children}</span>
+        {icon}
       </button>
     );
   },
 );
-Button.displayName = 'Button';
+IconButton.displayName = 'IconButton';

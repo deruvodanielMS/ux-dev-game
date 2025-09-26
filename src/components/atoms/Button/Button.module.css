@@ -82,6 +82,14 @@
   border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
+.plain {
+  background: transparent;
+  border: none;
+  color: inherit;
+  padding: 0.25rem;
+  gap: 0.25rem;
+}
+
 .button:focus {
   outline: none;
 }

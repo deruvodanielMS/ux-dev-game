@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 
 import { Button } from '@/components/atoms/Button/Button';
 import { AbsorbedCharactersSection } from '@/components/organisms/AbsorbedCharactersSection/AbsorbedCharactersSection';
+import { AuthButton } from '@/components/organisms/AuthButton/AuthButton';
 import { CharacterList } from '@/components/organisms/CharacterList/CharacterList';
-import { EmailLogin } from '@/components/organisms/EmailLogin/EmailLogin';
 
 import { useGame } from '@/context/GameContext';
 import { useModal } from '@/context/ModalContext';
@@ -89,20 +89,7 @@ export const WelcomePage = () => {
                       Mapa
                     </Button>
                   ) : (
-                    <Button
-                      onClick={() =>
-                        showModal({
-                          title: 'Iniciar Sesión',
-                          body: <EmailLogin />,
-                          allowClose: true,
-                        })
-                      }
-                      variant="ghost"
-                      className={styles.ghostLarge}
-                      ariaLabel="Login"
-                    >
-                      Login
-                    </Button>
+                    <AuthButton />
                   )}
                 </div>
               </div>

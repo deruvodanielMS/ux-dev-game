@@ -1,48 +1,20 @@
 import React from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
 import { useNavigate } from 'react-router-dom';
 
 import type { PlayerProfile } from '@/types/components/header';
 
+import { Button } from '@/components/atoms/Button/Button';
 import { AuthButton } from '@/components/organisms/AuthButton/AuthButton';
+import { SettingsModalContent } from '@/components/organisms/SettingsModal/SettingsModalContent';
 
 import { useAudio } from '@/context/AudioContext';
 import { useGame } from '@/context/GameContext';
 import { useModal } from '@/context/ModalContext';
-import { supabase } from '@/services/supabase';
+import { useLoadPlayerProfile } from '@/hooks/useLoadPlayerProfile';
 
 import styles from './Header.module.css';
 
-// Settings modal body
-const SettingsBody: React.FC = () => {
-  const audio = useAudio();
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <button
-          className={styles.playBtn}
-          onClick={() => (audio.isPlaying ? audio.pause() : audio.play())}
-          aria-label="Toggle music"
-        >
-          {audio.isPlaying ? '⏸' : '⏵'}
-        </button>
-        <label className={styles.volumeLabel} htmlFor="volume-slider">
-          Vol
-        </label>
-        <input
-          id="volume-slider"
-          className={styles.volume}
-          type="range"
-          min={0}
-          max={1}
-          step={0.01}
-          value={audio.volume}
-          onChange={(e) => audio.setVolume(Number(e.target.value))}
-        />
-      </div>
-    </div>
-  );
-};
+// Settings body extracted to SettingsModalContent component
 
 export const Header: React.FC = () => {
   const { state, dispatch } = useGame();
@@ -52,8 +24,10 @@ export const Header: React.FC = () => {
   const audio = useAudio();
   const [open, setOpen] = React.useState(false);
   const [profile, setProfile] = React.useState<PlayerProfile | null>(null);
-  const [hamburgerOpen, setHamburgerOpen] = React.useState(false);
   const wasLoggedRef = React.useRef<boolean>(false);
+  // Using Auth0 now; Supabase auth removed. Load profile only if we have player email in state.
+  const playerEmail = player?.email as string | undefined;
+  const { profile: loadedProfile } = useLoadPlayerProfile(playerEmail);
 
   // redirect first login to profile
   React.useEffect(() => {
@@ -69,88 +43,25 @@ export const Header: React.FC = () => {
     wasLoggedRef.current = state.isLoggedIn;
   }, [state.isLoggedIn, navigate, hideModal]);
 
-  // auth0 integration
-  const {
-    isAuthenticated,
-    getAccessTokenSilently,
-    logout: auth0Logout,
-    user: auth0User,
-  } = useAuth0();
-
+  // sync profile from loader
   React.useEffect(() => {
-    let mounted = true;
-
-    (async () => {
-      try {
-        console.log(isAuthenticated);
-        if (!isAuthenticated || !getAccessTokenSilently) return;
-        const token = await getAccessTokenSilently();
-        if (!token) return;
-
-        if (!supabase) return;
-        const email = auth0User?.email ?? null;
-        if (!email) return;
-        const { data: p } = await supabase
-          // .schema('private')
-          .from('players')
-          .select('*')
-          .eq(`email`, email)
-          .limit(1)
-          .single();
-        console.log('Fetched player profile from Supabase:', p);
-        if (!p) {
-          console.error('No player profile found');
-          await supabase
-            .from('players')
-            .insert({ email, name: auth0User?.name ?? email });
-        }
-        if (!mounted) return;
-        if (p) {
-          setProfile(p);
-          dispatch({
-            type: 'UPDATE_PLAYER_DATA',
-            payload: { name: p.name ?? player?.name ?? '' },
-          });
-          (async () => {
-            try {
-              let avatarVal =
-                p.avatar_url ?? p.avatarUrl ?? player?.avatarUrl ?? null;
-              if (
-                avatarVal &&
-                !(
-                  avatarVal.startsWith('http://') ||
-                  avatarVal.startsWith('https://')
-                )
-              ) {
-                const { resolveAvatarUrl } = await import('@/services/avatars');
-                const resolved = await resolveAvatarUrl(avatarVal);
-                if (resolved) avatarVal = resolved;
-              }
-              dispatch({ type: 'SET_AVATAR', payload: avatarVal });
-            } catch {
-              dispatch({
-                type: 'SET_AVATAR',
-                payload: p.avatar_url ?? player?.avatarUrl ?? null,
-              });
-            }
-          })();
-        }
-      } catch {
-        /* ignore */
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, getAccessTokenSilently, auth0User]);
+    if (loadedProfile) {
+      const mapped: PlayerProfile = {
+        name:
+          (loadedProfile as unknown as { name?: string | null }).name ??
+          player?.name ??
+          'Sin nombre',
+        level:
+          (loadedProfile as unknown as { level?: number | null }).level ??
+          player?.level ??
+          1,
+      };
+      setProfile(mapped);
+    }
+  }, [loadedProfile, player]);
 
   const avatarRef = React.useRef<HTMLDivElement | null>(null);
-  const mobileNavRef = React.useRef<HTMLElement | null>(null);
-  const hamburgerRef = React.useRef<HTMLButtonElement | null>(null);
-
   const toggleDropdown = () => setOpen((s) => !s);
-  const toggleHamburger = () => setHamburgerOpen((s) => !s);
 
   // close dropdowns when clicking outside
   React.useEffect(() => {
@@ -164,32 +75,19 @@ export const Header: React.FC = () => {
       ) {
         setOpen(false);
       }
-      if (
-        hamburgerOpen &&
-        mobileNavRef.current &&
-        target &&
-        !mobileNavRef.current.contains(target) &&
-        hamburgerRef.current &&
-        !hamburgerRef.current.contains(target)
-      ) {
-        setHamburgerOpen(false);
-      }
     }
     document.addEventListener('mousedown', onDocDown);
     return () => document.removeEventListener('mousedown', onDocDown);
-  }, [open, hamburgerOpen]);
+  }, [open]);
 
   const handleLogout = async () => {
-    try {
-      auth0Logout({ logoutParams: { returnTo: window.location.origin } });
-    } catch {
-      /* ignore */
-    }
+    // Auth0 logout is handled inside AuthButton; this just clears local UI state.
     dispatch({ type: 'UPDATE_PLAYER_DATA', payload: { name: '' } });
     dispatch({ type: 'SET_AVATAR', payload: null });
     setProfile(null);
     setOpen(false);
-    setHamburgerOpen(false);
+    // hamburger removed
+    // hamburger removed
     navigate('/');
   };
 
@@ -208,24 +106,18 @@ export const Header: React.FC = () => {
       </div>
       <div className={styles.right}>
         <div className={styles.controlsRow}>
-          <button
+          <Button
+            variant="plain"
             className={styles.playBtn}
             onClick={() => (audio.isPlaying ? audio.pause() : audio.play())}
-            aria-label="Toggle music"
+            ariaLabel="Toggle music"
+            title="Toggle music"
           >
             {audio.isPlaying ? '⏸' : '⏵'}
-          </button>
+          </Button>
           <AuthButton />
         </div>
-        <button
-          ref={hamburgerRef}
-          className={styles.hamburger}
-          aria-label="Abrir menu"
-          onClick={toggleHamburger}
-          aria-expanded={hamburgerOpen}
-        >
-          {hamburgerOpen ? '✕' : '☰'}
-        </button>
+
         <div className={styles.avatarWrap} ref={avatarRef}>
           <div
             className={styles.avatar}
@@ -269,68 +161,44 @@ export const Header: React.FC = () => {
                 </div>
               </div>
               <div className={styles.dropActions}>
-                <button
+                <Button
+                  variant="ghost"
                   className={styles.dropBtn}
                   onClick={() => {
                     navigate('/profile');
                     setOpen(false);
                   }}
+                  ariaLabel="Editar perfil"
                 >
                   Editar perfil
-                </button>
-                <button className={styles.dropBtnGhost} onClick={handleLogout}>
+                </Button>
+                <Button
+                  variant="ghost"
+                  className={styles.dropBtnGhost}
+                  onClick={handleLogout}
+                  ariaLabel="Cerrar sesión"
+                >
                   Cerrar sesión
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="ghost"
                   className={styles.dropBtn}
                   onClick={() => {
                     setOpen(false);
                     showModal({
                       title: 'Ajustes',
-                      body: <SettingsBody />,
+                      body: <SettingsModalContent />,
                       allowClose: true,
                     });
                   }}
+                  ariaLabel="Ajustes"
                 >
                   Settings
-                </button>
+                </Button>
               </div>
             </div>
           )}
         </div>
-        {hamburgerOpen && (
-          <nav
-            className={styles.mobileNav}
-            role="navigation"
-            ref={mobileNavRef}
-          >
-            <button
-              className={styles.mobileItem}
-              onClick={() => {
-                navigate('/profile');
-                setHamburgerOpen(false);
-              }}
-            >
-              Perfil
-            </button>
-            <button
-              className={styles.mobileItem}
-              onClick={() => {
-                setHamburgerOpen(false);
-                showModal({
-                  title: 'Ajustes',
-                  body: <SettingsBody />,
-                  allowClose: true,
-                });
-              }}
-            >
-              Ajustes
-            </button>
-            <button className={styles.mobileItemGhost} onClick={handleLogout}>
-              Cerrar sesión
-            </button>
-          </nav>
-        )}
       </div>
     </header>
   );

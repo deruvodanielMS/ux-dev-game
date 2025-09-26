@@ -8,6 +8,12 @@ import React, {
   useState,
 } from 'react';
 
+// Default background music tracks (royalty-free placeholders)
+const DEFAULT_TRACKS = [
+  'https://cdn.pixabay.com/download/audio/2022/03/15/audio_f5509d4f52.mp3?filename=arcade-funk-110045.mp3',
+  'https://cdn.pixabay.com/download/audio/2023/01/12/audio_bfa4b5d479.mp3?filename=loopable-atmospheric-video-game-music-133983.mp3',
+];
+
 import type { AudioContextType } from '@/types/context/audio';
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
@@ -58,19 +64,39 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const setVolume = (v: number) => setVolumeState(Math.max(0, Math.min(1, v)));
 
-  const play = useCallback(() => {
-    audioRef.current?.play();
+  // DEFAULT_TRACKS moved outside component scope (see bottom) if needed
+
+  const ensureSource = useCallback(() => {
+    if (audioRef.current && !audioRef.current.src) {
+      audioRef.current.src = DEFAULT_TRACKS[0];
+    }
   }, []);
+
+  const play = useCallback(() => {
+    if (!audioRef.current) return;
+    ensureSource();
+    const p = audioRef.current.play();
+    if (p && typeof p.catch === 'function') {
+      p.catch(() => undefined);
+    }
+  }, [ensureSource]);
 
   const pause = useCallback(() => {
     audioRef.current?.pause();
   }, []);
 
-  const setSource = (src?: string | null) => {
-    if (audioRef.current) {
-      audioRef.current.src = src ?? '';
-    }
-  };
+  const setSource = useCallback(
+    (src?: string | null) => {
+      if (audioRef.current) {
+        audioRef.current.src = src ?? '';
+        if (src && isPlaying) {
+          const p = audioRef.current.play();
+          p?.catch(() => undefined);
+        }
+      }
+    },
+    [isPlaying],
+  );
 
   const playSound = useCallback(
     (sound: string) => {
@@ -91,7 +117,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
       isPlaying,
       playSound,
     }),
-    [volume, isPlaying, playSound, play, pause],
+    [volume, isPlaying, playSound, play, pause, setSource],
   );
 
   return (

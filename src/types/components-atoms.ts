@@ -3,11 +3,27 @@ import type { CSSProperties, ReactNode } from 'react';
 
 export interface ButtonProps {
   children?: ReactNode;
-  onClick?: () => void;
-  variant?: 'primary' | 'ghost';
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  variant?: 'primary' | 'ghost' | 'plain';
   className?: string;
   ariaLabel?: string;
   loading?: boolean;
+  disabled?: boolean;
+  type?: 'button' | 'submit' | 'reset';
+  title?: string;
+}
+
+// Icon-only button (circular or square) for toolbar / header small actions
+export interface IconButtonProps {
+  icon: ReactNode; // required visual icon element (svg, span, etc.)
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  ariaLabel: string; // accessibility label required since no text
+  className?: string;
+  size?: 'xs' | 'sm' | 'md' | 'lg';
+  variant?: 'primary' | 'ghost' | 'plain';
+  disabled?: boolean;
+  title?: string; // optional tooltip
+  type?: 'button' | 'submit' | 'reset';
 }
 
 export interface StatusBarProps {

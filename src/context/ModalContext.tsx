@@ -2,6 +2,8 @@ import React, { createContext, useContext, useMemo, useState } from 'react';
 
 import type { ModalContextType, ModalOptions } from '@/types/context/modal';
 
+import { Button } from '@/components/atoms/Button/Button';
+import { IconButton } from '@/components/atoms/Button/IconButton';
 import styles from '@/components/organisms/Modal/Modal.module.css';
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
@@ -49,13 +51,19 @@ export const ModalProvider: React.FC<{ children: React.ReactNode }> = ({
                   <h3 className={styles.modalTitle}>{opts.title}</h3>
                 )}
                 {opts.allowClose !== false && (
-                  <button
-                    aria-label="Cerrar"
+                  <IconButton
+                    ariaLabel="Cerrar"
+                    icon={
+                      <span style={{ fontSize: '1.2rem', lineHeight: 1 }}>
+                        &times;
+                      </span>
+                    }
                     className={styles.modalClose}
                     onClick={hideModal}
-                  >
-                    &times;
-                  </button>
+                    variant="plain"
+                    size="sm"
+                    title="Cerrar"
+                  />
                 )}
               </div>
 
@@ -63,16 +71,18 @@ export const ModalProvider: React.FC<{ children: React.ReactNode }> = ({
 
               <div className={styles.modalActions}>
                 {opts.actions?.map((a, i) => (
-                  <button
+                  <Button
                     key={i}
+                    variant={a.variant === 'ghost' ? 'ghost' : 'primary'}
                     className={`${styles.modalBtn} ${a.variant === 'ghost' ? styles.ghost : ''}`}
                     onClick={() => {
                       a.onClick?.();
                       hideModal();
                     }}
+                    ariaLabel={a.label}
                   >
                     {a.label}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>

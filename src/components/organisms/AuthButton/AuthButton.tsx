@@ -1,6 +1,8 @@
 import React from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 
+import { Button } from '@/components/atoms/Button/Button';
+
 import styles from './AuthButton.module.css';
 
 export const AuthButton: React.FC = () => {
@@ -62,22 +64,26 @@ export const AuthButton: React.FC = () => {
             src={user?.picture}
             alt={user?.name || 'avatar'}
           />
-          <button
+          <Button
             className={styles.button}
             onClick={handleLogout}
-            aria-label="Cerrar sesión"
+            ariaLabel="Cerrar sesión"
+            variant="ghost"
+            title="Cerrar sesión"
           >
             Cerrar
-          </button>
+          </Button>
         </>
       ) : (
-        <button
+        <Button
           className={styles.button}
           onClick={handleLogin}
-          aria-label="Iniciar sesión"
+          ariaLabel="Iniciar sesión"
+          variant="primary"
+          title="Iniciar sesión"
         >
           Login
-        </button>
+        </Button>
       )}
     </div>
   );
