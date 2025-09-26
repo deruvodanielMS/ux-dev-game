@@ -104,13 +104,65 @@ export const CharacterCard = ({
           <div style={{ flex: 1 }}>
             <h4 style={{ margin: '0 0 8px 0' }}>Estadísticas</h4>
             {character.stats ? (
-              <ul style={{ margin: 0, paddingLeft: '1.1rem' }}>
-                {Object.entries(character.stats).map(([k, v]) => (
-                  <li key={k}>
-                    {k}: {v}
-                  </li>
-                ))}
-              </ul>
+              <div
+                style={{
+                  display: 'grid',
+                  gap: '0.5rem',
+                  gridTemplateColumns: 'repeat(auto-fill,minmax(120px,1fr))',
+                  margin: 0,
+                }}
+              >
+                {Object.entries(character.stats).map(([rawKey, v]) => {
+                  const key = rawKey as string;
+                  const labelMap: Record<string, string> = {
+                    battles_won: 'Batallas Ganadas',
+                    battles_lost: 'Batallas Perdidas',
+                    damage_dealt: 'Daño Infligido',
+                    damage_taken: 'Daño Recibido',
+                    enemies_defeated: 'Enemigos Derrotados',
+                    last_updated: 'Actualizado',
+                    ai_level: 'Nivel IA',
+                  };
+                  const label = labelMap[key] || key.replace(/_/g, ' ');
+                  const valueDisplay =
+                    key === 'last_updated' && typeof v === 'number'
+                      ? new Date(v).toLocaleString('es-ES', {
+                          hour12: false,
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })
+                      : String(v);
+                  return (
+                    <div
+                      key={key}
+                      style={{
+                        background: 'rgba(255,255,255,0.05)',
+                        padding: '6px 8px',
+                        borderRadius: 8,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 4,
+                        minHeight: 54,
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: 11,
+                          letterSpacing: 0.5,
+                          textTransform: 'uppercase',
+                          opacity: 0.7,
+                        }}
+                      >
+                        {label}
+                      </span>
+                      <strong style={{ fontSize: 14 }}>{valueDisplay}</strong>
+                    </div>
+                  );
+                })}
+              </div>
             ) : (
               <p style={{ margin: 0 }}>Sin estadísticas disponibles.</p>
             )}

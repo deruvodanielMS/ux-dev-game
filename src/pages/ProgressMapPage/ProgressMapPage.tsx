@@ -2,13 +2,14 @@ import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Button } from '@/components/atoms/Button/Button';
+import { LevelNode } from '@/components/atoms/LevelNode/LevelNode';
 import { Skeleton } from '@/components/atoms/Skeleton/Skeleton';
 import { ProgressMapTemplate } from '@/components/templates/ProgressMapTemplate/ProgressMapTemplate';
 
 import { useGame } from '@/context/GameContext';
 import enemiesData from '@/data/enemies.json';
 
-import './ProgressMapPage.module.css';
+import styles from './ProgressMapPage.module.css';
 
 // Simple derived grouping of enemies into pseudo-levels by difficulty for visualization
 type EnemyData = {
@@ -75,6 +76,37 @@ export const ProgressMapPage = () => {
   };
   const totalEnemies = (enemiesData as EnemyData[]).length;
 
+  // Construimos una serie lineal de "niveles" (enemies) para representar nodos
+  const allEnemies = levels.flatMap((g) => g.enemies);
+  const nodes = allEnemies.map((e, idx) => {
+    const done = defeated.includes(e.id);
+    const prev = allEnemies[idx - 1];
+    const unlocked = idx === 0 || (prev && defeated.includes(prev.id));
+    const current = !done && unlocked;
+    const state: 'locked' | 'current' | 'completed' = done
+      ? 'completed'
+      : current
+        ? 'current'
+        : 'locked';
+    return { id: e.id, index: idx, label: e.name, state, stars: done ? 3 : 0 };
+  });
+
+  // Posicionamiento simple serpenteante (zig-zag) calculado como porcentajes
+  const positioned = nodes.map((n, i) => {
+    const row = Math.floor(i / 5); // 5 nodos por fila virtual
+    const posInRow = i % 5;
+    const directionLeftToRight = row % 2 === 0;
+    const xSlot = directionLeftToRight ? posInRow : 4 - posInRow;
+    const x = 12 + xSlot * 18; // 12%, 30%, 48%, 66%, 84%
+    const y = 18 + row * 28; // escalonado vertical
+    return { ...n, x, y };
+  });
+
+  // Construir path SVG siguiendo los puntos
+  const pathD = positioned
+    .map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`)
+    .join(' ');
+
   return (
     <ProgressMapTemplate
       title={<h1 className="title">Mapa de Progreso</h1>}
@@ -85,86 +117,41 @@ export const ProgressMapPage = () => {
         </p>
       }
       map={
-        <div className="map">
-          {levels.map((lvl) => (
-            <div key={lvl.id} className="levelBlock">
-              <h2 className="levelTitle">{lvl.title}</h2>
-              <div className="levelRow">
-                {lvl.enemies.map((e, idx) => {
-                  const done = defeated.includes(e.id);
-                  // regla simple: un enemigo está desbloqueado si es el primero del grupo
-                  // o si el inmediatamente anterior del agrupado está derrotado
-                  const prev = lvl.enemies[idx - 1];
-                  const unlocked =
-                    idx === 0 || (prev && defeated.includes(prev.id));
-                  const diffLabel =
-                    e.difficulty === 'easy'
-                      ? 'Fácil'
-                      : e.difficulty === 'medium'
-                        ? 'Media'
-                        : e.difficulty === 'hard'
-                          ? 'Difícil'
-                          : e.difficulty;
-                  return (
-                    <button
-                      key={e.id}
-                      type="button"
-                      disabled={!unlocked || done}
-                      className={`node enemyCard ${done ? 'done' : ''} ${!unlocked && !done ? 'locked' : ''}`}
-                      onClick={() => unlocked && !done && goBattle(e.id)}
-                      aria-label={`Enemigo ${e.name} ${done ? 'derrotado' : unlocked ? 'disponible' : 'bloqueado'}`}
-                    >
-                      <div className="nodeContent">
-                        <div className="avatar">
-                          {e.avatar_url ? (
-                            <img src={e.avatar_url} alt={e.name} />
-                          ) : (
-                            <div className="placeholder">?</div>
-                          )}
-                        </div>
-                        <div className="infoBlock">
-                          <div className="nameRow">
-                            <span className="name">{e.name}</span>
-                            <span className={`badge diff-${e.difficulty}`}>
-                              {diffLabel}
-                            </span>
-                            {done && (
-                              <span className="check" title="Derrotado">
-                                ✔
-                              </span>
-                            )}
-                            {!done && !unlocked && (
-                              <span
-                                className="badge"
-                                style={{ background: '#1e293b' }}
-                                title="Bloqueado"
-                              >
-                                🔒
-                              </span>
-                            )}
-                          </div>
-                          {e.stats && (
-                            <ul className="statLine" aria-label="Estadísticas">
-                              <li title="Salud">❤ {e.stats.health}</li>
-                              <li title="Ataque">⚔ {e.stats.attack}</li>
-                              <li title="Defensa">🛡 {e.stats.defense}</li>
-                            </ul>
-                          )}
-                          {e.description && (
-                            <p className="desc" title={e.description}>
-                              {e.description.length > 60
-                                ? e.description.slice(0, 57) + '…'
-                                : e.description}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
+        <div className={styles.map}>
+          <svg
+            className={styles.pathLayer}
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            aria-hidden
+          >
+            <path
+              className={styles.dottedPath}
+              d={pathD.replace(
+                /(\d+\.?\d*) (\d+\.?\d*)/g,
+                (_, x, y) => `${x} ${y}`,
+              )}
+            />
+          </svg>
+          <div className={styles.nodesLayer}>
+            <div className={styles.nodesLayerInner}>
+              {positioned.map((n) => (
+                <div
+                  key={n.id}
+                  className={styles.nodeWrap}
+                  style={{ left: `${n.x}%`, top: `${n.y}%` }}
+                >
+                  <LevelNode
+                    id={n.id}
+                    index={n.index}
+                    label={n.label}
+                    stars={n.stars}
+                    state={n.state}
+                    onClick={(id) => goBattle(id)}
+                  />
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       }
       summary={

@@ -10,4 +10,7 @@ export interface PlayersContextValue {
   refresh: (force?: boolean) => Promise<void>;
   getById: (id: string) => Player | undefined;
   upsertLocal: (player: Player) => void;
+  updatePlayer: (id: string, patch: Partial<Player>) => void;
+  syncPlayer: (id: string) => Promise<Player | null>;
+  syncing: (id?: string) => boolean;
 }

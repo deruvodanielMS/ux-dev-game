@@ -47,6 +47,20 @@ const ensureRemotePlayerRecordMock = vi
 vi.mock('@/services/players', () => ({
   ensureRemotePlayerRecord: (...a: unknown[]) =>
     ensureRemotePlayerRecordMock(...a),
+  sortPlayersForLadder: (arr: Array<Record<string, unknown>>) => arr,
+  fetchPlayerById: (id: string) =>
+    Promise.resolve({
+      id,
+      name: 'Player',
+      level: 1,
+      experience: 0,
+      avatarUrl: null,
+      defeatedEnemies: [],
+      characters: [],
+      inventory: { items: [], cards: [] },
+      progress: { currentLevelId: '1', completedLevels: [] },
+      stats: {},
+    }),
 }));
 
 // Mock supabase client unused paths
@@ -57,6 +71,7 @@ import { BattlePage } from '@/pages/BattlePage/BattlePage';
 import { AudioProvider } from '@/context/AudioContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { GameProvider } from '@/context/GameContext';
+import { PlayersProvider } from '@/context/PlayersContext';
 import { ToastProvider } from '@/context/ToastContext';
 
 function Providers({ children }: { children: React.ReactNode }) {
@@ -64,7 +79,9 @@ function Providers({ children }: { children: React.ReactNode }) {
     <AuthProvider>
       <AudioProvider>
         <ToastProvider>
-          <GameProvider>{children}</GameProvider>
+          <PlayersProvider>
+            <GameProvider>{children}</GameProvider>
+          </PlayersProvider>
         </ToastProvider>
       </AudioProvider>
     </AuthProvider>

@@ -10,6 +10,7 @@ export * from './components-character-card';
 export * from './components-character-list';
 export * from './components-damage-number';
 export * from './components-player-card';
+export * from './components-progress-map';
 export * from './components-progress-map-template';
 export * from './components-stat-display';
 export * from './components-turn-indicator';

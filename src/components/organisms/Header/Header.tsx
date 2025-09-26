@@ -17,6 +17,17 @@ import styles from './Header.module.css';
 
 // Settings body extracted to SettingsModalContent component
 
+const Logo: React.FC<{ size?: number }> = ({ size = 40 }) => (
+  <img
+    src="/reshot-icon-robot-hand-LD4YZBQN36.svg"
+    width={size}
+    height={size}
+    alt="Robot Slayer logo"
+    loading="lazy"
+    style={{ display: 'block' }}
+  />
+);
+
 export const Header: React.FC = () => {
   const { state } = useGame();
   const auth = useAuth();
@@ -31,19 +42,18 @@ export const Header: React.FC = () => {
   const { profile: loadedProfile } = useLoadPlayerProfile(playerEmail);
   const isLoggedIn = auth.isAuthenticated && !!player;
 
-  // redirect first login to profile
+  // Removed automatic redirect to /profile to avoid unwanted navigation.
   React.useEffect(() => {
-    const was = wasLoggedRef.current;
-    if (!was && auth.isAuthenticated) {
+    // still close any open modal on first auth
+    if (!wasLoggedRef.current && auth.isAuthenticated) {
       try {
         hideModal();
       } catch {
         /* ignore */
       }
-      if (window.location.pathname !== '/profile') navigate('/profile');
     }
     wasLoggedRef.current = auth.isAuthenticated;
-  }, [auth.isAuthenticated, navigate, hideModal]);
+  }, [auth.isAuthenticated, hideModal]);
 
   // sync profile from loader
   React.useEffect(() => {
@@ -82,14 +92,15 @@ export const Header: React.FC = () => {
   return (
     <header className={styles.header}>
       <div className={styles.brandRow}>
-        <div
-          className={styles.brand}
-          onClick={() => navigate('/')}
-          onKeyDown={(e) => e.key === 'Enter' && navigate('/')}
-          role="button"
-          tabIndex={0}
-        >
-          UXDevsia
+        <div className={styles.brandGroup}>
+          <button
+            className={styles.brand}
+            onClick={() => navigate('/dashboard')}
+            aria-label="Go to dashboard"
+          >
+            <Logo size={36} />
+            <span className={styles.brandText}>RobotSlayer</span>
+          </button>
         </div>
       </div>
 

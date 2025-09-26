@@ -49,6 +49,20 @@ vi.mock('@/services/players', () => ({
   savePlayer: (...a: unknown[]) => savePlayerMock(...a),
   ensureRemotePlayerRecord: (...a: unknown[]) =>
     ensureRemotePlayerRecordMock(...a),
+  sortPlayersForLadder: (arr: Array<Record<string, unknown>>) => arr,
+  fetchPlayerById: (id: string) =>
+    Promise.resolve({
+      id,
+      name: 'Synced Name',
+      level: 1,
+      experience: 0,
+      avatarUrl: 'https://cdn.example.com/auth0-123/avatar-path.png',
+      defeatedEnemies: [],
+      characters: [],
+      inventory: { items: [], cards: [] },
+      progress: { currentLevelId: '1', completedLevels: [] },
+      stats: {},
+    }),
 }));
 
 // Minimal supabase mock (avoid network)
@@ -60,13 +74,16 @@ import { ProfileSetupPage } from '@/pages/ProfileSetupPage/ProfileSetupPage';
 
 import { AuthProvider } from '@/context/AuthContext';
 import { GameProvider } from '@/context/GameContext';
+import { PlayersProvider } from '@/context/PlayersContext';
 import { ToastProvider } from '@/context/ToastContext';
 
 function Providers({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
       <ToastProvider>
-        <GameProvider>{children}</GameProvider>
+        <PlayersProvider>
+          <GameProvider>{children}</GameProvider>
+        </PlayersProvider>
       </ToastProvider>
     </AuthProvider>
   );

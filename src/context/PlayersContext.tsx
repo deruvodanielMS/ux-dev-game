@@ -11,6 +11,7 @@ import type { PlayersContextValue } from '@/types/context/players';
 import type { Player } from '@/types/player';
 
 import {
+  fetchPlayerById,
   fetchPlayers,
   savePlayer,
   sortPlayersForLadder,
@@ -30,6 +31,7 @@ interface InternalState {
   loading: boolean;
   error: string | null;
   lastFetched: number | null;
+  syncingIds: Set<string>;
 }
 
 const PlayersContext = createContext<PlayersContextValue | undefined>(
@@ -47,25 +49,30 @@ export const PlayersProvider: React.FC<PlayersProviderProps> = ({
     loading: auto,
     error: null,
     lastFetched: null,
+    syncingIds: new Set(),
   });
   const inFlight = useRef<Promise<Player[]> | null>(null);
 
   const performFetch = useCallback(async (): Promise<Player[]> => {
+    window.__net?.start?.();
     setState((s) => ({ ...s, loading: true, error: null }));
     try {
       const list = await fetchPlayers();
-      setState({
+      setState((s) => ({
         players: list,
         ladder: sortPlayersForLadder(list),
         loading: false,
         error: null,
         lastFetched: Date.now(),
-      });
+        syncingIds: s.syncingIds,
+      }));
       return list;
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Error desconocido';
       setState((s) => ({ ...s, loading: false, error: message }));
       return [];
+    } finally {
+      window.__net?.end?.();
     }
   }, []);
 
@@ -104,8 +111,27 @@ export const PlayersProvider: React.FC<PlayersProviderProps> = ({
       if (idx >= 0) next[idx] = player;
       else next.push(player);
       const ladder = sortPlayersForLadder(next);
-      // persist locally via existing service (no remote write guaranteed)
       void savePlayer(player);
+      return { ...s, players: next, ladder };
+    });
+  }, []);
+
+  // Merge partial fields for a player in cache and re-sort ladder.
+  const updatePlayer = useCallback((id: string, patch: Partial<Player>) => {
+    setState((s) => {
+      const idx = s.players.findIndex((p) => p.id === id || p.slug === id);
+      if (idx === -1) return s; // nothing to do
+      const current = s.players[idx];
+      const merged: Player = {
+        ...current,
+        ...patch,
+        // deep merge of stats if present
+        stats: { ...(current.stats || {}), ...(patch.stats || {}) },
+      };
+      const next = [...s.players];
+      next[idx] = merged;
+      const ladder = sortPlayersForLadder(next);
+      void savePlayer(merged);
       return { ...s, players: next, ladder };
     });
   }, []);
@@ -120,6 +146,45 @@ export const PlayersProvider: React.FC<PlayersProviderProps> = ({
     refresh,
     getById,
     upsertLocal,
+    updatePlayer,
+    syncing: (id?: string) =>
+      id ? state.syncingIds.has(id) : state.syncingIds.size > 0,
+    syncPlayer: async (id: string) => {
+      setState((s) => ({
+        ...s,
+        syncingIds: new Set(s.syncingIds).add(id),
+      }));
+      try {
+        window.__net?.start?.();
+        const fresh = await fetchPlayerById(id);
+        if (fresh) {
+          setState((s) => {
+            const idx = s.players.findIndex((p) => p.id === fresh.id);
+            const next = [...s.players];
+            if (idx >= 0)
+              next[idx] = {
+                ...next[idx],
+                ...fresh,
+                stats: { ...(next[idx].stats || {}), ...(fresh.stats || {}) },
+              };
+            else next.push(fresh);
+            return {
+              ...s,
+              players: next,
+              ladder: sortPlayersForLadder(next),
+            };
+          });
+        }
+        return fresh;
+      } finally {
+        window.__net?.end?.();
+        setState((s) => {
+          const nextIds = new Set(s.syncingIds);
+          nextIds.delete(id);
+          return { ...s, syncingIds: nextIds };
+        });
+      }
+    },
   };
 
   return (

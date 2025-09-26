@@ -1,4 +1,4 @@
-import { publicAvatarUrlFor } from '@/services/avatars';
+import { publicAvatarUrlFor, sanitizeStorageKey } from '@/services/avatars';
 import { supabase } from '@/services/supabase';
 
 import type { Player } from '@/types';
@@ -58,7 +58,9 @@ export async function fetchPlayers(): Promise<Player[]> {
     if (!supabase) throw new Error('Supabase client not configured');
     const { data, error } = await supabase
       .from('players')
-      .select('id, slug, name, level, experience, avatar_url, defeated_enemies')
+      .select(
+        'id, slug, name, level, experience, avatar_url, defeated_enemies, stats',
+      )
       .limit(200);
     if (error) throw error;
     if (!data) return readFromLocalStorage();
@@ -71,10 +73,29 @@ export async function fetchPlayers(): Promise<Player[]> {
       experience?: number | null;
       avatar_url?: string | null;
       defeated_enemies?: string[] | null;
+      stats?: Record<string, number> | null;
     };
     return data.map((row: PlayerRow) => {
       const existing = readFromLocalStorage().find((p) => p.id === row.id);
       let avatarUrl = row.avatar_url || existing?.avatarUrl || null;
+      // Fallback: si no hay avatar_url pero conocemos el slug (o id) intentamos construir ruta determinista
+      if (!avatarUrl) {
+        const baseId = row.slug || row.id;
+        if (baseId) {
+          const safe = sanitizeStorageKey(baseId);
+          // intentamos extensiones comunes; primera que exista se usa
+          const exts = ['png', 'jpg', 'jpeg', 'webp'];
+          for (const ext of exts) {
+            const candidatePath = `${safe}/avatar.${ext}`;
+            const url = publicAvatarUrlFor(candidatePath);
+            // No podemos HEAD sincrónico aquí; asumimos png/jpg etc. Si no existe el servidor devolverá 404, la UI lo mostrará roto y forzará update real.
+            if (url) {
+              avatarUrl = url;
+              break;
+            }
+          }
+        }
+      }
       // Normalize: if rawPath exists and looks relative, build full URL and overwrite path with full URL (new convention)
       if (avatarUrl && !/^https?:\/\//i.test(avatarUrl)) {
         const full = publicAvatarUrlFor(avatarUrl);
@@ -99,11 +120,59 @@ export async function fetchPlayers(): Promise<Player[]> {
           currentLevelId: '1',
           completedLevels: [],
         },
-        stats: existing?.stats || {},
+        stats: row.stats || existing?.stats || {},
       } as Player;
     });
   } catch {
     return readFromLocalStorage();
+  }
+}
+
+// Fetch a single player by id or slug (tries id first then slug) returning partial Player shape
+export async function fetchPlayerById(id: string): Promise<Player | null> {
+  try {
+    if (!supabase) return null;
+    const isNumeric = /^\d+$/.test(id);
+    const selectCols =
+      'id, slug, name, level, experience, avatar_url, defeated_enemies, stats';
+    let row: RemotePlayerRow | null = null;
+    if (isNumeric) {
+      const { data, error } = await supabase
+        .from('players')
+        .select(selectCols)
+        .eq('id', id)
+        .maybeSingle();
+      if (!error && data) row = data; // else fallback to slug
+    }
+    if (!row) {
+      const { data, error } = await supabase
+        .from('players')
+        .select(selectCols)
+        .eq('slug', id)
+        .maybeSingle();
+      if (!error && data) row = data;
+    }
+    if (!row) return null;
+    let avatarUrl = row.avatar_url || null;
+    if (avatarUrl && !/^https?:\/\//i.test(avatarUrl)) {
+      const full = publicAvatarUrlFor(avatarUrl);
+      if (full) avatarUrl = full;
+    }
+    return {
+      id: row.id || row.slug || id,
+      slug: row.slug || null,
+      name: row.name || 'Jugador',
+      level: row.level || 1,
+      experience: row.experience || 0,
+      avatarUrl,
+      defeatedEnemies: row.defeated_enemies || [],
+      characters: [],
+      inventory: { items: [], cards: [] },
+      progress: { currentLevelId: '1', completedLevels: [] },
+      stats: row.stats || {},
+    } as Player;
+  } catch {
+    return null;
   }
 }
 
@@ -188,6 +257,21 @@ type RemotePlayerRow = {
 
 function mapRemoteRowToPlayerPartial(row: RemotePlayerRow): Partial<Player> {
   let avatarUrl = row.avatar_url || null;
+  if (!avatarUrl) {
+    const baseId = row.slug || row.id;
+    if (baseId) {
+      const safe = sanitizeStorageKey(baseId);
+      const exts = ['png', 'jpg', 'jpeg', 'webp'];
+      for (const ext of exts) {
+        const candidatePath = `${safe}/avatar.${ext}`;
+        const url = publicAvatarUrlFor(candidatePath);
+        if (url) {
+          avatarUrl = url;
+          break;
+        }
+      }
+    }
+  }
   if (avatarUrl && !/^https?:\/\//i.test(avatarUrl)) {
     const full = publicAvatarUrlFor(avatarUrl);
     if (full) avatarUrl = full;
@@ -251,33 +335,72 @@ export async function updatePlayerAvatar(
     writeToLocalStorage(current);
   }
   if (!supabase) return;
-  // Evitar 403 de RLS: si no hay sesión autenticada en supabase (usamos Auth0) no intentamos escribir.
+  window.__net?.start?.();
   try {
-    const session = await supabase.auth.getSession();
-    if (!session.data.session) return; // sin sesión -> skip silencioso
-  } catch {
-    return;
-  }
-  // If id column in DB is BIGINT and id is non-numeric (Auth0 sub), avoid casting error by skipping direct id update.
-  const updatePayload = { avatar_url: fullUrl };
-  if (isNumericId(id)) {
-    const { error } = await supabase
+    const updatePayload = { avatar_url: fullUrl };
+    console.debug(
+      '[avatar] intentando persistir avatar_url (evitando PATCH CORS)',
+      {
+        id,
+        fullUrl,
+      },
+    );
+    // 0) Intentar RPC set_player_avatar (requiere que hayas creado la función SQL)
+    try {
+      const rpcRes = await supabase.rpc('set_player_avatar', {
+        p_slug: id,
+        p_avatar_url: fullUrl,
+      });
+      if (!rpcRes.error) {
+        console.debug('[avatar] RPC set_player_avatar ok');
+        return;
+      }
+      console.warn(
+        '[avatar] RPC set_player_avatar falló, sigo con upsert',
+        rpcRes.error.message,
+      );
+    } catch (e) {
+      console.warn(
+        '[avatar] excepción en RPC set_player_avatar',
+        (e as Error).message,
+      );
+    }
+    // Estrategia: usar únicamente UPSERT (POST) para evitar método PATCH bloqueado por CORS.
+    // Prioridad slug (id externo) para no duplicar registros; si es numérico y existe constraint por id también funcionará.
+    const slugUpsert = { slug: id, ...updatePayload };
+    const numericUpsert = isNumericId(id)
+      ? { id, slug: id, ...updatePayload }
+      : null;
+
+    // 1) Intentar upsert por slug (onConflict=slug) -> POST
+    let res = await supabase
       .from('players')
-      .update(updatePayload)
-      .eq('id', id);
-    if (!error) return;
-    // fallback to slug if error persists
-  }
-  // Attempt slug match (requires a text slug column storing external auth id)
-  const { error: slugErr } = await supabase
-    .from('players')
-    .update(updatePayload)
-    .eq('slug', id);
-  if (slugErr) {
-    // As last resort try upsert (will still fail if schema incompatible)
-    await supabase
-      .from('players')
-      .upsert({ slug: id, ...updatePayload }, { onConflict: 'slug' });
+      .upsert(slugUpsert, { onConflict: 'slug' });
+    if (!res.error) {
+      console.debug('[avatar] upsert por slug ok (POST)');
+      return;
+    }
+    console.warn(
+      '[avatar] fallo upsert por slug, intentando variante numérica',
+      res.error.message,
+    );
+
+    // 2) Si id numérico, intentar upsert incluyendo id (onConflict=slug mantiene unicidad principal)
+    if (numericUpsert) {
+      res = await supabase
+        .from('players')
+        .upsert(numericUpsert, { onConflict: 'slug' });
+      if (!res.error) {
+        console.debug('[avatar] upsert numérico ok (POST)');
+        return;
+      }
+      console.warn('[avatar] fallo upsert numérico', res.error.message);
+    }
+  } catch (e) {
+    console.warn('[avatar] excepción en upsert avatar', (e as Error).message);
+    // silencioso; UI ya refleja el cambio local
+  } finally {
+    window.__net?.end?.();
   }
 }
 
@@ -319,33 +442,15 @@ export async function updatePlayerProfile(
 
   if (Object.keys(payload).length === 0) return;
 
-  // 1) Try update by id (only if numeric to avoid BIGINT cast error)
-  if (isNumericId(authUid)) {
-    const res1 = await supabase
-      .from('players')
-      .update(payload)
-      .eq('id', authUid);
-    if (!res1.error) return; // success
-    lastError = res1.error;
-  }
-
-  // 2) Try update by slug (external auth id)
-  const res2 = await supabase
-    .from('players')
-    .update(payload)
-    .eq('slug', authUid);
-  if (!res2.error) return; // success
-  lastError = res2.error;
-
-  // 3) Fallback: intentar upsert (creará registro si no existe) usando authUid como id
+  // Evitamos PATCH (update) por problemas CORS -> usamos sólo UPSERT (POST)
   const upsertPayload = isNumericId(authUid)
     ? { id: authUid, slug: authUid, ...payload }
     : { slug: authUid, ...payload };
-  const res3 = await supabase
+  const res = await supabase
     .from('players')
     .upsert(upsertPayload, { onConflict: 'slug' });
-  if (!res3.error) return;
-  lastError = res3.error;
+  if (!res.error) return;
+  lastError = res.error;
 
   // all attempts failed
   const err = new Error(lastError?.message ?? 'Failed to update profile');

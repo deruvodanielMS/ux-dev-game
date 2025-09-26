@@ -1,5 +1,6 @@
 import type { PlayerCardProps } from '@/types/components-player-card';
 
+import { Skeleton } from '@/components/atoms/Skeleton/Skeleton';
 import { StatusBar } from '@/components/atoms/StatusBar/StatusBar';
 
 import { resolvePlayerAvatar } from '@/services/avatarResolve';
@@ -15,11 +16,32 @@ export const PlayerCard = ({
   stamina = 100,
   isActive = false,
   variant = 'player',
-}: PlayerCardProps & { avatarPath?: string | null }) => {
+  syncing = false,
+}: PlayerCardProps & { avatarPath?: string | null; syncing?: boolean }) => {
   const resolvedAvatar = resolvePlayerAvatar({
     avatarUrl,
     avatarPath: avatarPath || null,
   });
+  if (syncing) {
+    return (
+      <div className={`${styles.card} ${styles.syncing}`} aria-busy>
+        <div className={styles.top}>
+          <div className={styles.avatar}>
+            <Skeleton width={64} height={64} circle />
+          </div>
+          <div className={styles.info}>
+            <Skeleton width={120} height={18} />
+            <Skeleton width={80} height={14} />
+          </div>
+        </div>
+        <div className={styles.bars}>
+          <Skeleton width={180} height={12} />
+          <Skeleton width={180} height={12} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className={`${styles.card} ${isActive ? styles.active : ''} ${variant === 'enemy' ? styles.enemy : ''}`}

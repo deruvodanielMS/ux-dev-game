@@ -9,6 +9,7 @@ import { AvatarUploader } from '@/components/molecules/AvatarUploader/AvatarUplo
 import { StatDisplay } from '@/components/molecules/StatDisplay/StatDisplay';
 
 import { useGame } from '@/context/GameContext';
+import { usePlayersContext } from '@/context/PlayersContext';
 import { useToast } from '@/context/ToastContext';
 
 import { publicAvatarUrlFor, uploadAvatar } from '@/services/avatars';
@@ -25,6 +26,8 @@ export const ProfileSetupPage = () => {
   const player = gameState.player;
   const navigate = useNavigate();
   const { notify } = useToast();
+  const { updatePlayer, syncPlayer, syncing } = usePlayersContext();
+  const syncingThis = player?.id ? syncing(player.id) : false;
   const userId = player?.id ?? null;
   const [email, setEmail] = useState<string>(player?.email ?? '');
   const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(
@@ -50,6 +53,8 @@ export const ProfileSetupPage = () => {
           // Persist y actualizar estado con URL final (convención unificada)
           await updatePlayerAvatar(userId, fullUrl);
           gameDispatch({ type: 'SET_AVATAR', payload: fullUrl });
+          // Actualizar cache global (ladder/dashboard) inmediatamente
+          updatePlayer(userId, { avatarUrl: fullUrl });
         } catch (upErr: unknown) {
           notify({
             message: 'Error subiendo avatar: ' + (upErr as Error)?.message,
@@ -67,6 +72,10 @@ export const ProfileSetupPage = () => {
       gameDispatch({
         type: 'UPDATE_PLAYER_DATA',
         payload: { name: player.name || '', email: email || null },
+      });
+      updatePlayer(userId, {
+        name: player.name || email || userId || 'Player',
+        email: email || null,
       });
       try {
         const ladderPlayer: Player = {
@@ -99,6 +108,10 @@ export const ProfileSetupPage = () => {
           level: 'warning',
         });
       }
+      // Force sync from backend (if possible) so dashboard/ladder show canonical stats
+      if (userId) {
+        void syncPlayer(userId);
+      }
       navigate('/ladder');
     } catch (err: unknown) {
       const msg = (err as Error)?.message ?? String(err);
@@ -116,6 +129,11 @@ export const ProfileSetupPage = () => {
     <div className={styles.page}>
       <main className={styles.card}>
         <h1 className={styles.title}>Configura tu Identidad Digital</h1>
+        {syncingThis && (
+          <div className={styles.syncing} aria-live="polite">
+            Sincronizando perfil...
+          </div>
+        )}
         <p className={styles.subtitle}>
           Tu identidad digital representa tu presencia en la red y tu reputación
           técnica. Sube un avatar para personalizarla.

@@ -6,6 +6,17 @@ import { useModal } from '@/context/ModalContext';
 
 import styles from './AppFooter.module.css';
 
+const FooterLogo: React.FC<{ size?: number }> = ({ size = 28 }) => (
+  <img
+    src="/reshot-icon-robot-hand-LD4YZBQN36.svg"
+    width={size}
+    height={size}
+    alt="Robot Slayer logo"
+    loading="lazy"
+    style={{ display: 'block' }}
+  />
+);
+
 export const AppFooter: React.FC = () => {
   const { showModal } = useModal();
 
@@ -38,7 +49,9 @@ export const AppFooter: React.FC = () => {
   return (
     <footer className={styles.footerWrap}>
       <div className={styles.container}>
-        <p className={styles.copy}>2025 UX Dev Team — Making sense</p>
+        <p className={styles.copy}>
+          <FooterLogo size={20} /> 2025 UX Dev Team — Making sense
+        </p>
         <div className={styles.actions}>
           <Button onClick={openRules} variant="ghost" ariaLabel="Info">
             Info

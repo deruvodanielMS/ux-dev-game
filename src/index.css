@@ -1,5 +1,7 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --font-body: 'Montserrat';
+  --font-display: 'Smooch Sans', 'Montserrat';
+  font-family: var(--font-body);
   line-height: 1.5;
   font-weight: 400;
 
@@ -30,9 +32,19 @@ body {
   min-height: 100vh;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
 h1 {
   font-size: 3.2em;
-  line-height: 1.1;
 }
 
 button {
@@ -52,6 +64,11 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+
+.page {
+  min-height: 85vh;
+  height: 100%;
 }
 
 @media (prefers-color-scheme: light) {

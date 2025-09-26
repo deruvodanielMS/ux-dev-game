@@ -46,11 +46,9 @@ export async function uploadAvatar(
 
   // Sanitizar userId (Auth0 sub puede contener '|', ':', etc.) para usarlo como carpeta.
   const safeUserId = sanitizeStorageKey(userId);
-
-  const fileExt = file.name.split('.').pop() ?? 'png';
-  const timestamp = Date.now();
-  const fileName = `${safeUserId}-${timestamp}.${fileExt}`; // unique filename to avoid caching collisions
-  const filePath = `${safeUserId}/${fileName}`;
+  const fileExt = (file.name.split('.').pop() || 'png').toLowerCase();
+  // Ruta determinista para permitir reemplazo sin acumular archivos
+  const filePath = `${safeUserId}/avatar.${fileExt}`;
 
   const { error: uploadError } = await supabase.storage
     .from('avatars')
@@ -75,7 +73,7 @@ export async function uploadAvatar(
 // Reemplaza caracteres no válidos en claves de almacenamiento.
 // Permitimos alfanumérico, '-', '_', '/', y convertimos el resto a '-'.
 // Además truncamos a 64 chars para evitar rutas excesivas.
-function sanitizeStorageKey(input: string): string {
+export function sanitizeStorageKey(input: string): string {
   const cleaned = input
     .trim()
     .toLowerCase()

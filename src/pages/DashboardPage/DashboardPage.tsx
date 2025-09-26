@@ -1,36 +1,25 @@
-/* eslint-disable simple-import-sort/imports */
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import type { Player } from '@/types';
 
 import { Button } from '@/components/atoms/Button/Button';
 import { CharacterList } from '@/components/organisms/CharacterList/CharacterList';
 
 import { useGame } from '@/context/GameContext';
-import { fetchPlayers, getTopPlayers } from '@/services/players';
+import { usePlayers } from '@/hooks/usePlayers';
+import { getTopPlayers } from '@/services/players';
 
 import styles from './DashboardPage.module.css';
 
 export const DashboardPage = () => {
   const navigate = useNavigate();
   const { state } = useGame();
-  const [players, setPlayers] = useState<Player[]>([]);
+  const { players, loading: playersLoading, refresh } = usePlayers();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const me = state.player;
 
   useEffect(() => {
-    let active = true;
-    fetchPlayers()
-      .then((res) => {
-        if (active) setPlayers(res);
-      })
-      .catch(() => {
-        /* silent */
-      });
-    return () => {
-      active = false;
-    };
+    if (players.length === 0) void refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const topPlayers = useMemo(() => getTopPlayers(players, 5), [players]);
@@ -73,13 +62,13 @@ export const DashboardPage = () => {
         </div>
         <div className={styles.card}>
           <h4>Jugadores totales</h4>
-          <strong>{players.length}</strong>
+          <strong>{playersLoading ? '...' : players.length}</strong>
         </div>
       </section>
 
       <div className={styles.flexRow}>
         <div className={styles.panel} style={{ flex: '2 1 520px' }}>
-          <h3 className={styles.sectionTitle}>Selecciona tu Personaje</h3>
+          <h3 className={styles.sectionTitle}>Personajes</h3>
           <CharacterList selectedId={selectedId} onSelect={setSelectedId} />
           <div className={styles.actionsRow}>
             <Button
@@ -103,7 +92,9 @@ export const DashboardPage = () => {
               </li>
             ))}
             {topPlayers.length === 0 && (
-              <li style={{ opacity: 0.6 }}>Sin jugadores aún</li>
+              <li style={{ opacity: 0.6 }}>
+                {playersLoading ? 'Cargando...' : 'Sin jugadores aún'}
+              </li>
             )}
           </ul>
         </div>

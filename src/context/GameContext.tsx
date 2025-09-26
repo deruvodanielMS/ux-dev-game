@@ -101,6 +101,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       }
       const defeated = state.player.defeatedEnemies || [];
       const already = defeated.includes(enemyId);
+      const existingStats = state.player.stats || {};
       return {
         ...state,
         player: {
@@ -108,8 +109,25 @@ function gameReducer(state: GameState, action: GameAction): GameState {
           experience: newXp,
           level,
           defeatedEnemies: already ? defeated : [...defeated, enemyId],
+          stats: {
+            ...existingStats,
+            last_updated: Date.now(),
+          },
         },
       };
+    }
+    case 'INCREMENT_STATS': {
+      if (!state.player) return state;
+      const increments = action.payload;
+      const current = state.player.stats || {};
+      const next: Record<string, number> = { ...current };
+      for (const [k, v] of Object.entries(increments)) {
+        const prev =
+          typeof current[k] === 'number' ? (current[k] as number) : 0;
+        next[k] = prev + v;
+      }
+      next.last_updated = Date.now();
+      return { ...state, player: { ...state.player, stats: next } };
     }
     case 'CLEAR_USER':
       return { ...initialState, loading: false };

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import type { CharacterListProps } from '@/types/components-character-list';
 import type { Player } from '@/types/player';
@@ -6,57 +6,37 @@ import type { Player } from '@/types/player';
 import { Button } from '@/components/atoms/Button/Button';
 import { CharacterCard } from '@/components/molecules/CharacterCard/CharacterCard';
 
-import { useToast } from '@/context/ToastContext';
-import { fetchPlayers, sortPlayers } from '@/services/players';
+import { usePlayers } from '@/hooks/usePlayers';
+import { sortPlayers } from '@/services/players';
 
 import styles from './CharacterList.module.css';
 
 export const CharacterList = ({ selectedId, onSelect }: CharacterListProps) => {
-  const [players, setPlayers] = useState<Player[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { notify } = useToast();
+  const { players, loading, error, refresh } = usePlayers();
+  // (notify not needed after refactor) keep hook call if future toasts desired
+  const [local, setLocal] = useState<Player[]>([]);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const list = await fetchPlayers();
-      const sorted = sortPlayers(list);
-      setPlayers(sorted);
-    } catch (err: unknown) {
-      const e = err as Error;
-      console.warn('Error loading players', e);
-      setError(e?.message ?? 'Error cargando jugadores');
-      setPlayers([]);
-      notify({
-        title: 'Error',
-        message: e?.message ?? 'Error cargando jugadores',
-        level: 'danger',
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [notify]);
-
+  // sync players into local sorted copy
   useEffect(() => {
-    let mounted = true;
-    (async () => {
-      if (!mounted) return;
-      await load();
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, [load]);
+    setLocal(sortPlayers(players));
+  }, [players]);
 
-  const active = players.map((p) => ({
-    id: p.id,
-    name: p.name,
-    level: p.level,
-    stats: p.stats,
-    avatarUrl: p.avatarUrl || undefined,
-  }));
+  // optional auto refresh if list empty
+  useEffect(() => {
+    if (players.length === 0) void refresh();
+  }, [players.length, refresh]);
+
+  const active = useMemo(
+    () =>
+      local.map((p) => ({
+        id: p.id,
+        name: p.name,
+        level: p.level,
+        stats: p.stats,
+        avatarUrl: p.avatarUrl || undefined,
+      })),
+    [local],
+  );
 
   if (loading)
     return (
@@ -71,7 +51,9 @@ export const CharacterList = ({ selectedId, onSelect }: CharacterListProps) => {
         ))}
       </div>
     );
-  if (error) return <div className={styles.list}>{error}</div>;
+  if (error) {
+    return <div className={styles.list}>{error}</div>;
+  }
   if (active.length === 0)
     return <div className={styles.list}>No hay jugadores disponibles.</div>;
 

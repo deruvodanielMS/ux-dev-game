@@ -1,23 +1,25 @@
 import { supabase } from '@/services/supabase';
 
+declare global {
+  interface Window {
+    __net?: { start?: () => void; end?: () => void };
+  }
+}
+
 import type { Player } from '@/types';
 
 // Persist experience, level and defeated enemies. Safe no-op if no session.
 export async function persistProgress(player: Player): Promise<void> {
   try {
-    // Update profile simple fields (name/avatar/email) via existing helper if needed
-    // Here we focus on experience, level, defeated_enemies
+    window.__net?.start?.();
     if (!supabase) return;
-    const session = await supabase.auth.getSession();
-    if (!session.data.session) return; // no supabase auth session -> skip
-
+    // Intentamos igual, aunque no haya sesión; si RLS bloquea, simplemente falla silencioso
     const payload: Record<string, unknown> = {
       experience: player.experience,
       level: player.level,
       defeated_enemies: player.defeatedEnemies || [],
+      ...(player.stats ? { stats: player.stats } : {}),
     };
-
-    // Attempt by numeric id first
     const numericId = /^\d+$/.test(player.id);
     if (numericId) {
       const { error } = await supabase
@@ -26,15 +28,11 @@ export async function persistProgress(player: Player): Promise<void> {
         .eq('id', player.id);
       if (!error) return;
     }
-
-    // Fallback by slug (external auth id)
     const { error: slugErr } = await supabase
       .from('players')
       .update(payload)
       .eq('slug', player.id);
     if (!slugErr) return;
-
-    // Last resort: upsert using slug
     await supabase
       .from('players')
       .upsert(
@@ -44,6 +42,8 @@ export async function persistProgress(player: Player): Promise<void> {
         { onConflict: 'slug' },
       );
   } catch {
-    // silent: offline or RLS restriction
+    // silent
+  } finally {
+    window.__net?.end?.();
   }
 }

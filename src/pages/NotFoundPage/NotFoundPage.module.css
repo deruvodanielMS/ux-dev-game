@@ -51,9 +51,6 @@
 }
 
 .code {
-  font-family:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
-    'Courier New', monospace;
   background: #1e1e1e;
   padding: 0.35rem 0.6rem;
   border-radius: 6px;

@@ -15,6 +15,7 @@ import { CardHand } from '@/components/organisms/CardHand/CardHand';
 
 import { useAudio } from '@/context/AudioContext';
 import { useGame } from '@/context/GameContext';
+import { usePlayersContext } from '@/context/PlayersContext';
 import enemies from '@/data/enemies.json';
 import { persistProgress } from '@/services/progress';
 
@@ -30,7 +31,12 @@ const initialState = (enemyHealth: number): State => ({
   battleLog: [],
 });
 
-function reducer(state: State, action: Action): State {
+// Track total damage dealt in state via closure variable? Instead embed in battleLog parsing or extend state.
+// Simpler: extend State with damageDealt accumulator.
+function reducer(
+  state: State & { damageDealt?: number },
+  action: Action,
+): State & { damageDealt?: number } {
   switch (action.type) {
     case 'PLAY_CARD': {
       if (!state.playerTurn) return state;
@@ -61,6 +67,7 @@ function reducer(state: State, action: Action): State {
             playerStamina: Math.max(0, state.playerStamina - staminaCost),
             playerTurn: false,
             battleLog: [log, ...state.battleLog],
+            damageDealt: (state.damageDealt || 0) + enemyDamage,
           };
         }
         case 'refactor': {
@@ -73,6 +80,7 @@ function reducer(state: State, action: Action): State {
             playerStamina: Math.max(0, state.playerStamina - staminaCost),
             playerTurn: false,
             battleLog: [log, ...state.battleLog],
+            damageDealt: (state.damageDealt || 0) + enemyDamage,
           };
         }
         default:
@@ -104,7 +112,7 @@ function reducer(state: State, action: Action): State {
       };
     }
     case 'RESET':
-      return initialState(50);
+      return { ...initialState(50), damageDealt: 0 };
     default:
       return state;
   }
@@ -112,6 +120,7 @@ function reducer(state: State, action: Action): State {
 
 export const BattlePage = () => {
   const { state: gameState, dispatch: gameDispatch } = useGame();
+  const { updatePlayer, syncPlayer, syncing } = usePlayersContext();
   const player = gameState.player;
   const location = useLocation();
   const params = new URLSearchParams(location.search);
@@ -124,7 +133,10 @@ export const BattlePage = () => {
     (enemyIdParam && allEnemies.find((e) => e.id === enemyIdParam)) ||
     fallback ||
     allEnemies[0];
-  const [s, dispatch] = useReducer(reducer, initialState(enemy.stats.health));
+  const [s, dispatch] = useReducer(reducer, {
+    ...initialState(enemy.stats.health),
+    damageDealt: 0,
+  });
   const navigate = useNavigate();
   const audio = useAudio();
   const [handledVictory, setHandledVictory] = useState(false);
@@ -197,11 +209,29 @@ export const BattlePage = () => {
           type: 'AWARD_EXPERIENCE',
           payload: { enemyId: enemy.id, amount },
         });
-        // Persist asynchronously (fire and forget)
+        gameDispatch({
+          type: 'INCREMENT_STATS',
+          payload: {
+            battles_won: 1,
+            enemies_defeated: 1,
+            damage_dealt: s.damageDealt || 0,
+          },
+        });
+        // Sync ladder/dashboard cache & persist progress inmediatamente (ligero defer para que el reducer aplique)
         setTimeout(() => {
           const latest = gameState.player;
-          if (latest) void persistProgress({ ...latest });
-        }, 50);
+          if (latest) {
+            updatePlayer(latest.id, {
+              level: latest.level,
+              experience: latest.experience,
+              stats: latest.stats,
+              defeatedEnemies: latest.defeatedEnemies,
+            });
+            void persistProgress({ ...latest }).then(() => {
+              void syncPlayer(latest.id);
+            });
+          }
+        }, 20);
       }
       // navigate back after short delay
       setTimeout(() => {
@@ -226,8 +256,11 @@ export const BattlePage = () => {
     enemy,
     navigate,
     s.playerHealth,
+    s.damageDealt,
     gameDispatch,
     gameState.player,
+    updatePlayer,
+    syncPlayer,
   ]);
 
   // generate damage numbers when enemy health decreases
@@ -255,6 +288,7 @@ export const BattlePage = () => {
     <div className={styles.page}>
       <div className={styles.arena}>
         <div className={styles.turnRow}>
+          {/* Could show syncing indicator if wanted */}
           <TurnIndicator turn={s.playerTurn ? 'player' : 'enemy'} />
         </div>
 
@@ -266,6 +300,7 @@ export const BattlePage = () => {
             health={s.playerHealth}
             stamina={s.playerStamina}
             isActive={s.playerTurn}
+            syncing={player?.id ? syncing(player.id) : false}
           />
         </div>
 
