@@ -3,6 +3,8 @@ import { useAuth0 } from '@auth0/auth0-react';
 
 import { Button } from '@/components/atoms/Button/Button';
 
+import { useGame } from '@/context/GameContext';
+
 import styles from './AuthButton.module.css';
 
 export const AuthButton: React.FC = () => {
@@ -14,6 +16,7 @@ export const AuthButton: React.FC = () => {
     getAccessTokenSilently,
     isAuthenticated,
   } = useAuth0();
+  const { dispatch } = useGame();
 
   const handleLogin = async () => {
     console.log('AuthButton: handleLogin clicked');
@@ -49,6 +52,12 @@ export const AuthButton: React.FC = () => {
   const handleLogout = async () => {
     try {
       // auth0-react v2 expects logout with logoutParams
+      dispatch({ type: 'CLEAR_USER' });
+      try {
+        localStorage.removeItem('duelo_player_state_v1');
+      } catch {
+        /* ignore */
+      }
       logout({ logoutParams: { returnTo: window.location.origin } });
     } catch (e) {
       console.error('logout error', e);

@@ -1,5 +1,5 @@
 import React, { useEffect, useReducer, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import type {
   BattleAction as Action,
@@ -16,6 +16,7 @@ import { CardHand } from '@/components/organisms/CardHand/CardHand';
 import { useAudio } from '@/context/AudioContext';
 import { useGame } from '@/context/GameContext';
 import enemies from '@/data/enemies.json';
+import { persistProgress } from '@/services/progress';
 
 import styles from './BattlePage.module.css';
 
@@ -112,7 +113,17 @@ function reducer(state: State, action: Action): State {
 export const BattlePage = () => {
   const { state: gameState, dispatch: gameDispatch } = useGame();
   const player = gameState.player;
-  const enemy: Enemy = (enemies as unknown as Enemy[])[0];
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const enemyIdParam = params.get('enemy');
+  const allEnemies = enemies as unknown as Enemy[];
+  // choose enemy by param, fallback to first not yet defeated or very first
+  const defeatedList = gameState.player?.defeatedEnemies || [];
+  const fallback = allEnemies.find((e) => !defeatedList.includes(e.id));
+  const enemy: Enemy =
+    (enemyIdParam && allEnemies.find((e) => e.id === enemyIdParam)) ||
+    fallback ||
+    allEnemies[0];
   const [s, dispatch] = useReducer(reducer, initialState(enemy.stats.health));
   const navigate = useNavigate();
   const audio = useAudio();
@@ -166,16 +177,39 @@ export const BattlePage = () => {
   useEffect(() => {
     if (s.enemyHealth <= 0 && !handledVictory) {
       setHandledVictory(true);
-      // add to defeated list
-      if (enemy.id)
-        gameDispatch({ type: 'ADD_DEFEATED_ENEMY', payload: enemy.id });
-      // small delay then navigate to progress map
+      if (enemy.id) {
+        // award experience based on difficulty
+        let amount = 50;
+        switch (enemy.difficulty) {
+          case 'easy':
+            amount = 50;
+            break;
+          case 'medium':
+            amount = 120;
+            break;
+          case 'hard':
+            amount = 250;
+            break;
+          default:
+            amount = 80;
+        }
+        gameDispatch({
+          type: 'AWARD_EXPERIENCE',
+          payload: { enemyId: enemy.id, amount },
+        });
+        // Persist asynchronously (fire and forget)
+        setTimeout(() => {
+          const latest = gameState.player;
+          if (latest) void persistProgress({ ...latest });
+        }, 50);
+      }
+      // navigate back after short delay
       setTimeout(() => {
         const go = window.confirm(
-          '¡Enemigo derrotado! ¿Ir al mapa de progreso?',
+          '¡Enemigo derrotado! Experiencia obtenida. ¿Ir al mapa de progreso?',
         );
         if (go) navigate('/progress');
-      }, 500);
+      }, 600);
     }
 
     if (s.playerHealth <= 0) {
@@ -193,6 +227,7 @@ export const BattlePage = () => {
     navigate,
     s.playerHealth,
     gameDispatch,
+    gameState.player,
   ]);
 
   // generate damage numbers when enemy health decreases

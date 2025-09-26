@@ -19,5 +19,6 @@ export type Enemy = {
   id: string;
   name: string;
   avatar_url: string;
+  difficulty?: 'easy' | 'medium' | 'hard' | string;
   stats: { health: number; attack: number; defense: number };
 };

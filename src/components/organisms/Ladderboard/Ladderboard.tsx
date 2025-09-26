@@ -1,6 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import type { LadderboardProps } from '@/types/components/ladderboard';
+
+import { Button } from '@/components/atoms/Button/Button';
 
 import { usePlayers } from '@/hooks/usePlayers';
 
@@ -8,6 +11,7 @@ import styles from './Ladderboard.module.css';
 
 export const Ladderboard: React.FC<LadderboardProps> = ({ className }) => {
   const { ladder, loading, error } = usePlayers();
+  const navigate = useNavigate();
 
   return (
     <section
@@ -66,6 +70,10 @@ export const Ladderboard: React.FC<LadderboardProps> = ({ className }) => {
               ))}
             </tbody>
           </table>
+
+          <Button onClick={() => navigate('/dashboard')}>
+            Ir al Dashboard
+          </Button>
         </div>
       )}
     </section>

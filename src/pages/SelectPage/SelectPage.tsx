@@ -30,7 +30,7 @@ export const SelectPage = () => {
               onClick={() => navigate('/battle')}
               ariaLabel="Confirmar selección"
             >
-              Confirmar
+              Empezar Batalla
             </Button>
           </div>
         </header>

@@ -6,6 +6,7 @@ import { AudioProvider } from '@/context/AudioContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { GameProvider } from '@/context/GameContext';
 import { ModalProvider } from '@/context/ModalContext';
+import { PlayersProvider } from '@/context/PlayersContext';
 import { ToastProvider } from '@/context/ToastContext';
 
 import './index.css';
@@ -26,20 +27,24 @@ createRoot(document.getElementById('root')!).render(
             authorizationParams={{ redirect_uri: window.location.origin }}
           >
             <AuthProvider>
-              <GameProvider>
-                <AudioProvider>
-                  <App />
-                </AudioProvider>
-              </GameProvider>
+              <PlayersProvider>
+                <GameProvider>
+                  <AudioProvider>
+                    <App />
+                  </AudioProvider>
+                </GameProvider>
+              </PlayersProvider>
             </AuthProvider>
           </Auth0Provider>
         ) : (
           // Fallback without Auth0: provide only non-auth providers
-          <GameProvider>
-            <AudioProvider>
-              <App />
-            </AudioProvider>
-          </GameProvider>
+          <PlayersProvider>
+            <GameProvider>
+              <AudioProvider>
+                <App />
+              </AudioProvider>
+            </GameProvider>
+          </PlayersProvider>
         )}
       </ModalProvider>
     </ToastProvider>

@@ -107,6 +107,103 @@ export async function fetchPlayers(): Promise<Player[]> {
   }
 }
 
+// Ensure a remote player record exists for the authenticated user (Auth0) using slug=auth user id.
+// Returns a partial Player (remote authoritative fields) or null if not possible.
+export async function ensureRemotePlayerRecord(params: {
+  id: string;
+  name?: string | null;
+  email?: string | null;
+  picture?: string | null;
+}): Promise<Partial<Player> | null> {
+  const { id, name, email, picture } = params;
+  if (!id) return null;
+  if (!supabase) return null; // cannot ensure without supabase client
+  try {
+    // 1) Try fetch existing by slug (external auth id)
+    const { data: existingBySlug, error: fetchSlugErr } = await supabase
+      .from('players')
+      .select(
+        'id, slug, name, level, experience, avatar_url, defeated_enemies, stats',
+      )
+      .eq('slug', id)
+      .maybeSingle();
+    if (!fetchSlugErr && existingBySlug) {
+      return mapRemoteRowToPlayerPartial(existingBySlug);
+    }
+
+    // 2) If not found by slug, optionally try by id if numeric
+    if (/^\d+$/.test(id)) {
+      const { data: existingById, error: fetchIdErr } = await supabase
+        .from('players')
+        .select(
+          'id, slug, name, level, experience, avatar_url, defeated_enemies, stats',
+        )
+        .eq('id', id)
+        .maybeSingle();
+      if (!fetchIdErr && existingById) {
+        return mapRemoteRowToPlayerPartial(existingById);
+      }
+    }
+
+    // 3) Not found → create via upsert (slug conflict key)
+    const upsertPayload: Record<string, unknown> = {
+      slug: id,
+      name: name || email || 'Jugador',
+      email: email || null,
+      avatar_url: picture || null,
+      // start with base progression if table allows these fields
+      level: 1,
+      experience: 0,
+      defeated_enemies: [],
+    };
+    await supabase
+      .from('players')
+      .upsert(upsertPayload, { onConflict: 'slug' });
+
+    // 4) Fetch again to return authoritative values
+    const { data: after, error: afterErr } = await supabase
+      .from('players')
+      .select(
+        'id, slug, name, level, experience, avatar_url, defeated_enemies, stats',
+      )
+      .eq('slug', id)
+      .maybeSingle();
+    if (afterErr || !after) return null;
+    return mapRemoteRowToPlayerPartial(after);
+  } catch {
+    return null; // silent failure (offline / RLS)
+  }
+}
+
+type RemotePlayerRow = {
+  id?: string;
+  slug?: string | null;
+  name?: string | null;
+  level?: number | null;
+  experience?: number | null;
+  avatar_url?: string | null;
+  defeated_enemies?: string[] | null;
+  stats?: Record<string, number> | null;
+};
+
+function mapRemoteRowToPlayerPartial(row: RemotePlayerRow): Partial<Player> {
+  let avatarUrl = row.avatar_url || null;
+  if (avatarUrl && !/^https?:\/\//i.test(avatarUrl)) {
+    const full = publicAvatarUrlFor(avatarUrl);
+    if (full) avatarUrl = full;
+  }
+  return {
+    id: row.id || row.slug || '',
+    slug: row.slug || null,
+    name: row.name || undefined,
+    level: row.level || undefined,
+    experience: row.experience || undefined,
+    avatarUrl,
+    defeatedEnemies: row.defeated_enemies || undefined,
+    stats: row.stats || undefined,
+  } as Partial<Player>;
+}
+
 export async function savePlayer(player: Player): Promise<Player> {
   // No backend write; just persist locally (Supabase write restricted without auth session)
   const existing = readFromLocalStorage();
