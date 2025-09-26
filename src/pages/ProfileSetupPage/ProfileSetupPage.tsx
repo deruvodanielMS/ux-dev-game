@@ -1,5 +1,8 @@
+/* eslint-disable simple-import-sort/imports */
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import type { Player, Stats } from '@/types';
 
 import { Button } from '@/components/atoms/Button/Button';
 import { AvatarUploader } from '@/components/molecules/AvatarUploader/AvatarUploader';
@@ -7,21 +10,24 @@ import { StatDisplay } from '@/components/molecules/StatDisplay/StatDisplay';
 
 import { useGame } from '@/context/GameContext';
 import { useToast } from '@/context/ToastContext';
-import { savePlayer, updatePlayerProfile } from '@/services/players';
-import { supabase } from '@/services/supabase';
+
+import { publicAvatarUrlFor, uploadAvatar } from '@/services/avatars';
+import {
+  savePlayer,
+  updatePlayerAvatar,
+  updatePlayerProfile,
+} from '@/services/players';
 
 import styles from './ProfileSetupPage.module.css';
-
-import type { Player, Stats } from '@/types';
 
 export const ProfileSetupPage = () => {
   const { state: gameState, dispatch: gameDispatch } = useGame();
   const player = gameState.player;
   const navigate = useNavigate();
   const { notify } = useToast();
-  const [userId, setUserId] = useState<string | null>(player?.id ?? null);
+  const userId = player?.id ?? null;
   const [email, setEmail] = useState<string>(player?.email ?? '');
-  const [pendingAvatarPath, setPendingAvatarPath] = useState<string | null>(
+  const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(
     null,
   );
 
@@ -35,24 +41,29 @@ export const ProfileSetupPage = () => {
         notify({ message: 'Usuario no identificado.', level: 'danger' });
         return;
       }
+      // Subir avatar primero si hay archivo nuevo
+      let avatarFailed = false;
+      if (selectedAvatarFile) {
+        try {
+          const storagePath = await uploadAvatar(selectedAvatarFile, userId);
+          const fullUrl = publicAvatarUrlFor(storagePath) || storagePath;
+          // Persist y actualizar estado con URL final (convención unificada)
+          await updatePlayerAvatar(userId, fullUrl);
+          gameDispatch({ type: 'SET_AVATAR', payload: fullUrl });
+        } catch (upErr: unknown) {
+          notify({
+            message: 'Error subiendo avatar: ' + (upErr as Error)?.message,
+            level: 'danger',
+          });
+          avatarFailed = true;
+        }
+      }
+
       await updatePlayerProfile(userId, {
         name: player.name,
         email: email || null,
+        avatarUrl: gameState.player?.avatarUrl || null,
       });
-      if (pendingAvatarPath) {
-        try {
-          await import('../../services/players').then((m) =>
-            m.updatePlayerAvatar(userId!, pendingAvatarPath!),
-          );
-          setPendingAvatarPath(null);
-        } catch (avatarErr: unknown) {
-          const msg = (avatarErr as Error)?.message ?? String(avatarErr);
-          notify({
-            message: `No se pudo guardar el avatar: ${msg}`,
-            level: 'warning',
-          });
-        }
-      }
       gameDispatch({
         type: 'UPDATE_PLAYER_DATA',
         payload: { name: player.name || '', email: email || null },
@@ -76,33 +87,29 @@ export const ProfileSetupPage = () => {
       } catch {
         /* ignore */
       }
-      notify({
-        message: 'Perfil actualizado correctamente.',
-        level: 'success',
-      });
-      navigate('/battle');
+      if (!avatarFailed) {
+        notify({
+          message: 'Perfil actualizado correctamente.',
+          level: 'success',
+        });
+      } else {
+        notify({
+          message:
+            'Perfil guardado (avatar pendiente). Puedes reintentar subirlo más tarde.',
+          level: 'warning',
+        });
+      }
+      navigate('/ladder');
     } catch (err: unknown) {
       const msg = (err as Error)?.message ?? String(err);
       notify({ message: msg || 'Error actualizando perfil.', level: 'danger' });
     }
   }
 
-  useEffect(() => {
-    (async () => {
-      try {
-        if (!supabase) return;
-        const { data } = await supabase.auth.getUser();
-        const u = data?.user ?? null;
-        if (u && !userId) setUserId(u.id);
-      } catch {
-        /* ignore */
-      }
-    })();
-  }, [userId]);
+  // removed supabase auth user fetch effect
 
-  const handleUploadSuccess = (url: string, storagePath?: string) => {
-    gameDispatch({ type: 'SET_AVATAR', payload: url });
-    if (storagePath) setPendingAvatarPath(storagePath);
+  const handleFileSelected = (file: File) => {
+    setSelectedAvatarFile(file);
   };
 
   return (
@@ -130,25 +137,13 @@ export const ProfileSetupPage = () => {
             placeholder="Tu nombre"
           />
         </div>
-        <div className={styles.row}>
-          <label className={styles.label} htmlFor="email">
-            Email
-          </label>
-          <input
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className={styles.input}
-            placeholder="Tu email"
-          />
-        </div>
+
         <div className={styles.row}>
           <div className={styles.label}>Identidad Digital</div>
           <AvatarUploader
-            userId={userId ?? undefined}
             initialAvatar={player?.avatarUrl ?? null}
             initialLevel={player?.level || 1}
-            onUploadSuccess={handleUploadSuccess}
+            onFileSelected={handleFileSelected}
           />
         </div>
         <div className={styles.row}>

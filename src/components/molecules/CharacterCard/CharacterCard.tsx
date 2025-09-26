@@ -4,8 +4,10 @@ import type { CharacterCardProps } from '@/types/components-character-card';
 
 import { StatusBar } from '@/components/atoms/StatusBar/StatusBar';
 
+import { useAuth } from '@/context/AuthContext';
 import { useGame } from '@/context/GameContext';
 import { useModal } from '@/context/ModalContext';
+import { resolvePlayerAvatar } from '@/services/avatarResolve';
 
 import styles from './CharacterCard.module.css';
 
@@ -21,6 +23,14 @@ export const CharacterCard = ({
     .join('')
     .toUpperCase();
 
+  const auth = useAuth();
+  const derivedAvatarUrl = resolvePlayerAvatar({
+    avatarUrl: character.avatarUrl,
+    avatarPath: (character as { avatarPath?: string | null }).avatarPath,
+    legacyAvatar: (character as { avatar?: string | null }).avatar,
+    authPicture: auth?.user?.picture || null,
+  });
+
   const { showModal } = useModal();
   const { state } = useGame();
   const navigate = useNavigate();
@@ -34,7 +44,6 @@ export const CharacterCard = ({
     ? Math.floor((now - lastPr) / (1000 * 60 * 60 * 24))
     : 9999;
   const daysLimit = 30;
-  // riskProgress: 0 when freshly PR'd, 100 when >= 30 days (at risk)
   const riskProgress = Math.max(
     0,
     Math.min(
@@ -70,9 +79,9 @@ export const CharacterCard = ({
               flexShrink: 0,
             }}
           >
-            {character.avatarUrl ? (
+            {derivedAvatarUrl ? (
               <img
-                src={character.avatarUrl}
+                src={derivedAvatarUrl}
                 alt="avatar"
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
@@ -142,10 +151,6 @@ export const CharacterCard = ({
               },
             ]
           : []),
-        {
-          label: 'Cerrar',
-          variant: 'ghost',
-        },
       ],
       allowClose: true,
     });
@@ -166,9 +171,9 @@ export const CharacterCard = ({
         disabled={absorbed}
       >
         <div className={styles.avatar} aria-hidden>
-          {character.avatarUrl ? (
+          {derivedAvatarUrl ? (
             <img
-              src={character.avatarUrl}
+              src={derivedAvatarUrl}
               alt={`${character.name} avatar`}
               className={styles.avatarImage}
             />
@@ -180,7 +185,6 @@ export const CharacterCard = ({
 
         <div className={styles.info}>
           <div className={styles.name}>{character.name}</div>
-          <div className={styles.meta}>Nivel {character.level ?? 1}</div>
 
           <div className={styles.absorbWrapInline}>
             <StatusBar

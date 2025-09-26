@@ -1,9 +1,12 @@
 :root {
   --muted: #9aa4b2;
+  height: 100%;
 }
 
 .board {
   width: 100%;
+  max-width: 1400px;
+  margin: 40px auto;
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.02),

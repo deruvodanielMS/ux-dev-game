@@ -1,5 +1,40 @@
 import { supabase } from './supabase';
 
+// Construye una URL pública a partir de un path relativo (bucket público 'avatars').
+// Precedencia:
+// 1. VITE_SUPABASE_AVATARS_BASE_URL (si se definió manualmente)
+// 2. Derivar de VITE_SUPABASE_URL => <url>/storage/v1/object/public/avatars
+// Si no existen, devuelve el path tal cual (probablemente romperá la img y sirve como indicador).
+export function publicAvatarUrlFor(
+  path: string | null | undefined,
+): string | null {
+  if (!path) return null;
+  if (/^https?:\/\//i.test(path)) return path; // ya es URL completa
+  const cleaned = path.startsWith('/') ? path.slice(1) : path;
+  const explicitBase = import.meta.env.VITE_SUPABASE_AVATARS_BASE_URL as
+    | string
+    | undefined;
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+  const base =
+    explicitBase ||
+    (supabaseUrl
+      ? `${supabaseUrl}/storage/v1/object/public/avatars`
+      : undefined);
+  if (base) return `${base}/${cleaned}`;
+
+  // Fallback: intentar usar getPublicUrl del cliente (no requiere red y devuelve un placeholder aunque el bucket no sea público)
+  try {
+    const pub = supabase?.storage.from('avatars').getPublicUrl(cleaned)
+      .data.publicUrl;
+    if (pub) return pub;
+  } catch {
+    // ignorar
+  }
+
+  // Último recurso: devolver el path (romperá la imagen y sirve como indicador visual de que falta configuración)
+  return cleaned;
+}
+
 export async function uploadAvatar(
   file: File,
   userId: string,
@@ -9,10 +44,13 @@ export async function uploadAvatar(
       'Supabase client not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.',
     );
 
+  // Sanitizar userId (Auth0 sub puede contener '|', ':', etc.) para usarlo como carpeta.
+  const safeUserId = sanitizeStorageKey(userId);
+
   const fileExt = file.name.split('.').pop() ?? 'png';
   const timestamp = Date.now();
-  const fileName = `${userId}-${timestamp}.${fileExt}`; // unique filename to avoid caching collisions
-  const filePath = `${userId}/${fileName}`;
+  const fileName = `${safeUserId}-${timestamp}.${fileExt}`; // unique filename to avoid caching collisions
+  const filePath = `${safeUserId}/${fileName}`;
 
   const { error: uploadError } = await supabase.storage
     .from('avatars')
@@ -20,11 +58,30 @@ export async function uploadAvatar(
       cacheControl: '3600',
       upsert: true,
     });
-
-  if (uploadError) throw uploadError;
+  if (uploadError) {
+    const msg = (uploadError as Error)?.message || '';
+    if (msg.toLowerCase().includes('row-level security')) {
+      throw new Error(
+        'RLS storage policy bloqueó la subida. Crea una policy en storage.objects para permitir INSERT en el bucket "avatars" (o habilita auth de Supabase / endpoint server).',
+      );
+    }
+    throw uploadError;
+  }
 
   // Return the storage path (not the public URL). Caller should resolve URL for display.
   return filePath;
+}
+
+// Reemplaza caracteres no válidos en claves de almacenamiento.
+// Permitimos alfanumérico, '-', '_', '/', y convertimos el resto a '-'.
+// Además truncamos a 64 chars para evitar rutas excesivas.
+function sanitizeStorageKey(input: string): string {
+  const cleaned = input
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9-_]/g, '-')
+    .replace(/-+/g, '-');
+  return cleaned.slice(0, 64) || 'user';
 }
 
 export async function uploadCharacterAvatar(

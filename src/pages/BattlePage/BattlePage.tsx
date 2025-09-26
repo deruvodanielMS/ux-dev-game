@@ -266,6 +266,13 @@ export const BattlePage = () => {
 
         <div className={styles.controls}>
           <Button
+            variant="ghost"
+            onClick={() => navigate('/dashboard')}
+            ariaLabel="Atras"
+          >
+            Atras
+          </Button>
+          <Button
             onClick={() => dispatch({ type: 'RESET' })}
             ariaLabel="Reiniciar"
           >

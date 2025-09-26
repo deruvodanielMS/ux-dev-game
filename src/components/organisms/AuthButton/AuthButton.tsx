@@ -65,7 +65,6 @@ export const AuthButton: React.FC = () => {
             alt={user?.name || 'avatar'}
           />
           <Button
-            className={styles.button}
             onClick={handleLogout}
             ariaLabel="Cerrar sesión"
             variant="ghost"
@@ -76,7 +75,6 @@ export const AuthButton: React.FC = () => {
         </>
       ) : (
         <Button
-          className={styles.button}
           onClick={handleLogin}
           ariaLabel="Iniciar sesión"
           variant="primary"

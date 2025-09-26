@@ -110,8 +110,24 @@ ESLint auto-sorts. Do not fight the linter—run `npm run lint:fix` if needed.
 
 ## 11. Avatars / Upload Flow
 
-- Use `uploadAvatar` then `resolveAvatarUrl` (handles signed URLs / storage paths).
-- Perform optimistic UI updates (see `AvatarUploader`).
+Canonical flow (2025-09 update):
+
+1. Usuario selecciona archivo en `AvatarUploader`.
+2. Llamar `uploadAvatar(file, userId)` -> devuelve path relativo en bucket público `avatars`.
+3. Convertir inmediatamente a URL pública FULL usando `publicAvatarUrlFor(path)`.
+4. Persistir esa URL FULL en la columna `avatar_url` vía `updatePlayerAvatar`.
+5. Disparar `dispatch({ type: 'SET_AVATAR', payload: fullUrl })`.
+
+Convención: `player.avatarPath` ahora ALMACENA una URL completa (no un path). El código mantiene retro-compatibilidad convirtiendo paths relativos antiguos al vuelo.
+
+Helper central: `resolvePlayerAvatar({ avatarUrl, avatarPath, legacyAvatar, authPicture })` para derivar la imagen mostrando prioridad:
+
+1. `avatarUrl` explícito
+2. `avatarPath` (ya debe ser URL completa; si no lo es se normaliza)
+3. `legacyAvatar` (campo heredado `avatar` si existe)
+4. `authPicture` (foto de Auth0) como último recurso.
+
+Evitar duplicar lógica de fallback en componentes; usar el helper.
 
 ## 12. Dependencies
 
@@ -161,12 +177,12 @@ ESLint auto-sorts. Do not fight the linter—run `npm run lint:fix` if needed.
 
 ## 18. Common Issues & Quick Fixes
 
-| Problem               | Fix                                       |
-| --------------------- | ----------------------------------------- |
-| Import order          | `npm run lint:fix`                        |
-| Missing types         | Add to `src/types` + barrel               |
-| Hook outside provider | Wrap with provider (e.g. `ToastProvider`) |
-| Avatar not loading    | Use `resolveAvatarUrl` with correct path  |
+| Problem               | Fix                                                            |
+| --------------------- | -------------------------------------------------------------- |
+| Import order          | `npm run lint:fix`                                             |
+| Missing types         | Add to `src/types` + barrel                                    |
+| Hook outside provider | Wrap with provider (e.g. `ToastProvider`)                      |
+| Avatar not loading    | Usa `resolvePlayerAvatar` / normaliza con `publicAvatarUrlFor` |
 
 ## 19. Suggested Roadmap (Optional)
 

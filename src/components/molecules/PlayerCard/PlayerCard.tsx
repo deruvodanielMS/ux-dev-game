@@ -2,25 +2,38 @@ import type { PlayerCardProps } from '@/types/components-player-card';
 
 import { StatusBar } from '@/components/atoms/StatusBar/StatusBar';
 
+import { resolvePlayerAvatar } from '@/services/avatarResolve';
+
 import styles from './PlayerCard.module.css';
 
 export const PlayerCard = ({
   name,
   avatarUrl,
+  avatarPath, // allow optional avatarPath if parent passes it
   level = 1,
   health = 100,
   stamina = 100,
   isActive = false,
   variant = 'player',
-}: PlayerCardProps) => {
+}: PlayerCardProps & { avatarPath?: string | null }) => {
+  const resolvedAvatar = resolvePlayerAvatar({
+    avatarUrl,
+    avatarPath: avatarPath || null,
+  });
   return (
     <div
       className={`${styles.card} ${isActive ? styles.active : ''} ${variant === 'enemy' ? styles.enemy : ''}`}
     >
       <div className={styles.top}>
         <div className={styles.avatar}>
-          {avatarUrl ? (
-            <img src={avatarUrl} alt={`${name} avatar`} />
+          {resolvedAvatar ? (
+            <img
+              src={resolvedAvatar}
+              alt={`${name} avatar`}
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).style.display = 'none';
+              }}
+            />
           ) : (
             <div className={styles.placeholder}>
               {name

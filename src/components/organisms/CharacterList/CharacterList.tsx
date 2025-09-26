@@ -1,22 +1,18 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import type { CharacterListProps } from '@/types/components-character-list';
+import type { Player } from '@/types/player';
 
 import { Button } from '@/components/atoms/Button/Button';
 import { CharacterCard } from '@/components/molecules/CharacterCard/CharacterCard';
 
-import { useGame } from '@/context/GameContext';
 import { useToast } from '@/context/ToastContext';
-import { getCharacters } from '@/services/characters';
+import { fetchPlayers, sortPlayers } from '@/services/players';
 
 import styles from './CharacterList.module.css';
 
-import type { Character } from '@/types';
-
-const ABSORBED_NAMES = new Set(['Zeta', 'Joaco', 'Emily']);
-
 export const CharacterList = ({ selectedId, onSelect }: CharacterListProps) => {
-  const [characters, setCharacters] = useState<Character[]>([]);
+  const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { notify } = useToast();
@@ -25,16 +21,17 @@ export const CharacterList = ({ selectedId, onSelect }: CharacterListProps) => {
     setLoading(true);
     setError(null);
     try {
-      const list = await getCharacters();
-      setCharacters(list);
+      const list = await fetchPlayers();
+      const sorted = sortPlayers(list);
+      setPlayers(sorted);
     } catch (err: unknown) {
-      const error = err as Error;
-      console.warn('Error loading characters', error);
-      setError(error?.message ?? 'Error cargando personajes');
-      setCharacters([]);
+      const e = err as Error;
+      console.warn('Error loading players', e);
+      setError(e?.message ?? 'Error cargando jugadores');
+      setPlayers([]);
       notify({
         title: 'Error',
-        message: error?.message ?? 'Error cargando personajes',
+        message: e?.message ?? 'Error cargando jugadores',
         level: 'danger',
       });
     } finally {
@@ -53,17 +50,13 @@ export const CharacterList = ({ selectedId, onSelect }: CharacterListProps) => {
     };
   }, [load]);
 
-  const { state } = useGame();
-
-  // If user is logged in, restrict list to their own characters only
-  let visible = characters;
-  if (state.isLoggedIn && state.player?.id) {
-    visible = characters.filter((c) => c.id === state.player?.id);
-  }
-
-  const active = visible
-    .filter((c) => !ABSORBED_NAMES.has(c.name))
-    .sort((a, b) => (b.level ?? 0) - (a.level ?? 0));
+  const active = players.map((p) => ({
+    id: p.id,
+    name: p.name,
+    level: p.level,
+    stats: p.stats,
+    avatarUrl: p.avatarUrl || undefined,
+  }));
 
   if (loading)
     return (
@@ -80,7 +73,7 @@ export const CharacterList = ({ selectedId, onSelect }: CharacterListProps) => {
     );
   if (error) return <div className={styles.list}>{error}</div>;
   if (active.length === 0)
-    return <div className={styles.list}>No hay personajes disponibles.</div>;
+    return <div className={styles.list}>No hay jugadores disponibles.</div>;
 
   return (
     <div className={styles.list} role="list">
