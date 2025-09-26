@@ -207,3 +207,35 @@ Evitar duplicar lógica de fallback en componentes; usar el helper.
 ---
 
 Living document. Update when introducing new layers (tests, CI, etc.).
+
+## 22. Player Caching & Ladder Strategy (2025-09)
+
+Para reducir requests repetidos a Supabase:
+
+1. Hook `useLadderPlayers` (nuevo):
+   - Cache in-memory (estado React) + TTL configurable (default 30s).
+   - Evita solicitudes simultáneas usando `inFlight` ref.
+   - Expone `refresh()` para forzar refetch manual.
+   - Ordena jugadores con `sortPlayersForLadder` centralizada.
+2. Futuro (no implementado aún):
+   - `PlayersContext` global que unifique ladder + detalles de jugador y permita suscripción realtime.
+   - Canal realtime Supabase: invalidar cache al recibir INSERT/UPDATE/DELETE en `players`.
+3. Convenciones de normalización:
+   - Avatar: almacenar siempre URL completa (`avatarUrl`) y normalizar paths con `publicAvatarUrlFor` al ingresar.
+   - Orden ladder: nivel DESC, experiencia DESC, nombre ASC.
+4. Uso recomendado en componentes:
+   ```tsx
+   import { useLadderPlayers } from '@/hooks/useLadderPlayers';
+   const { ladder, loading, refresh, stale } = useLadderPlayers();
+   // mostrar botón Refresh sólo si stale o usuario lo solicita
+   ```
+5. Política de fallback offline:
+   - Si `fetchPlayers` falla, se retorna copia local (localStorage) y `error` se setea para UI opcional.
+6. Evitar múltiples fetch locales:
+   - Reutilizar el mismo hook en cada render; React deduplica si vive en un único componente contenedor.
+7. Próximos pasos sugeridos (para agentes):
+   - Implementar `PlayersContext` con proveedores derivados (ladder, topN, findById).
+   - Integrar realtime y invalidación granular (solo reemplazar jugador mutado).
+   - Agregar métrica simple (console.debug) en dev para contar fetch reales.
+
+Esta sección debe actualizarse cuando se agregue el contexto global o el soporte realtime.
