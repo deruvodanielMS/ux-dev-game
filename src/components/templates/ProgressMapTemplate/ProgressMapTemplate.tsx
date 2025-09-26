@@ -9,11 +9,11 @@ export const ProgressMapTemplate = ({
   summary,
 }: ProgressMapTemplateProps) => (
   <div className={styles.page}>
-    <main className={styles.card}>
+    <div className={styles.card}>
       {title}
       {subtitle}
       {map}
       {summary}
-    </main>
+    </div>
   </div>
 );
