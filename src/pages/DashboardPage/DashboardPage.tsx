@@ -8,7 +8,6 @@ import { Button } from '@/components/atoms/Button/Button';
 import { CharacterList } from '@/components/organisms/CharacterList/CharacterList';
 
 import { useGame } from '@/context/GameContext';
-import { useToast } from '@/context/ToastContext';
 import { fetchPlayers, getTopPlayers } from '@/services/players';
 
 import styles from './DashboardPage.module.css';
@@ -16,7 +15,6 @@ import styles from './DashboardPage.module.css';
 export const DashboardPage = () => {
   const navigate = useNavigate();
   const { state } = useGame();
-  const { notify } = useToast();
   const [players, setPlayers] = useState<Player[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const me = state.player;
@@ -85,18 +83,10 @@ export const DashboardPage = () => {
           <CharacterList selectedId={selectedId} onSelect={setSelectedId} />
           <div className={styles.actionsRow}>
             <Button
-              onClick={() => {
-                if (!selectedId) {
-                  notify({
-                    level: 'info',
-                    message: 'Selecciona un personaje.',
-                  });
-                  return;
-                }
-                navigate('/battle');
-              }}
+              onClick={() => navigate('/battle')}
+              ariaLabel="Confirmar selección"
             >
-              Confirmar
+              Empezar Batalla
             </Button>
           </div>
         </div>

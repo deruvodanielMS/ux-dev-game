@@ -9,6 +9,8 @@ import type {
 
 import { useAuth } from '@/context/AuthContext';
 import { publicAvatarUrlFor } from '@/services/avatars';
+import { ensureRemotePlayerRecord } from '@/services/players';
+import { persistProgress } from '@/services/progress';
 
 import type { Player } from '@/types';
 
@@ -82,6 +84,33 @@ function gameReducer(state: GameState, action: GameAction): GameState {
           ],
         },
       };
+    case 'AWARD_EXPERIENCE': {
+      if (!state.player) return state;
+      const { enemyId, amount } = action.payload;
+      const prevXp = state.player.experience || 0;
+      const newXp = prevXp + amount;
+      // same curve used in services (linear incremental cost 100 * level)
+      let level = 1;
+      let remaining = newXp;
+      let cost = 100;
+      while (remaining >= cost) {
+        remaining -= cost;
+        level += 1;
+        cost = 100 * level;
+        if (level >= 99) break;
+      }
+      const defeated = state.player.defeatedEnemies || [];
+      const already = defeated.includes(enemyId);
+      return {
+        ...state,
+        player: {
+          ...state.player,
+          experience: newXp,
+          level,
+          defeatedEnemies: already ? defeated : [...defeated, enemyId],
+        },
+      };
+    }
     case 'CLEAR_USER':
       return { ...initialState, loading: false };
     default:
@@ -127,34 +156,78 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
 
   // When auth user changes, if we have an authenticated user and no player yet or email differs, seed a basic player shell.
   useEffect(() => {
-    if (auth.loading) return; // wait until auth resolves
-    if (!auth.isAuthenticated) {
-      // clear user-related state but keep loading false
-      dispatch({ type: 'CLEAR_USER' });
-      return;
-    }
-    const authUser = auth.user;
-    if (authUser) {
+    let cancelled = false;
+    async function sync() {
+      if (auth.loading) return;
+      if (!auth.isAuthenticated) {
+        dispatch({ type: 'CLEAR_USER' });
+        return;
+      }
+      const authUser = auth.user;
+      if (!authUser) return;
+
+      // seed shell immediately for UI responsiveness
       const existing = state.player;
-      if (!existing || existing.email !== authUser.email) {
-        const shell = {
-          id: existing?.id || authUser.id || 'local-' + Date.now().toString(36),
-          // prefer previously persisted id to keep continuity with localStorage
+      if (!existing || existing.id !== authUser.id) {
+        const shell: Player = {
+          id: authUser.id,
+          // use auth0 sub as canonical id (also used as slug remotely)
           name: existing?.name || authUser.name || 'Sin nombre',
           email: authUser.email || existing?.email || '',
           level: existing?.level || 1,
+          experience: existing?.experience || 0,
           stats: existing?.stats || {},
           defeatedEnemies: existing?.defeatedEnemies || [],
           avatarUrl: existing?.avatarUrl || authUser.picture || null,
-        } satisfies Partial<Player> as Player; // minimal shell cast to Player until server sync
+          characters: existing?.characters || [],
+          inventory: existing?.inventory || { items: [], cards: [] },
+          progress: existing?.progress || {
+            currentLevelId: '1',
+            completedLevels: [],
+          },
+        } as Player;
         dispatch({ type: 'SET_PLAYER', payload: shell });
       }
+
+      // ensure remote record exists / fetch remote authoritative data
+      const remote = await ensureRemotePlayerRecord({
+        id: authUser.id,
+        name: authUser.name || null,
+        email: authUser.email || null,
+        picture: authUser.picture || null,
+      });
+      if (remote && !cancelled) {
+        // merge remote authoritative fields into state without dropping local unsynced props
+        dispatch({
+          type: 'UPDATE_PLAYER_DATA',
+          payload: {
+            name: remote.name ?? undefined,
+            level: remote.level ?? undefined,
+            experience: remote.experience ?? undefined,
+            avatarUrl: remote.avatarUrl ?? undefined,
+            defeatedEnemies: remote.defeatedEnemies ?? undefined,
+            stats: remote.stats ?? undefined,
+          },
+        });
+      }
+      if (state.loading) dispatch({ type: 'SET_LOADING', payload: false });
     }
-    if (state.loading) {
-      dispatch({ type: 'SET_LOADING', payload: false });
-    }
+    void sync();
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [auth.user, auth.isAuthenticated, auth.loading]);
+
+  // Reactive persistence: debounce-like effect for progress fields
+  useEffect(() => {
+    const player = state.player;
+    if (!player) return;
+    const timer = setTimeout(() => {
+      void persistProgress(player);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [state.player]);
 
   return (
     <GameContext.Provider value={{ state, dispatch }}>

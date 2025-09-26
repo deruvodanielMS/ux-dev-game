@@ -25,6 +25,7 @@ export type GameAction =
   | { type: 'UPDATE_PLAYER_DATA'; payload: Partial<Player> }
   | { type: 'SET_AVATAR'; payload: string | null }
   | { type: 'ADD_DEFEATED_ENEMY'; payload: string }
+  | { type: 'AWARD_EXPERIENCE'; payload: { enemyId: string; amount: number } }
   | { type: 'CLEAR_USER' };
 
 export type GameContextType = {

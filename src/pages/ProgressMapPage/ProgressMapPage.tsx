@@ -70,9 +70,8 @@ export const ProgressMapPage = () => {
   if (!player) return <div>Sin datos de jugador.</div>;
 
   const defeated = player.defeatedEnemies || [];
-  const goBattle = () => {
-    // Placeholder: podríamos pasar enemyId por query param si luego la batalla admite targeting específico
-    navigate('/battle');
+  const goBattle = (enemyId: string) => {
+    navigate(`/battle?enemy=${encodeURIComponent(enemyId)}`);
   };
   const totalEnemies = (enemiesData as EnemyData[]).length;
 
@@ -91,8 +90,13 @@ export const ProgressMapPage = () => {
             <div key={lvl.id} className="levelBlock">
               <h2 className="levelTitle">{lvl.title}</h2>
               <div className="levelRow">
-                {lvl.enemies.map((e) => {
+                {lvl.enemies.map((e, idx) => {
                   const done = defeated.includes(e.id);
+                  // regla simple: un enemigo está desbloqueado si es el primero del grupo
+                  // o si el inmediatamente anterior del agrupado está derrotado
+                  const prev = lvl.enemies[idx - 1];
+                  const unlocked =
+                    idx === 0 || (prev && defeated.includes(prev.id));
                   const diffLabel =
                     e.difficulty === 'easy'
                       ? 'Fácil'
@@ -105,9 +109,10 @@ export const ProgressMapPage = () => {
                     <button
                       key={e.id}
                       type="button"
-                      className={`node enemyCard ${done ? 'done' : ''}`}
-                      onClick={() => goBattle()}
-                      aria-label={`Enemigo ${e.name} ${done ? 'derrotado' : ''}`}
+                      disabled={!unlocked || done}
+                      className={`node enemyCard ${done ? 'done' : ''} ${!unlocked && !done ? 'locked' : ''}`}
+                      onClick={() => unlocked && !done && goBattle(e.id)}
+                      aria-label={`Enemigo ${e.name} ${done ? 'derrotado' : unlocked ? 'disponible' : 'bloqueado'}`}
                     >
                       <div className="nodeContent">
                         <div className="avatar">
@@ -126,6 +131,15 @@ export const ProgressMapPage = () => {
                             {done && (
                               <span className="check" title="Derrotado">
                                 ✔
+                              </span>
+                            )}
+                            {!done && !unlocked && (
+                              <span
+                                className="badge"
+                                style={{ background: '#1e293b' }}
+                                title="Bloqueado"
+                              >
+                                🔒
                               </span>
                             )}
                           </div>

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/atoms/Button/Button';
 
 import { useAudio } from '@/context/AudioContext';
+import { useAuth } from '@/context/AuthContext';
 import { useGame } from '@/context/GameContext';
 import { useModal } from '@/context/ModalContext';
 
@@ -29,6 +30,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({
   avatarUrl,
 }) => {
   const { dispatch } = useGame();
+  const auth = useAuth();
   const navigate = useNavigate();
   const { showModal } = useModal();
   const audio = useAudio();
@@ -61,11 +63,24 @@ export const UserMenu: React.FC<UserMenuProps> = ({
     return () => document.removeEventListener('mousedown', onDoc);
   }, [open, onClose, triggerRef]);
 
-  const handleLogout = () => {
-    dispatch({ type: 'UPDATE_PLAYER_DATA', payload: { name: '' } });
-    dispatch({ type: 'SET_AVATAR', payload: null });
-    onClose();
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      // Limpieza inmediata UI
+      dispatch({ type: 'CLEAR_USER' });
+      // Limpiar storage local del jugador para evitar "auto-login visual"
+      try {
+        localStorage.removeItem('duelo_player_state_v1');
+      } catch {
+        /* ignore */
+      }
+      onClose();
+      navigate('/');
+      // Llamar logout Auth0 (redirige fuera y vuelve)
+      await auth.logout();
+    } catch (e) {
+      // fallback: intentar logout directo auth0-react si algo falla
+      console.error('Logout falló', e);
+    }
   };
 
   const launchSettings = () => {

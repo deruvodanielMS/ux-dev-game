@@ -201,6 +201,26 @@
   font-weight: 600;
   text-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
 }
+
+.enemyCard.locked {
+  opacity: 0.3;
+  filter: grayscale(0.8) brightness(0.7);
+  cursor: not-allowed;
+  position: relative;
+}
+
+.enemyCard.locked::after {
+  content: '🔒';
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.enemyCard:disabled {
+  pointer-events: none;
+}
 .summary {
   margin-top: 1rem;
   color: var(--muted);
