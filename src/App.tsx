@@ -11,6 +11,7 @@ import { ProfileSetupPage } from '@/pages/ProfileSetupPage/ProfileSetupPage';
 import { ProgressMapPage } from '@/pages/ProgressMapPage/ProgressMapPage';
 // SelectPage deprecated -> replaced by DashboardPage
 import { WelcomePage } from '@/pages/WelcomePage/WelcomePage';
+import { NotFoundPage } from '@/pages/NotFoundPage/NotFoundPage';
 
 import './App.css';
 
@@ -61,6 +62,7 @@ export const App = () => {
             </RequireAuth>
           }
         />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <AppFooter />
     </BrowserRouter>
