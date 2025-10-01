@@ -1,0 +1,7 @@
+{
+  "extends": "../tsconfig.storybook.json",
+  "compilerOptions": {
+    "outDir": "../node_modules/.tmp/.storybook-ts"
+  },
+  "include": ["./**/*"]
+}
