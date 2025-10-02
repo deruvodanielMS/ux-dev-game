@@ -1,12 +1,16 @@
 import type { EnemyMap, IEnemy } from '@/types/enemy';
 
-import enemiesData from '@/data/enemies.json';
+import {
+  getAllEnemies,
+  getLevelsByDifficulty,
+  getProgressByDifficulty,
+} from '@/data/enemies';
 
 /**
  * Servicio para manejar operaciones relacionadas con enemigos
  */
 export class EnemyService {
-  private static enemies: IEnemy[] = enemiesData as IEnemy[];
+  private static enemies: IEnemy[] = getAllEnemies();
 
   /**
    * Obtiene todos los enemigos
@@ -157,5 +161,52 @@ export class EnemyService {
       progressPercentage,
       defeatedByDifficulty,
     };
+  }
+
+  /**
+   * Obtiene información de niveles por dificultad
+   */
+  static getLevelsInfo() {
+    return getLevelsByDifficulty();
+  }
+
+  /**
+   * Obtiene progreso detallado por dificultad
+   */
+  static getDetailedProgress(defeatedEnemies: string[]) {
+    return getProgressByDifficulty(defeatedEnemies);
+  }
+
+  /**
+   * Verifica si un jugador puede acceder a una dificultad específica
+   */
+  static canAccessDifficulty(
+    difficulty: IEnemy['difficulty'],
+    defeatedEnemies: string[],
+  ): boolean {
+    if (difficulty === 'easy') return true;
+
+    const difficulties: IEnemy['difficulty'][] = [
+      'easy',
+      'medium',
+      'hard',
+      'boss',
+    ];
+    const difficultyIndex = difficulties.indexOf(difficulty);
+
+    if (difficultyIndex === -1) return false;
+
+    // Verificar que se hayan completado todos los niveles anteriores
+    for (let i = 0; i < difficultyIndex; i++) {
+      const prevDifficulty = difficulties[i];
+      const prevEnemies = this.getEnemiesByDifficultyLevel(prevDifficulty);
+      const defeatedPrev = prevEnemies.filter((enemy) =>
+        defeatedEnemies.includes(enemy.id),
+      ).length;
+
+      if (defeatedPrev < prevEnemies.length) return false;
+    }
+
+    return true;
   }
 }
