@@ -48,9 +48,6 @@ export const DashboardPage = () => {
             {t('nav.progress')}
           </Button>
           <Button onClick={() => navigate('/ladder')}>{t('nav.ladder')}</Button>
-          <Button onClick={() => navigate('/profile')}>
-            {t('nav.profile')}
-          </Button>
         </div>
       </header>
 

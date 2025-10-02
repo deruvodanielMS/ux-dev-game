@@ -17,6 +17,7 @@ export const CharacterCard = ({
   selected = false,
   absorbed = false,
   interactive = true,
+  onSelect,
 }: CharacterCardProps) => {
   const initials = character.name
     .split(' ')
@@ -222,7 +223,10 @@ export const CharacterCard = ({
           type="button"
           className={styles.card}
           onClick={() => {
-            if (!absorbed) openView();
+            if (!absorbed) {
+              onSelect?.(character.id);
+              openView();
+            }
           }}
           aria-pressed={selected}
           aria-disabled={absorbed}

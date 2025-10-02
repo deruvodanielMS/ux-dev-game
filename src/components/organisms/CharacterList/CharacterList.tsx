@@ -3,7 +3,6 @@ import { useEffect, useMemo, useState } from 'react';
 import type { CharacterListProps } from '@/types/components-character-list';
 import type { Player } from '@/types/player';
 
-import { Button } from '@/components/atoms/Button/Button';
 import { CharacterCard } from '@/components/molecules/CharacterCard/CharacterCard';
 
 import { usePlayers } from '@/hooks/usePlayers';
@@ -60,19 +59,14 @@ export const CharacterList = ({ selectedId, onSelect }: CharacterListProps) => {
   return (
     <div className={styles.list} role="list">
       {active.map((c) => (
-        <Button
-          key={c.id}
-          variant="plain"
-          className={styles.item}
-          onClick={() => onSelect?.(c.id)}
-          ariaLabel={`Seleccionar ${c.name}`}
-        >
+        <div key={c.id} className={styles.item}>
           <CharacterCard
             character={c}
             selected={selectedId === c.id}
-            interactive={false}
+            interactive={true}
+            onSelect={onSelect}
           />
-        </Button>
+        </div>
       ))}
     </div>
   );

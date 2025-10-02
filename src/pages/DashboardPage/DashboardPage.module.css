@@ -11,8 +11,9 @@
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: space-between;
+  text-align: left;
 }
 
 .kpiGrid {
@@ -99,6 +100,14 @@
   border-radius: 999px;
   font-weight: 600;
   letter-spacing: 0.5px;
+}
+
+/* Utility class for text ellipsis */
+.textEllipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 .actionsRow {
