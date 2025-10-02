@@ -1,4 +1,7 @@
+import React from 'react';
 import type { Preview } from '@storybook/react-vite';
+
+import { ThemeProvider } from '../src/context/ThemeContext';
 
 import '../src/theme/tokens.css';
 
@@ -23,6 +26,13 @@ const preview: Preview = {
       },
     },
   },
+  decorators: [
+    (Story) => (
+      <ThemeProvider>
+        <Story />
+      </ThemeProvider>
+    ),
+  ],
 };
 
 export default preview;

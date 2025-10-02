@@ -3,5 +3,9 @@
   "compilerOptions": {
     "outDir": "../node_modules/.tmp/.storybook-ts"
   },
-  "include": ["./**/*"]
+  "include": [
+    "./**/*",
+    "../src/context/ThemeContext.tsx",
+    "../src/theme/tokens.css"
+  ]
 }
