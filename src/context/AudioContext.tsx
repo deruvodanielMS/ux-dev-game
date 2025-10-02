@@ -8,13 +8,17 @@ import React, {
   useState,
 } from 'react';
 
-// Default background music tracks (royalty-free placeholders)
-const DEFAULT_TRACKS = [
-  'https://cdn.pixabay.com/download/audio/2022/03/15/audio_f5509d4f52.mp3?filename=arcade-funk-110045.mp3',
-  'https://cdn.pixabay.com/download/audio/2023/01/12/audio_bfa4b5d479.mp3?filename=loopable-atmospheric-video-game-music-133983.mp3',
-];
-
 import type { AudioContextType } from '@/types/context/audio';
+import { MusicContext } from '@/types/context/audio';
+
+// Music tracks for different game contexts
+const MUSIC_TRACKS = {
+  [MusicContext.MENU]: '/music/pre-battle-workout-317984.mp3',
+  [MusicContext.BATTLE]: '/music/Battle Cry.mp3',
+  [MusicContext.MAP]:
+    '/music/190729-heavy-battle-guitar-dark-hard-noise-155527.mp3',
+  [MusicContext.VICTORY]: '/music/stealth-battle-205902.mp3', // Using map music for victory
+};
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
 
@@ -31,6 +35,9 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   });
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentContext, setCurrentContextState] = useState<MusicContext>(
+    MusicContext.MENU,
+  );
 
   useEffect(() => {
     if (!audioRef.current) {
@@ -68,9 +75,9 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const ensureSource = useCallback(() => {
     if (audioRef.current && !audioRef.current.src) {
-      audioRef.current.src = DEFAULT_TRACKS[0];
+      audioRef.current.src = MUSIC_TRACKS[currentContext];
     }
-  }, []);
+  }, [currentContext]);
 
   const play = useCallback(() => {
     if (!audioRef.current) return;
@@ -107,6 +114,20 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
     [volume],
   );
 
+  const setMusicContext = useCallback((context: MusicContext) => {
+    setCurrentContextState(context);
+    if (audioRef.current) {
+      const newTrack = MUSIC_TRACKS[context];
+      if (audioRef.current.src !== newTrack) {
+        const wasPlaying = !audioRef.current.paused;
+        audioRef.current.src = newTrack;
+        if (wasPlaying) {
+          audioRef.current.play().catch(console.warn);
+        }
+      }
+    }
+  }, []);
+
   const value = useMemo(
     () => ({
       volume,
@@ -114,10 +135,21 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
       play,
       pause,
       setSource,
+      setMusicContext,
+      currentContext,
       isPlaying,
       playSound,
     }),
-    [volume, isPlaying, playSound, play, pause, setSource],
+    [
+      volume,
+      isPlaying,
+      playSound,
+      play,
+      pause,
+      setSource,
+      setMusicContext,
+      currentContext,
+    ],
   );
 
   return (

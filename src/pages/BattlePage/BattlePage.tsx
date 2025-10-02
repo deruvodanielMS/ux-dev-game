@@ -14,10 +14,10 @@ import { TurnIndicator } from '@/components/atoms/TurnIndicator/TurnIndicator';
 import { PlayerCard } from '@/components/molecules/PlayerCard/PlayerCard';
 import { CardHand } from '@/components/organisms/CardHand/CardHand';
 
-import { useAudio } from '@/context/AudioContext';
 import { useGame } from '@/context/GameContext';
 import { usePlayersContext } from '@/context/PlayersContext';
 import enemies from '@/data/enemies.json';
+import { useMusicController } from '@/hooks/useMusicContext';
 import { persistProgress } from '@/services/progress';
 
 import styles from './BattlePage.module.css';
@@ -139,25 +139,14 @@ export const BattlePage = () => {
     damageDealt: 0,
   });
   const navigate = useNavigate();
-  const audio = useAudio();
   const { t } = useTranslation();
+  const musicController = useMusicController();
   const [handledVictory, setHandledVictory] = useState(false);
   const [damageNumbers, setDamageNumbers] = useState<
     { id: string; value: number; top: number; left: number | string }[]
   >([]);
 
-  // play battle music while this page is mounted
-  React.useEffect(() => {
-    const src =
-      'https://cdn.builder.io/o/assets%2F18b71006d6404cecbe90ad5e2b850e0e%2Fc4c10a69a33a4bbdb8bacc26bfcf1e26?alt=media&token=b7e21c32-d821-483d-b8a4-22eacf9f04d8&apiKey=18b71006d6404cecbe90ad5e2b850e0e';
-    audio.setSource(src);
-    // try to play; audio.play handles promise
-    audio.play();
-    return () => {
-      audio.pause();
-      audio.setSource(null);
-    };
-  }, [audio]);
+  // La música de batalla se maneja automáticamente por useMusicContext en App.tsx
 
   const handlePlay = (card: string) => {
     dispatch({ type: 'PLAY_CARD', card });
@@ -191,6 +180,8 @@ export const BattlePage = () => {
   useEffect(() => {
     if (s.enemyHealth <= 0 && !handledVictory) {
       setHandledVictory(true);
+      // Reproducir música de victoria
+      musicController.playVictoryMusic();
       if (enemy.id) {
         // award experience based on difficulty
         let amount = 50;
@@ -263,6 +254,7 @@ export const BattlePage = () => {
     gameState.player,
     updatePlayer,
     syncPlayer,
+    musicController,
   ]);
 
   // generate damage numbers when enemy health decreases
