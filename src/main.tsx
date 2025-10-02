@@ -13,7 +13,9 @@ import { ToastProvider } from '@/context/ToastContext';
 
 import './index.css';
 import './theme/tokens.css';
+import './theme/global.css';
 
+import '@/i18n';
 import { App } from '@/App';
 
 const domain = import.meta.env.VITE_AUTH0_DOMAIN as string | undefined;
@@ -35,45 +37,47 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider>
       <ToastProvider>
-        <ModalProvider>
-          {domain && clientId ? (
-            <Auth0Provider
-              domain={domain}
-              clientId={clientId}
-              cacheLocation="localstorage"
-              useRefreshTokens
-              authorizationParams={{
-                redirect_uri: window.location.origin,
-                audience: audience || undefined,
-                organization: organization || undefined,
-                scope: scope || 'openid profile email',
-              }}
-            >
-              <AuthProvider>
-                <PlayersProvider>
-                  <NetworkActivityProvider>
-                    <GameProvider>
-                      <AudioProvider>
+        {domain && clientId ? (
+          <Auth0Provider
+            domain={domain}
+            clientId={clientId}
+            cacheLocation="localstorage"
+            useRefreshTokens
+            authorizationParams={{
+              redirect_uri: window.location.origin,
+              audience: audience || undefined,
+              organization: organization || undefined,
+              scope: scope || 'openid profile email',
+            }}
+          >
+            <AuthProvider>
+              <PlayersProvider>
+                <NetworkActivityProvider>
+                  <GameProvider>
+                    <AudioProvider>
+                      <ModalProvider>
                         <App />
-                      </AudioProvider>
-                    </GameProvider>
-                  </NetworkActivityProvider>
-                </PlayersProvider>
-              </AuthProvider>
-            </Auth0Provider>
-          ) : (
-            // Fallback without Auth0: provide only non-auth providers
-            <PlayersProvider>
-              <NetworkActivityProvider>
-                <GameProvider>
-                  <AudioProvider>
+                      </ModalProvider>
+                    </AudioProvider>
+                  </GameProvider>
+                </NetworkActivityProvider>
+              </PlayersProvider>
+            </AuthProvider>
+          </Auth0Provider>
+        ) : (
+          // Fallback without Auth0: provide only non-auth providers
+          <PlayersProvider>
+            <NetworkActivityProvider>
+              <GameProvider>
+                <AudioProvider>
+                  <ModalProvider>
                     <App />
-                  </AudioProvider>
-                </GameProvider>
-              </NetworkActivityProvider>
-            </PlayersProvider>
-          )}
-        </ModalProvider>
+                  </ModalProvider>
+                </AudioProvider>
+              </GameProvider>
+            </NetworkActivityProvider>
+          </PlayersProvider>
+        )}
       </ToastProvider>
     </ThemeProvider>
   </StrictMode>,

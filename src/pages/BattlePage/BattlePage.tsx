@@ -1,4 +1,5 @@
 import React, { useEffect, useReducer, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import type {
@@ -139,6 +140,7 @@ export const BattlePage = () => {
   });
   const navigate = useNavigate();
   const audio = useAudio();
+  const { t } = useTranslation();
   const [handledVictory, setHandledVictory] = useState(false);
   const [damageNumbers, setDamageNumbers] = useState<
     { id: string; value: number; top: number; left: number | string }[]
@@ -344,9 +346,9 @@ export const BattlePage = () => {
           </Button>
           <Button
             onClick={() => dispatch({ type: 'RESET' })}
-            ariaLabel="Reiniciar"
+            ariaLabel={t('battle.reset')}
           >
-            Reiniciar
+            {t('battle.reset')}
           </Button>
         </div>
 

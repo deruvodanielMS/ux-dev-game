@@ -1,21 +1,38 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
-import type { BattleCardInfo, BattleCardProps } from '@/types/components-card';
+import type { BattleCardProps } from '@/types/components-card';
 
 import styles from './Card.module.css';
 
-const CARD_INFO: Record<string, BattleCardInfo> = {
-  'code-review': { title: 'Code Review', desc: 'Recupera HP revisando PRs.' },
-  'bug-fix': { title: 'Bug Fix', desc: 'Arregla un bug: daño directo.' },
-  refactor: {
-    title: 'Refactor',
-    desc: 'Mejora el código y causa daño estable.',
-  },
-};
-
 export const Card = ({ id, onPlay }: BattleCardProps) => {
-  const info = CARD_INFO[id] ?? { title: id, desc: '' };
+  const { t } = useTranslation();
   const [anim, setAnim] = useState(false);
+
+  // Get card info from translations
+  const getCardInfo = (cardId: string) => {
+    switch (cardId) {
+      case 'code-review':
+        return {
+          title: t('card.codeReview.title'),
+          desc: t('card.codeReview.desc'),
+        };
+      case 'bug-fix':
+        return {
+          title: t('card.bugFix.title'),
+          desc: t('card.bugFix.desc'),
+        };
+      case 'refactor':
+        return {
+          title: t('card.refactor.title'),
+          desc: t('card.refactor.desc'),
+        };
+      default:
+        return { title: cardId, desc: '' };
+    }
+  };
+
+  const info = getCardInfo(id);
 
   const handleClick = () => {
     setAnim(true);

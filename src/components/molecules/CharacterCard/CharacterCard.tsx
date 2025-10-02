@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import type { CharacterCardProps } from '@/types/components-character-card';
@@ -15,6 +16,7 @@ export const CharacterCard = ({
   character,
   selected = false,
   absorbed = false,
+  interactive = true,
 }: CharacterCardProps) => {
   const initials = character.name
     .split(' ')
@@ -24,6 +26,7 @@ export const CharacterCard = ({
     .toUpperCase();
 
   const auth = useAuth();
+  const { t } = useTranslation();
   const derivedAvatarUrl = resolvePlayerAvatar({
     avatarUrl: character.avatarUrl,
     avatarPath: (character as { avatarPath?: string | null }).avatarPath,
@@ -176,8 +179,10 @@ export const CharacterCard = ({
               />
               <p style={{ marginTop: 6, color: 'var(--muted)', fontSize: 13 }}>
                 {willBeAbsorbed
-                  ? 'En riesgo: sin PR en 30 días'
-                  : `${Math.max(0, daysLimit - daysSince)} días restantes`}
+                  ? t('character.absorption.riskText')
+                  : t('character.absorption.daysLeft', {
+                      days: Math.max(0, daysLimit - daysSince),
+                    })}
               </p>
             </div>
           </div>
@@ -212,49 +217,98 @@ export const CharacterCard = ({
     <div
       className={`${styles.wrapper} ${selected ? styles.selected : ''} ${absorbed ? styles.absorbed : ''}`}
     >
-      <button
-        type="button"
-        className={styles.card}
-        onClick={() => {
-          if (!absorbed) openView();
-        }}
-        aria-pressed={selected}
-        aria-disabled={absorbed}
-        disabled={absorbed}
-      >
-        <div className={styles.avatar} aria-hidden>
-          {derivedAvatarUrl ? (
-            <img
-              src={derivedAvatarUrl}
-              alt={`${character.name} avatar`}
-              className={styles.avatarImage}
-            />
-          ) : (
-            <div className={styles.avatarInner}>{initials}</div>
-          )}
-          <div className={styles.avatarBadge}>Lv {character.level ?? 1}</div>
-        </div>
-
-        <div className={styles.info}>
-          <div className={styles.name}>{character.name}</div>
-
-          <div className={styles.absorbWrapInline}>
-            <StatusBar
-              label={willBeAbsorbed ? 'En riesgo' : 'Tiempo para absorción'}
-              current={riskProgress}
-              max={100}
-              color={determineColor()}
-            />
-            <p className={styles.absorbText}>
-              {willBeAbsorbed
-                ? 'En riesgo: sin PR en 30 días'
-                : `${Math.max(0, daysLimit - daysSince)} días restantes`}
-            </p>
+      {interactive ? (
+        <button
+          type="button"
+          className={styles.card}
+          onClick={() => {
+            if (!absorbed) openView();
+          }}
+          aria-pressed={selected}
+          aria-disabled={absorbed}
+          disabled={absorbed}
+        >
+          <div className={styles.avatar} aria-hidden>
+            {derivedAvatarUrl ? (
+              <img
+                src={derivedAvatarUrl}
+                alt={`${character.name} avatar`}
+                className={styles.avatarImage}
+              />
+            ) : (
+              <div className={styles.avatarInner}>{initials}</div>
+            )}
+            <div className={styles.avatarBadge}>Lv {character.level ?? 1}</div>
           </div>
-        </div>
 
-        <div className={styles.actionsInline} />
-      </button>
+          <div className={styles.info}>
+            <div className={styles.name}>{character.name}</div>
+
+            <div className={styles.absorbWrapInline}>
+              <StatusBar
+                label={
+                  willBeAbsorbed
+                    ? t('character.absorption.risk')
+                    : t('character.absorption.safe')
+                }
+                current={riskProgress}
+                max={100}
+                color={determineColor()}
+              />
+              <p className={styles.absorbText}>
+                {willBeAbsorbed
+                  ? t('character.absorption.riskText')
+                  : t('character.absorption.daysLeft', {
+                      days: Math.max(0, daysLimit - daysSince),
+                    })}
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.actionsInline} />
+        </button>
+      ) : (
+        <div className={styles.card}>
+          <div className={styles.avatar} aria-hidden>
+            {derivedAvatarUrl ? (
+              <img
+                src={derivedAvatarUrl}
+                alt={`${character.name} avatar`}
+                className={styles.avatarImage}
+              />
+            ) : (
+              <div className={styles.avatarInner}>{initials}</div>
+            )}
+            <div className={styles.avatarBadge}>Lv {character.level ?? 1}</div>
+          </div>
+
+          <div className={styles.info}>
+            <div className={styles.name}>{character.name}</div>
+
+            <div className={styles.absorbWrapInline}>
+              <StatusBar
+                label={
+                  willBeAbsorbed
+                    ? t('character.absorption.risk')
+                    : t('character.absorption.safe')
+                }
+                current={riskProgress}
+                max={100}
+                color={determineColor()}
+              />
+              <p className={styles.absorbText}>
+                {willBeAbsorbed
+                  ? t('character.absorption.riskText')
+                  : t('character.absorption.daysLeft', {
+                      days: Math.max(0, daysLimit - daysSince),
+                    })}
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.actionsInline} />
+        </div>
+      )}
     </div>
   );
 };

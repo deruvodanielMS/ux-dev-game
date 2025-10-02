@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { Button } from '@/components/atoms/Button/Button';
@@ -29,7 +30,10 @@ interface GroupedLevel {
   title: string;
   enemies: EnemyData[];
 }
-function groupEnemies(all: EnemyData[]): GroupedLevel[] {
+function groupEnemies(
+  all: EnemyData[],
+  t: (key: string) => string,
+): GroupedLevel[] {
   const groups: Record<string, EnemyData[]> = {
     easy: [],
     medium: [],
@@ -40,13 +44,13 @@ function groupEnemies(all: EnemyData[]): GroupedLevel[] {
     else groups.easy.push(e);
   });
   return [
-    { id: 'easy', title: 'Nivel 1: Fundamentos', enemies: groups.easy },
+    { id: 'easy', title: t('progress.level1'), enemies: groups.easy },
     {
       id: 'medium',
-      title: 'Nivel 2: Desafíos Intermedios',
+      title: t('progress.level2'),
       enemies: groups.medium,
     },
-    { id: 'hard', title: 'Nivel 3: Amenazas Críticas', enemies: groups.hard },
+    { id: 'hard', title: t('progress.level3'), enemies: groups.hard },
   ].filter((g) => g.enemies.length > 0);
 }
 
@@ -54,8 +58,12 @@ export const ProgressMapPage = () => {
   const { state } = useGame();
   const { player, loading, error } = state;
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
-  const levels = useMemo(() => groupEnemies(enemiesData as EnemyData[]), []);
+  const levels = useMemo(
+    () => groupEnemies(enemiesData as EnemyData[], t),
+    [t],
+  );
 
   if (loading) {
     return (

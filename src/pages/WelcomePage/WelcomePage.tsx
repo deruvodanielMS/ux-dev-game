@@ -1,6 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { Button } from '@/components/atoms/Button/Button';
+import { Heading } from '@/components/atoms/Typography/Heading';
+import { Text } from '@/components/atoms/Typography/Text';
 import { AuthButton } from '@/components/organisms/AuthButton/AuthButton';
 
 import { useAuth } from '@/context/AuthContext';
@@ -15,11 +18,12 @@ export const WelcomePage = () => {
   const player = gameState.player;
   const navigate = useNavigate();
   const { notify } = useToast();
+  const { t } = useTranslation();
 
   const goToDashboard = () => {
     if (!auth.isAuthenticated) {
       notify({
-        title: 'Inicia sesión',
+        title: t('welcome.login'),
         message: 'Debes autenticarte para elegir un personaje.',
         level: 'info',
       });
@@ -44,11 +48,10 @@ export const WelcomePage = () => {
           </div>
 
           <div className={styles.heroLeft}>
-            <h1 className={styles.title}>Duelo de Código</h1>
-            <p className={styles.mission}>
-              La IA está absorbiendo a quienes no se mantienen actualizados y no
-              colaboran. Tu misión: unirte al equipo y luchar por el código.
-            </p>
+            <Heading level="h1" className={styles.title}>
+              {t('welcome.title')}
+            </Heading>
+            <Text className={styles.mission}>{t('welcome.subtitle')}</Text>
 
             <div className={styles.heroActions}>
               <div className={styles.heroButtonsRight}>
@@ -56,9 +59,9 @@ export const WelcomePage = () => {
                   <Button
                     onClick={goToDashboard}
                     className={styles.primaryLarge}
-                    ariaLabel="Empezar"
+                    ariaLabel={t('welcome.getStarted')}
                   >
-                    Empezar la batalla
+                    {t('welcome.getStarted')}
                   </Button>
                 ) : (
                   <AuthButton />

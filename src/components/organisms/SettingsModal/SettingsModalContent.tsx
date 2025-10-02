@@ -1,37 +1,40 @@
-import { Button } from '@/components/atoms/Button/Button';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 
-import { useAudio } from '@/context/AudioContext';
+import { LanguageSelector } from '@/components/atoms/LanguageSelector/LanguageSelector';
+import { SettingsSection } from '@/components/atoms/SettingsSection/SettingsSection';
+import { ThemeSwitch } from '@/components/atoms/ThemeSwitch/ThemeSwitch';
 
-import styles from '../Header/Header.module.css';
+import { AudioControls } from '../AudioControls/AudioControls';
 
-export const SettingsModalContent = () => {
-  const audio = useAudio();
+export const SettingsModalContent: React.FC = () => {
+  const { t } = useTranslation();
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <Button
-          variant="plain"
-          className={styles.playBtn}
-          onClick={() => (audio.isPlaying ? audio.pause() : audio.play())}
-          ariaLabel="Toggle music"
-          title="Toggle music"
-        >
-          {audio.isPlaying ? '⏸' : '⏵'}
-        </Button>
-        <label className={styles.volumeLabel} htmlFor="volume-slider">
-          Vol
-        </label>
-        <input
-          id="volume-slider"
-          className={styles.volume}
-          type="range"
-          min={0}
-          max={1}
-          step={0.01}
-          value={audio.volume}
-          onChange={(e) => audio.setVolume(Number(e.target.value))}
-        />
-      </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      {/* Audio Settings */}
+      <SettingsSection
+        title={t('audio.toggle')}
+        description={t('settings.audio.description')}
+      >
+        <AudioControls />
+      </SettingsSection>
+
+      {/* Theme Settings */}
+      <SettingsSection
+        title={t('theme.switch')}
+        description={t('settings.theme.description')}
+      >
+        <ThemeSwitch size="md" showLabels={true} />
+      </SettingsSection>
+
+      {/* Language Settings */}
+      <SettingsSection
+        title="Idioma / Language"
+        description={t('settings.language.description')}
+      >
+        <LanguageSelector variant="buttons" size="md" />
+      </SettingsSection>
     </div>
   );
 };

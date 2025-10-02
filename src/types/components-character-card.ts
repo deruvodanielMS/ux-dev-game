@@ -13,4 +13,5 @@ export interface CharacterCardProps {
   character: UICharacterCardCharacter;
   selected?: boolean;
   absorbed?: boolean;
+  interactive?: boolean;
 }

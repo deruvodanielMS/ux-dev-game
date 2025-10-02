@@ -13,6 +13,7 @@ export * from './components-layout';
 export * from './components-player-card';
 export * from './components-progress-map';
 export * from './components-progress-map-template';
+export * from './components-settings';
 export * from './components-stat-display';
 export * from './components-turn-indicator';
 export * from './components-typography';

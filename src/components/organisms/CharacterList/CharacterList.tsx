@@ -67,7 +67,11 @@ export const CharacterList = ({ selectedId, onSelect }: CharacterListProps) => {
           onClick={() => onSelect?.(c.id)}
           ariaLabel={`Seleccionar ${c.name}`}
         >
-          <CharacterCard character={c} selected={selectedId === c.id} />
+          <CharacterCard
+            character={c}
+            selected={selectedId === c.id}
+            interactive={false}
+          />
         </Button>
       ))}
     </div>

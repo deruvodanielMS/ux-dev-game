@@ -1,10 +1,12 @@
 /* eslint-disable simple-import-sort/imports */
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import type { Player, Stats } from '@/types';
 
 import { Button } from '@/components/atoms/Button/Button';
+import { Heading, Text } from '@/components/atoms/Typography';
 import { AvatarUploader } from '@/components/molecules/AvatarUploader/AvatarUploader';
 import { StatDisplay } from '@/components/molecules/StatDisplay/StatDisplay';
 
@@ -26,6 +28,7 @@ export const ProfileSetupPage = () => {
   const player = gameState.player;
   const navigate = useNavigate();
   const { notify } = useToast();
+  const { t } = useTranslation();
   const { updatePlayer, syncPlayer, syncing } = usePlayersContext();
   const syncingThis = player?.id ? syncing(player.id) : false;
   const userId = player?.id ?? null;
@@ -128,19 +131,21 @@ export const ProfileSetupPage = () => {
   return (
     <div className={styles.page}>
       <main className={styles.card}>
-        <h1 className={styles.title}>Configura tu Identidad Digital</h1>
+        <Heading level="h1" className={styles.title}>
+          {t('profile.setup')}
+        </Heading>
         {syncingThis && (
           <div className={styles.syncing} aria-live="polite">
             Sincronizando perfil...
           </div>
         )}
-        <p className={styles.subtitle}>
+        <Text className={styles.subtitle}>
           Tu identidad digital representa tu presencia en la red y tu reputación
           técnica. Sube un avatar para personalizarla.
-        </p>
+        </Text>
         <div className={styles.row}>
           <label className={styles.label} htmlFor="name">
-            Nombre
+            {t('profile.name')}
           </label>
           <input
             id="name"
@@ -152,12 +157,12 @@ export const ProfileSetupPage = () => {
               })
             }
             className={styles.input}
-            placeholder="Tu nombre"
+            placeholder={t('profile.name')}
           />
         </div>
 
         <div className={styles.row}>
-          <div className={styles.label}>Identidad Digital</div>
+          <div className={styles.label}>{t('profile.avatar')}</div>
           <AvatarUploader
             initialAvatar={player?.avatarUrl ?? null}
             initialLevel={player?.level || 1}

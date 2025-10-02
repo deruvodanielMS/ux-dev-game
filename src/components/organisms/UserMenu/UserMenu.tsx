@@ -1,7 +1,9 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { Button } from '@/components/atoms/Button/Button';
+import { Text } from '@/components/atoms/Typography/Text';
 
 import { useAudio } from '@/context/AudioContext';
 import { useAuth } from '@/context/AuthContext';
@@ -34,6 +36,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({
   const navigate = useNavigate();
   const { showModal } = useModal();
   const audio = useAudio();
+  const { t } = useTranslation();
 
   React.useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -86,7 +89,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({
   const launchSettings = () => {
     onClose();
     showModal({
-      title: 'Ajustes',
+      title: t('settings.title'),
       body: <SettingsModalContent />,
       allowClose: true,
     });
@@ -111,8 +114,12 @@ export const UserMenu: React.FC<UserMenuProps> = ({
             )}
           </div>
           <div>
-            <div className={styles.name}>{name || 'Sin nombre'}</div>
-            <div className={styles.meta}>Nivel {level}</div>
+            <Text as="div" className={styles.name}>
+              {name || t('user.noName')}
+            </Text>
+            <Text as="div" className={styles.meta}>
+              {t('user.level', { level })}
+            </Text>
           </div>
         </div>
         <div className={styles.controlsRow}>
@@ -120,8 +127,8 @@ export const UserMenu: React.FC<UserMenuProps> = ({
             variant="plain"
             className={styles.playBtn}
             onClick={() => (audio.isPlaying ? audio.pause() : audio.play())}
-            ariaLabel="Toggle music"
-            title="Toggle music"
+            ariaLabel={t('audio.toggle')}
+            title={t('audio.toggle')}
           >
             {audio.isPlaying ? '⏸' : '⏵'}
           </Button>
@@ -133,16 +140,23 @@ export const UserMenu: React.FC<UserMenuProps> = ({
               navigate('/profile');
               onClose();
             }}
-            ariaLabel="Editar perfil"
+            ariaLabel={t('user.profile')}
           >
-            Editar perfil
+            {t('user.profile')}
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={launchSettings}
+            ariaLabel={t('user.settings')}
+          >
+            {t('user.settings')}
           </Button>
           <Button
             variant="ghost"
             onClick={handleLogout}
-            ariaLabel="Cerrar sesión"
+            ariaLabel={t('user.logout')}
           >
-            Cerrar sesión
+            {t('user.logout')}
           </Button>
         </div>
       </div>
@@ -154,8 +168,14 @@ export const UserMenu: React.FC<UserMenuProps> = ({
       />
       <div className={styles.drawer} role="dialog" aria-label="User menu">
         <div className={styles.drawerHeader}>
-          <span className={styles.drawerTitle}>Perfil</span>
-          <Button variant="ghost" onClick={onClose} ariaLabel="Cerrar">
+          <Text as="span" className={styles.drawerTitle}>
+            {t('nav.profile')}
+          </Text>
+          <Button
+            variant="ghost"
+            onClick={onClose}
+            ariaLabel={t('action.close')}
+          >
             ✕
           </Button>
         </div>
@@ -168,8 +188,12 @@ export const UserMenu: React.FC<UserMenuProps> = ({
             )}
           </div>
           <div>
-            <div className={styles.name}>{name || 'Sin nombre'}</div>
-            <div className={styles.meta}>Nivel {level}</div>
+            <Text as="div" className={styles.name}>
+              {name || t('user.noName')}
+            </Text>
+            <Text as="div" className={styles.meta}>
+              {t('user.level', { level })}
+            </Text>
           </div>
         </div>
         <div className={styles.actions}>
@@ -179,21 +203,25 @@ export const UserMenu: React.FC<UserMenuProps> = ({
               navigate('/profile');
               onClose();
             }}
-            ariaLabel="Editar perfil"
+            ariaLabel={t('user.profile')}
           >
-            Editar perfil
+            {t('user.profile')}
           </Button>
-          <Button variant="ghost" onClick={launchSettings} ariaLabel="Ajustes">
-            Settings
+          <Button
+            variant="ghost"
+            onClick={launchSettings}
+            ariaLabel={t('user.settings')}
+          >
+            {t('user.settings')}
           </Button>
         </div>
         <div className={styles.drawerActions}>
           <Button
             variant="ghost"
             onClick={handleLogout}
-            ariaLabel="Cerrar sesión"
+            ariaLabel={t('user.logout')}
           >
-            Cerrar sesión
+            {t('user.logout')}
           </Button>
         </div>
       </div>
