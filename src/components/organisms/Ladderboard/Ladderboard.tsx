@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import type { LadderboardProps } from '@/types/components/ladderboard';
@@ -15,6 +16,7 @@ export const Ladderboard: React.FC<LadderboardProps> = ({ className }) => {
   const { ladder, loading, error } = usePlayers();
   const { syncing } = usePlayersContext();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // derive a compact stats summary (currently only battles_won, damage_dealt, damage_taken if present)
   const rows = useMemo(
@@ -35,10 +37,10 @@ export const Ladderboard: React.FC<LadderboardProps> = ({ className }) => {
   return (
     <section
       className={`${styles.board} ${className ?? ''}`}
-      aria-label="Ranking Semanal"
+      aria-label={t('ladderboard.weeklyRanking')}
     >
       <header className={styles.headerRow}>
-        <h2 className={styles.title}>Ranking Semanal</h2>
+        <h2 className={styles.title}>{t('ladderboard.weeklyRanking')}</h2>
       </header>
 
       {loading && (
@@ -87,7 +89,7 @@ export const Ladderboard: React.FC<LadderboardProps> = ({ className }) => {
         </div>
       )}
       {error && !loading && (
-        <div className={styles.state}>No se pudo cargar el ranking.</div>
+        <div className={styles.state}>{t('ladderboard.couldNotLoad')}</div>
       )}
 
       {!loading && !error && (
@@ -95,9 +97,9 @@ export const Ladderboard: React.FC<LadderboardProps> = ({ className }) => {
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>#</th>
-                <th>Jugador</th>
-                <th>Nivel</th>
+                <th>{t('ladderboard.rank')}</th>
+                <th>{t('ladder.player')}</th>
+                <th>{t('ladder.level')}</th>
                 <th>Stats</th>
               </tr>
             </thead>
@@ -150,20 +152,29 @@ export const Ladderboard: React.FC<LadderboardProps> = ({ className }) => {
                         <div className={styles.statsRow}>
                           <div
                             className={styles.statItem}
-                            title="Batallas ganadas"
+                            title={t('ladderboard.battlesWon')}
                           >
-                            <span className={styles.statLabel}>BW</span>
+                            <span className={styles.statLabel}>
+                              {t('ladderboard.battlesWonShort')}
+                            </span>
                             <span className={styles.statValue}>{battles}</span>
                           </div>
-                          <div className={styles.statItem} title="Daño hecho">
-                            <span className={styles.statLabel}>DH</span>
+                          <div
+                            className={styles.statItem}
+                            title={t('ladderboard.damageDealt')}
+                          >
+                            <span className={styles.statLabel}>
+                              {t('ladderboard.damageDealtShort')}
+                            </span>
                             <span className={styles.statValue}>{dmg}</span>
                           </div>
                           <div
                             className={styles.statItem}
-                            title="Daño recibido"
+                            title={t('ladderboard.damageTaken')}
                           >
-                            <span className={styles.statLabel}>DR</span>
+                            <span className={styles.statLabel}>
+                              {t('ladderboard.damageTakenShort')}
+                            </span>
                             <span className={styles.statValue}>{taken}</span>
                           </div>
                         </div>
@@ -176,7 +187,7 @@ export const Ladderboard: React.FC<LadderboardProps> = ({ className }) => {
           </table>
 
           <Button onClick={() => navigate('/dashboard')}>
-            Ir al Dashboard
+            {t('dashboard.goToDashboard')}
           </Button>
         </div>
       )}

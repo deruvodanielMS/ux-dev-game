@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { Button } from '@/components/atoms/Button/Button';
+import { Heading, Text } from '@/components/atoms/Typography';
 import { CharacterList } from '@/components/organisms/CharacterList/CharacterList';
 
 import { useGame } from '@/context/GameContext';
@@ -14,6 +16,7 @@ export const DashboardPage = () => {
   const navigate = useNavigate();
   const { state } = useGame();
   const { players, loading: playersLoading, refresh } = usePlayers();
+  const { t } = useTranslation();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const me = state.player;
 
@@ -32,56 +35,64 @@ export const DashboardPage = () => {
     <div className={styles.page}>
       <header className={styles.headerRow}>
         <div>
-          <h1 style={{ margin: 0 }}>Dashboard</h1>
-          <p style={{ margin: '0.25rem 0 0', opacity: 0.75 }}>
-            Resumen de tu progreso y acciones rápidas.
-          </p>
+          <Heading level="h1" style={{ margin: 0 }}>
+            {t('dashboard.title')}
+          </Heading>
+          <Text style={{ margin: '0.25rem 0 0', opacity: 0.75 }}>
+            {t('dashboard.subtitle')}
+          </Text>
         </div>
         <div className={styles.actionsRow}>
-          <Button onClick={() => navigate('/battle')}>Ir a Batalla</Button>
+          <Button onClick={() => navigate('/battle')}>{t('nav.battle')}</Button>
           <Button onClick={() => navigate('/progress')}>
-            Mapa de Progreso
+            {t('nav.progress')}
           </Button>
-          <Button onClick={() => navigate('/ladder')}>Ladder</Button>
-          <Button onClick={() => navigate('/profile')}>Perfil</Button>
+          <Button onClick={() => navigate('/ladder')}>{t('nav.ladder')}</Button>
+          <Button onClick={() => navigate('/profile')}>
+            {t('nav.profile')}
+          </Button>
         </div>
       </header>
 
       <section className={styles.kpiGrid}>
         <div className={styles.card}>
-          <h4>Nivel</h4>
+          <Heading level="h4">{t('dashboard.level')}</Heading>
           <strong>{level}</strong>
         </div>
         <div className={styles.card}>
-          <h4>Experiencia</h4>
+          <Heading level="h4">{t('dashboard.experience')}</Heading>
           <strong>{experience}</strong>
         </div>
         <div className={styles.card}>
-          <h4>Enemigos derrotados</h4>
+          <Heading level="h4">{t('dashboard.enemiesDefeated')}</Heading>
           <strong>{totalDefeated}</strong>
         </div>
         <div className={styles.card}>
-          <h4>Jugadores totales</h4>
+          <Heading level="h4">{t('dashboard.totalPlayers')}</Heading>
           <strong>{playersLoading ? '...' : players.length}</strong>
         </div>
       </section>
 
       <div className={styles.flexRow}>
         <div className={styles.panel} style={{ flex: '2 1 520px' }}>
-          <h3 className={styles.sectionTitle}>Personajes</h3>
+          <Heading level="h3" className={styles.sectionTitle}>
+            {t('dashboard.characters')}
+          </Heading>
           <CharacterList selectedId={selectedId} onSelect={setSelectedId} />
           <div className={styles.actionsRow}>
             <Button
               onClick={() => navigate('/battle')}
-              ariaLabel="Confirmar selección"
+              ariaLabel={t('dashboard.startBattle')}
             >
-              Empezar Batalla
+              {t('dashboard.startBattle')}
             </Button>
           </div>
         </div>
 
         <div className={styles.panel}>
-          <h3 className={styles.sectionTitle}>Top 5 Jugadores</h3>
+          <Heading level="h3" className={styles.sectionTitle}>
+            Top 5 {t('ladder.player')}
+          </Heading>
           <ul className={styles.topPlayersList}>
             {topPlayers.map((p, i) => (
               <li key={p.id}>

@@ -132,7 +132,7 @@ describe('ProfileSetupPage', () => {
     );
 
     // Change name
-    const nameInput = screen.getByPlaceholderText('Tu nombre');
+    const nameInput = screen.getByPlaceholderText('profile.name');
     fireEvent.change(nameInput, { target: { value: 'Nuevo Nombre' } });
 
     // Select avatar file

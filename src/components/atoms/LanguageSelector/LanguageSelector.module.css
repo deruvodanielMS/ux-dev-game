@@ -1,0 +1,175 @@
+.selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.trigger:hover {
+  background-color: var(--color-surface-hover);
+  border-color: var(--color-primary);
+}
+
+.trigger:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.flag {
+  font-size: 1.125rem;
+  line-height: 1;
+}
+
+.languageName {
+  font-weight: var(--font-weight-medium);
+}
+
+.chevron {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  transition: transform 0.2s ease;
+}
+
+.chevron.open {
+  transform: rotate(180deg);
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  right: 0;
+  min-width: 10rem;
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 50;
+  overflow: hidden;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  text-align: left;
+}
+
+.menuItem:hover {
+  background-color: var(--color-surface-hover);
+}
+
+.menuItem:focus {
+  outline: none;
+  background-color: var(--color-surface-hover);
+}
+
+.menuItem.active {
+  background-color: var(--color-primary-muted);
+  color: var(--color-primary);
+}
+
+.menuItem .flag {
+  font-size: 1.25rem;
+}
+
+.languageDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  flex: 1;
+}
+
+.nativeName {
+  font-weight: var(--font-weight-medium);
+}
+
+.englishName {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
+
+/* Button variant styles */
+.buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.375rem;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.button:hover {
+  background-color: var(--color-surface-hover);
+  border-color: var(--color-primary);
+}
+
+.button:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.button.active {
+  background-color: var(--color-primary);
+  color: var(--color-primary-foreground);
+  border-color: var(--color-primary);
+}
+
+/* Size variants */
+.selector.sm .trigger,
+.selector.sm .button {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+.selector.sm .flag {
+  font-size: 1rem;
+}
+
+.selector.lg .trigger,
+.selector.lg .button {
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+}
+
+.selector.lg .flag {
+  font-size: 1.5rem;
+}
