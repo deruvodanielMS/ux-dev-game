@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/atoms/Button/Button';
 import { Text } from '@/components/atoms/Typography/Text';
 
-import { useAudio } from '@/context/AudioContext';
 import { useAuth } from '@/context/AuthContext';
 import { useGame } from '@/context/GameContext';
 import { useModal } from '@/context/ModalContext';
@@ -35,7 +34,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({
   const auth = useAuth();
   const navigate = useNavigate();
   const { showModal } = useModal();
-  const audio = useAudio();
+
   const { t } = useTranslation();
 
   React.useEffect(() => {
@@ -122,17 +121,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({
             </Text>
           </div>
         </div>
-        <div className={styles.controlsRow}>
-          <Button
-            variant="plain"
-            className={styles.playBtn}
-            onClick={() => (audio.isPlaying ? audio.pause() : audio.play())}
-            ariaLabel={t('audio.toggle')}
-            title={t('audio.toggle')}
-          >
-            {audio.isPlaying ? '⏸' : '⏵'}
-          </Button>
-        </div>
+
         <div className={styles.actions}>
           <Button
             variant="ghost"
