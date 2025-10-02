@@ -1,3 +1,6 @@
+// For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
+import storybook from 'eslint-plugin-storybook';
+
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import prettier from 'eslint-config-prettier';
@@ -75,6 +78,8 @@ export default tseslint.config(
         'error',
         { prefer: 'type-imports', fixStyle: 'inline-type-imports' },
       ],
+      // Allow default exports only in Storybook story files (Storybook requires default meta export)
+      'import/no-default-export': 'off',
     },
     settings: {
       react: {
@@ -83,4 +88,11 @@ export default tseslint.config(
     },
   },
   prettier,
+  storybook.configs['flat/recommended'],
+  {
+    files: ['**/*.stories.@(ts|tsx|js|jsx|mjs)'],
+    rules: {
+      'import/no-default-export': 'off',
+    },
+  },
 );

@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.storybook.json",
+  "compilerOptions": {
+    "outDir": "../node_modules/.tmp/.storybook-ts"
+  },
+  "include": [
+    "./**/*",
+    "../src/context/ThemeContext.tsx",
+    "../src/theme/tokens.css"
+  ]
+}

@@ -1,4 +1,4 @@
-# React + TypeScript + Vite
+# UX Dev Game
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
@@ -194,3 +194,20 @@ Environment variables (Supabase, Auth, etc.) go in a local `.env` (and optional 
 ---
 
 For environment requirements and general framework notes, see earlier sections in this README.
+
+## Design System & Storybook
+
+We integrated Storybook to document and iterate on UI components.
+
+- Run Storybook: `npm run storybook`
+- Build static Storybook: `npm run build-storybook`
+- Stories live alongside components as `*.stories.tsx`
+- Path alias `@/*` is supported in stories via Vite tsconfig paths.
+- Linting: Story files allow default export for Storybook meta only.
+- Addons: a11y, docs, onboarding. Basic light/dark backgrounds configured in `.storybook/preview.ts`.
+
+Conventions when adding components:
+
+- No `export default` in components; only named exports.
+- Reusable prop types under `src/types` and exported via `src/types/index.ts`.
+- Follow import grouping (see `AGENTS.md`).

@@ -1,0 +1,125 @@
+/* Base typography styles */
+.heading,
+.text {
+  margin: 0;
+  font-family: var(--font-family-base);
+  color: var(--color-text);
+}
+
+/* Heading default sizes per level */
+.default-h1 {
+  font-size: var(--font-size-4xl);
+  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-bold);
+}
+
+.default-h2 {
+  font-size: var(--font-size-3xl);
+  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-semibold);
+}
+
+.default-h3 {
+  font-size: var(--font-size-2xl);
+  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-semibold);
+}
+
+.default-h4 {
+  font-size: var(--font-size-xl);
+  line-height: var(--line-height-normal);
+  font-weight: var(--font-weight-medium);
+}
+
+.default-h5 {
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-normal);
+  font-weight: var(--font-weight-medium);
+}
+
+.default-h6 {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Size utilities */
+.size-xs {
+  font-size: var(--font-size-xs);
+}
+.size-sm {
+  font-size: var(--font-size-sm);
+}
+.size-base {
+  font-size: var(--font-size-base);
+}
+.size-lg {
+  font-size: var(--font-size-lg);
+}
+.size-xl {
+  font-size: var(--font-size-xl);
+}
+.size-2xl {
+  font-size: var(--font-size-2xl);
+}
+.size-3xl {
+  font-size: var(--font-size-3xl);
+}
+.size-4xl {
+  font-size: var(--font-size-4xl);
+}
+
+/* Weight utilities */
+.weight-normal {
+  font-weight: var(--font-weight-normal);
+}
+.weight-medium {
+  font-weight: var(--font-weight-medium);
+}
+.weight-semibold {
+  font-weight: var(--font-weight-semibold);
+}
+.weight-bold {
+  font-weight: var(--font-weight-bold);
+}
+
+/* Color utilities */
+.color-text {
+  color: var(--color-text);
+}
+.color-muted {
+  color: var(--color-muted);
+}
+.color-primary {
+  color: var(--color-primary);
+}
+.color-accent {
+  color: var(--color-accent);
+}
+.color-success {
+  color: var(--green);
+}
+.color-error {
+  color: var(--red);
+}
+.color-warning {
+  color: var(--yellow);
+}
+
+/* Text component default */
+.text {
+  line-height: var(--line-height-normal);
+}
+
+/* Responsive typography */
+@media (max-width: 768px) {
+  .default-h1 {
+    font-size: var(--font-size-3xl);
+  }
+  .default-h2 {
+    font-size: var(--font-size-2xl);
+  }
+  .default-h3 {
+    font-size: var(--font-size-xl);
+  }
+}

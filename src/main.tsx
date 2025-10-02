@@ -8,9 +8,11 @@ import { GameProvider } from '@/context/GameContext';
 import { ModalProvider } from '@/context/ModalContext';
 import { NetworkActivityProvider } from '@/context/NetworkActivityContext';
 import { PlayersProvider } from '@/context/PlayersContext';
+import { ThemeProvider } from '@/context/ThemeContext';
 import { ToastProvider } from '@/context/ToastContext';
 
 import './index.css';
+import './theme/tokens.css';
 
 import { App } from '@/App';
 
@@ -31,46 +33,48 @@ if (import.meta.env.DEV) {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ToastProvider>
-      <ModalProvider>
-        {domain && clientId ? (
-          <Auth0Provider
-            domain={domain}
-            clientId={clientId}
-            cacheLocation="localstorage"
-            useRefreshTokens
-            authorizationParams={{
-              redirect_uri: window.location.origin,
-              audience: audience || undefined,
-              organization: organization || undefined,
-              scope: scope || 'openid profile email',
-            }}
-          >
-            <AuthProvider>
-              <PlayersProvider>
-                <NetworkActivityProvider>
-                  <GameProvider>
-                    <AudioProvider>
-                      <App />
-                    </AudioProvider>
-                  </GameProvider>
-                </NetworkActivityProvider>
-              </PlayersProvider>
-            </AuthProvider>
-          </Auth0Provider>
-        ) : (
-          // Fallback without Auth0: provide only non-auth providers
-          <PlayersProvider>
-            <NetworkActivityProvider>
-              <GameProvider>
-                <AudioProvider>
-                  <App />
-                </AudioProvider>
-              </GameProvider>
-            </NetworkActivityProvider>
-          </PlayersProvider>
-        )}
-      </ModalProvider>
-    </ToastProvider>
+    <ThemeProvider>
+      <ToastProvider>
+        <ModalProvider>
+          {domain && clientId ? (
+            <Auth0Provider
+              domain={domain}
+              clientId={clientId}
+              cacheLocation="localstorage"
+              useRefreshTokens
+              authorizationParams={{
+                redirect_uri: window.location.origin,
+                audience: audience || undefined,
+                organization: organization || undefined,
+                scope: scope || 'openid profile email',
+              }}
+            >
+              <AuthProvider>
+                <PlayersProvider>
+                  <NetworkActivityProvider>
+                    <GameProvider>
+                      <AudioProvider>
+                        <App />
+                      </AudioProvider>
+                    </GameProvider>
+                  </NetworkActivityProvider>
+                </PlayersProvider>
+              </AuthProvider>
+            </Auth0Provider>
+          ) : (
+            // Fallback without Auth0: provide only non-auth providers
+            <PlayersProvider>
+              <NetworkActivityProvider>
+                <GameProvider>
+                  <AudioProvider>
+                    <App />
+                  </AudioProvider>
+                </GameProvider>
+              </NetworkActivityProvider>
+            </PlayersProvider>
+          )}
+        </ModalProvider>
+      </ToastProvider>
+    </ThemeProvider>
   </StrictMode>,
 );
