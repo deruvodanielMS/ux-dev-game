@@ -38,6 +38,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
   const [currentContext, setCurrentContextState] = useState<MusicContext>(
     MusicContext.MENU,
   );
+  const [userHasInteracted, setUserHasInteracted] = useState(false);
 
   useEffect(() => {
     if (!audioRef.current) {
@@ -48,6 +49,42 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
       audioRef.current.addEventListener('play', () => setIsPlaying(true));
       audioRef.current.addEventListener('pause', () => setIsPlaying(false));
       audioRef.current.addEventListener('ended', () => setIsPlaying(false));
+
+      // Auto-play inicial cuando se carga el audio
+      audioRef.current.src = MUSIC_TRACKS[currentContext];
+
+      // Función para intentar reproducir
+      const tryAutoPlay = () => {
+        if (audioRef.current) {
+          const playPromise = audioRef.current.play();
+          playPromise?.catch(() => {
+            console.info('Autoplay was prevented by browser policy');
+          });
+        }
+      };
+
+      // Intentar inmediatamente
+      tryAutoPlay();
+
+      // Configurar listener para el primer click/touch del usuario
+      const handleFirstInteraction = () => {
+        setUserHasInteracted(true);
+        tryAutoPlay();
+        // Remover listeners después del primer uso
+        document.removeEventListener('click', handleFirstInteraction);
+        document.removeEventListener('keydown', handleFirstInteraction);
+        document.removeEventListener('touchstart', handleFirstInteraction);
+      };
+
+      document.addEventListener('click', handleFirstInteraction);
+      document.addEventListener('keydown', handleFirstInteraction);
+      document.addEventListener('touchstart', handleFirstInteraction);
+
+      return () => {
+        document.removeEventListener('click', handleFirstInteraction);
+        document.removeEventListener('keydown', handleFirstInteraction);
+        document.removeEventListener('touchstart', handleFirstInteraction);
+      };
     }
     return () => {
       try {
@@ -69,6 +106,23 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [volume]);
 
+  // Efecto para auto-reproducir cuando cambia el contexto
+  useEffect(() => {
+    if (audioRef.current && audioRef.current.src) {
+      // Si ya tenemos una fuente y el usuario ha interactuado o es la primera carga
+      const tryPlay = () => {
+        const playPromise = audioRef.current?.play();
+        playPromise?.catch(() => {
+          console.info('Could not auto-play music');
+        });
+      };
+
+      // Pequeño delay para asegurar que el src está listo
+      const timer = setTimeout(tryPlay, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [currentContext, userHasInteracted]);
+
   const setVolume = (v: number) => setVolumeState(Math.max(0, Math.min(1, v)));
 
   // DEFAULT_TRACKS moved outside component scope (see bottom) if needed
@@ -82,6 +136,10 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
   const play = useCallback(() => {
     if (!audioRef.current) return;
     ensureSource();
+
+    // Asegurar que el usuario ha interactuado
+    setUserHasInteracted(true);
+
     const p = audioRef.current.play();
     if (p && typeof p.catch === 'function') {
       p.catch(() => undefined);
@@ -118,13 +176,18 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
     setCurrentContextState(context);
     if (audioRef.current) {
       const newTrack = MUSIC_TRACKS[context];
-      if (audioRef.current.src !== newTrack) {
-        const wasPlaying = !audioRef.current.paused;
+      const currentSrc = audioRef.current.src;
+
+      // Verificar si necesita cambiar la fuente
+      if (!currentSrc.endsWith(newTrack)) {
         audioRef.current.src = newTrack;
-        if (wasPlaying) {
-          audioRef.current.play().catch(console.warn);
-        }
       }
+
+      // Siempre intentar reproducir cuando cambia el contexto
+      const playPromise = audioRef.current.play();
+      playPromise?.catch(() => {
+        console.info('Auto-play was prevented by browser policy');
+      });
     }
   }, []);
 
