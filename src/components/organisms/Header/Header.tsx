@@ -17,7 +17,7 @@ import styles from './Header.module.css';
 
 const Logo: React.FC<{ size?: number }> = ({ size = 40 }) => (
   <img
-    src="/reshot-icon-robot-hand-LD4YZBQN36.svg"
+    src="/icon-robot-hand.svg"
     width={size}
     height={size}
     alt="Robot Slayer logo"
