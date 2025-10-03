@@ -1,9 +1,13 @@
-import react from '@vitejs/plugin-react';
-import tsconfigPaths from 'vite-tsconfig-paths';
+/// <reference types="vitest" />
+import path from 'path';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
-  plugins: [react(), tsconfigPaths()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
@@ -19,8 +23,25 @@ export default defineConfig({
     ],
     coverage: {
       provider: 'v8',
-      reports: ['text', 'html'],
-      exclude: ['src/types/**', 'src/**/*.d.ts', '**/e2e/**'],
+      reporter: ['text', 'html', 'json'],
+      thresholds: {
+        global: {
+          branches: 80,
+          functions: 80,
+          lines: 80,
+          statements: 80,
+        },
+      },
+      exclude: [
+        'node_modules/',
+        'src/test/',
+        'src/types/**',
+        '**/*.d.ts',
+        '**/*.config.*',
+        'dist/',
+        'coverage/',
+        'e2e/',
+      ],
     },
   },
 });
