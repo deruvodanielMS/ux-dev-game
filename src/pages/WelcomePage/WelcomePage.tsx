@@ -34,37 +34,50 @@ export const WelcomePage = () => {
   const isLoggedIn = auth.isAuthenticated && !!player;
 
   return (
-    <div className={styles.page}>
-      <main className={styles.container}>
-        <section className={`${styles.intro} ${styles.hero}`}>
+    <div className={styles.page} data-testid="welcome-page">
+      <main className={styles.container} data-testid="welcome-main">
+        <section
+          className={`${styles.intro} ${styles.hero}`}
+          data-testid="hero-section"
+        >
           <div className={styles.heroRight}>
             <div className={styles.finalMonsterWrap}>
               <img
                 className={styles.finalMonster}
                 src="https://i.pinimg.com/736x/ab/25/f6/ab25f694780cc113fd8fd7814857afe3.jpg"
                 alt="Monstruo IA Final"
+                data-testid="hero-monster-image"
               />
             </div>
           </div>
 
           <div className={styles.heroLeft}>
-            <Heading level="h1" className={styles.title}>
+            <Heading
+              level="h1"
+              className={styles.title}
+              data-testid="welcome-title"
+            >
               {t('welcome.title')}
             </Heading>
-            <Text className={styles.mission}>{t('welcome.subtitle')}</Text>
+            <Text className={styles.mission} data-testid="welcome-subtitle">
+              {t('welcome.subtitle')}
+            </Text>
 
-            <div className={styles.heroActions}>
+            <div className={styles.heroActions} data-testid="hero-actions">
               <div className={styles.heroButtonsRight}>
                 {isLoggedIn ? (
                   <Button
                     onClick={goToDashboard}
                     className={styles.primaryLarge}
                     ariaLabel={t('welcome.getStarted')}
+                    data-testid="get-started-button"
                   >
                     {t('welcome.getStarted')}
                   </Button>
                 ) : (
-                  <AuthButton />
+                  <div data-testid="auth-button-container">
+                    <AuthButton />
+                  </div>
                 )}
               </div>
             </div>

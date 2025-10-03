@@ -65,19 +65,21 @@ export const AuthButton: React.FC = () => {
   };
 
   return (
-    <div className={styles.authWrapper}>
+    <div className={styles.authWrapper} data-testid="auth-button-wrapper">
       {isAuthenticated ? (
         <>
           <img
             className={styles.avatar}
             src={user?.picture}
             alt={user?.name || 'avatar'}
+            data-testid="user-avatar"
           />
           <Button
             onClick={handleLogout}
             ariaLabel="Cerrar sesión"
             variant="ghost"
             title="Cerrar sesión"
+            data-testid="logout-button"
           >
             Cerrar
           </Button>
@@ -88,6 +90,7 @@ export const AuthButton: React.FC = () => {
           ariaLabel="Iniciar sesión"
           variant="primary"
           title="Iniciar sesión"
+          data-testid="login-button"
         >
           Login
         </Button>

@@ -163,23 +163,54 @@ npm run lint:fix    # auto-fix where possible
 npm run format      # prettier across repo
 ```
 
-### 6. Adding New Types
+### 6. E2E Testing with Playwright
+
+E2E tests are configured to run automatically on pre-push to ensure the full application works before sharing changes.
+
+#### Scripts
+
+```bash
+npm run test:e2e         # run all E2E tests
+npm run test:e2e:ui      # run tests with Playwright UI
+npm run test:e2e:debug   # run with debugger
+npm run test:e2e:report  # view test reports
+```
+
+#### Git Hooks
+
+- **Pre-commit**: Runs linting, type checking, unit tests, and build
+- **Pre-push**: Runs E2E tests (Playwright) to ensure full app functionality
+
+#### Test Structure
+
+- Tests located in `e2e/` directory
+- Page Object Model pattern for maintainable tests
+- Stable `data-testid` selectors for reliable element targeting
+- Cross-browser testing (Chromium, Firefox, WebKit)
+
+#### Authentication Testing
+
+- Login tests: Fully functional with fallback strategies
+- Dashboard tests: Skip gracefully when Auth0 not configured
+- Test environment setup documented in `E2E_TEST_SUMMARY.md`
+
+### 7. Adding New Types
 
 1. Create or extend a file under `src/types/...`.
 2. Export from that file and add to `src/types/index.ts` (barrel) if broadly reused.
 3. Use `import type { X } from '@/types';`.
 
-### 7. Rationale
+### 8. Rationale
 
 - Named exports improve refactor safety and tooling.
 - Centralized types reduce duplication and drift.
 - Deterministic import order improves diff clarity and avoids merge noise.
 
-### 8. Troubleshooting
+### 9. Troubleshooting
 
 If imports reorder unexpectedly, let ESLint auto-fix instead of manually adjusting. If a new path category emerges, adjust the grouping in `eslint.config.js`.
 
-### 9. Future Enhancements
+### 10. Future Enhancements
 
 Potential additions:
 
@@ -187,7 +218,7 @@ Potential additions:
 - Add stricter `typescript-eslint` type checking config.
 - Enforce exhaustive deps for custom hooks beyond react-hooks defaults.
 
-### 10. Environment & Secrets
+### 11. Environment & Secrets
 
 Environment variables (Supabase, Auth, etc.) go in a local `.env` (and optional `.env.local`). These files are git-ignored. Do NOT commit secrets. If you need to document required keys, create a `.env.example` without values or with placeholder values. Never place real credentials in the repo or commit history.
 
