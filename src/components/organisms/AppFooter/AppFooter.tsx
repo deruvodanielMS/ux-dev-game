@@ -8,7 +8,7 @@ import styles from './AppFooter.module.css';
 
 const FooterLogo: React.FC<{ size?: number }> = ({ size = 28 }) => (
   <img
-    src="/reshot-icon-robot-hand-LD4YZBQN36.svg"
+    src="/icon-robot-hand.svg"
     width={size}
     height={size}
     alt="Robot Slayer logo"

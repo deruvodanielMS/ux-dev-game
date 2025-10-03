@@ -10,7 +10,7 @@
       "defense": 5
     },
     "description": "Un error trivial que provoca desalineación y elementos invisibles. Se derrota con una estructura limpia y semántica.",
-    "avatar_url": "https://cdn.builder.io/api/v1/image/assets%2F18b71006d6404cecbe90ad5e2b850e0e%2F483352f1ff834cd18e0ba1b6c3a7206f?format=webp&width=800"
+    "avatar_url": "/img/html_bug.png"
   },
   {
     "id": "css-glitch",
@@ -23,7 +23,7 @@
       "defense": 10
     },
     "description": "Un error visual que rompe el diseño en diferentes navegadores. Se derrota con una estrategia de CSS Modules.",
-    "avatar_url": "https://cdn.builder.io/api/v1/image/assets%2F18b71006d6404cecbe90ad5e2b850e0e%2F0fb1013d496a49b781517115e4aca1fe?format=webp&width=800"
+    "avatar_url": "/img/css_glitch.png"
   },
   {
     "id": "ts-any-tyrant",
@@ -36,7 +36,7 @@
       "defense": 8
     },
     "description": "Un enemigo débil que evade el tipado estricto. Se derrota con interfaces y tipados genéricos.",
-    "avatar_url": null,
+    "avatar_url": "/img/any_tyrant.png",
     "weakness": "interfaces"
   },
   {
@@ -50,7 +50,7 @@
       "defense": 12
     },
     "description": "Un fallo menor en el Hot Module Replacement. Se derrota con una limpieza de caché o un reinicio rápido.",
-    "avatar_url": null,
+    "avatar_url": "/img/vite_cache.png",
     "weakness": "cache-clear"
   },
   {
@@ -64,7 +64,7 @@
       "defense": 15
     },
     "description": "Un fallo de lógica que congela la interfaz y provoca comportamiento inesperado. Requiere un pensamiento algorítmico y buenas prácticas de 'hooks'.",
-    "avatar_url": "https://cdn.builder.io/api/v1/image/assets%2F18b71006d6404cecbe90ad5e2b850e0e%2Fddda0f3562a44039b6d43252060fbae0?format=webp&width=800"
+    "avatar_url": "/img/js_logic_error.png"
   },
   {
     "id": "component-spaghetti",
@@ -77,7 +77,7 @@
       "defense": 20
     },
     "description": "Un componente enorme con lógica mezclada y sobrecarga de props. Requiere refactorización y aplicación de Atomic Design.",
-    "avatar_url": null,
+    "avatar_url": "/img/spaghetti.png",
     "weakness": "refactoring"
   },
   {
@@ -91,7 +91,7 @@
       "defense": 25
     },
     "description": "Un demonio que extiende las props innecesariamente. Se derrota implementando Context API o un gestor de estado.",
-    "avatar_url": null,
+    "avatar_url": "/img/prop_drilling.png",
     "weakness": "context"
   },
   {
@@ -105,7 +105,7 @@
       "defense": 30
     },
     "description": "Un error en la actualización del DOM virtual que causa 're-renders' infinitos. Se derrota con optimización de componentes y 'memoization'.",
-    "avatar_url": "https://cdn.builder.io/api/v1/image/assets%2F18b71006d6404cecbe90ad5e2b850e0e%2F61990cd3666442f1a167c3906283431b?format=webp&width=800"
+    "avatar_url": "/img/react_reconsiliation.png"
   },
   {
     "id": "supa-query-lag",
@@ -118,7 +118,7 @@
       "defense": 35
     },
     "description": "Una consulta ineficiente que causa retrasos en el servidor. Se derrota con indexación, políticas RLS y optimización de joins.",
-    "avatar_url": null,
+    "avatar_url": "/img/supabase_query_lag.png",
     "weakness": "optimization"
   },
   {
@@ -132,7 +132,7 @@
       "defense": 50
     },
     "description": "La IA que absorbe a los desarrolladores inactivos. Se derrota con la finalización del Design System y un Pull Request magistral.",
-    "avatar_url": null,
+    "avatar_url": "/img/the_absorber.png",
     "weakness": "design-system"
   }
 ]

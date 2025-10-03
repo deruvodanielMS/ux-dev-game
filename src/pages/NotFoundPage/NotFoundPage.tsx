@@ -8,7 +8,7 @@ import { Heading, Text } from '@/components/atoms/Typography';
 import styles from './NotFoundPage.module.css';
 
 // Image placed in /public so we can refer with absolute path at runtime
-const IMAGE_SRC = '/Gemini_Generated_Image_hjysr6hjysr6hjys.png';
+const IMAGE_SRC = '/img/bg.png';
 
 export const NotFoundPage: React.FC = () => {
   const navigate = useNavigate();
