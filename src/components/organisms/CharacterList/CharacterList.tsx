@@ -39,9 +39,13 @@ export const CharacterList = ({ selectedId, onSelect }: CharacterListProps) => {
 
   if (loading)
     return (
-      <div className={styles.list}>
+      <div className={styles.list} data-testid="character-list-loading">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className={styles.item}>
+          <div
+            key={i}
+            className={styles.item}
+            data-testid={`character-loading-item-${i}`}
+          >
             <div className={styles.skelRow}>
               <div className={styles.skelAvatar} />
               <div className={styles.skelText} />
@@ -51,15 +55,27 @@ export const CharacterList = ({ selectedId, onSelect }: CharacterListProps) => {
       </div>
     );
   if (error) {
-    return <div className={styles.list}>{error}</div>;
+    return (
+      <div className={styles.list} data-testid="character-list-error">
+        {error}
+      </div>
+    );
   }
   if (active.length === 0)
-    return <div className={styles.list}>No hay jugadores disponibles.</div>;
+    return (
+      <div className={styles.list} data-testid="character-list-empty">
+        No hay jugadores disponibles.
+      </div>
+    );
 
   return (
-    <div className={styles.list} role="list">
-      {active.map((c) => (
-        <div key={c.id} className={styles.item}>
+    <div className={styles.list} role="list" data-testid="character-list">
+      {active.map((c, index) => (
+        <div
+          key={c.id}
+          className={styles.item}
+          data-testid={`character-item-${index}`}
+        >
           <CharacterCard
             character={c}
             selected={selectedId === c.id}

@@ -217,6 +217,7 @@ export const CharacterCard = ({
   return (
     <div
       className={`${styles.wrapper} ${selected ? styles.selected : ''} ${absorbed ? styles.absorbed : ''}`}
+      data-testid="character-card-wrapper"
     >
       {interactive ? (
         <button
@@ -231,22 +232,40 @@ export const CharacterCard = ({
           aria-pressed={selected}
           aria-disabled={absorbed}
           disabled={absorbed}
+          data-testid="character-card-button"
         >
-          <div className={styles.avatar} aria-hidden>
+          <div
+            className={styles.avatar}
+            aria-hidden
+            data-testid="character-card-avatar"
+          >
             {derivedAvatarUrl ? (
               <img
                 src={derivedAvatarUrl}
                 alt={`${character.name} avatar`}
                 className={styles.avatarImage}
+                data-testid="character-card-avatar-image"
               />
             ) : (
-              <div className={styles.avatarInner}>{initials}</div>
+              <div
+                className={styles.avatarInner}
+                data-testid="character-card-avatar-initials"
+              >
+                {initials}
+              </div>
             )}
-            <div className={styles.avatarBadge}>Lv {character.level ?? 1}</div>
+            <div
+              className={styles.avatarBadge}
+              data-testid="character-card-level-badge"
+            >
+              Lv {character.level ?? 1}
+            </div>
           </div>
 
-          <div className={styles.info}>
-            <div className={styles.name}>{character.name}</div>
+          <div className={styles.info} data-testid="character-card-info">
+            <div className={styles.name} data-testid="character-card-name">
+              {character.name}
+            </div>
 
             <div className={styles.absorbWrapInline}>
               <StatusBar
@@ -272,22 +291,39 @@ export const CharacterCard = ({
           <div className={styles.actionsInline} />
         </button>
       ) : (
-        <div className={styles.card}>
-          <div className={styles.avatar} aria-hidden>
+        <div className={styles.card} data-testid="character-card-static">
+          <div
+            className={styles.avatar}
+            aria-hidden
+            data-testid="character-card-avatar"
+          >
             {derivedAvatarUrl ? (
               <img
                 src={derivedAvatarUrl}
                 alt={`${character.name} avatar`}
                 className={styles.avatarImage}
+                data-testid="character-card-avatar-image"
               />
             ) : (
-              <div className={styles.avatarInner}>{initials}</div>
+              <div
+                className={styles.avatarInner}
+                data-testid="character-card-avatar-initials"
+              >
+                {initials}
+              </div>
             )}
-            <div className={styles.avatarBadge}>Lv {character.level ?? 1}</div>
+            <div
+              className={styles.avatarBadge}
+              data-testid="character-card-level-badge"
+            >
+              Lv {character.level ?? 1}
+            </div>
           </div>
 
-          <div className={styles.info}>
-            <div className={styles.name}>{character.name}</div>
+          <div className={styles.info} data-testid="character-card-info">
+            <div className={styles.name} data-testid="character-card-name">
+              {character.name}
+            </div>
 
             <div className={styles.absorbWrapInline}>
               <StatusBar

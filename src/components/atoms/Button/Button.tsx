@@ -16,6 +16,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       disabled = false,
       type = 'button',
       title,
+      ...rest
     },
     ref,
   ) => {
@@ -40,6 +41,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         aria-label={ariaLabel}
         title={title}
         disabled={loading || disabled}
+        {...rest}
       >
         {loading ? <span className={styles.spinner} aria-hidden /> : null}
         <span className={styles.label}>{children}</span>

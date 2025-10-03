@@ -1,0 +1,46 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "[pre-push] Starting development server for E2E tests..."
+
+# Start dev server in background
+npm run dev > /dev/null 2>&1 &
+DEV_PID=$!
+
+# Wait for server to be ready
+echo "[pre-push] Waiting for server to start..."
+timeout=30
+count=0
+
+# Use a cross-platform approach to check if server is ready
+while [ $count -lt $timeout ]; do
+  # Try to connect using node to check if server is ready
+  if node -e "const http = require('http'); http.get('http://localhost:5173', (res) => process.exit(0)).on('error', () => process.exit(1));" 2>/dev/null; then
+    break
+  fi
+  sleep 1
+  count=$((count + 1))
+done
+
+if [ $count -ge $timeout ]; then
+  echo "[pre-push] ERROR: Dev server failed to start within ${timeout}s"
+  kill $DEV_PID 2>/dev/null || taskkill //PID $DEV_PID //F 2>/dev/null
+  exit 1
+fi
+
+echo "[pre-push] Server ready! Running E2E tests (Playwright)..."
+
+# Run E2E tests with CI reporter for cleaner output
+CI=true npm run test:e2e:ci
+TEST_EXIT_CODE=$?
+
+# Cleanup: kill dev server (cross-platform)
+kill $DEV_PID 2>/dev/null || taskkill //PID $DEV_PID //F 2>/dev/null
+
+# Exit with test result
+if [ $TEST_EXIT_CODE -ne 0 ]; then
+  echo "[pre-push] E2E tests failed!"
+  exit 1
+fi
+
+echo "[pre-push] E2E tests completed successfully!"
