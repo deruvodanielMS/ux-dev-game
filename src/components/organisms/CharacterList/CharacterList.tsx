@@ -3,7 +3,6 @@ import { useEffect, useMemo, useState } from 'react';
 import type { CharacterListProps } from '@/types/components-character-list';
 import type { Player } from '@/types/player';
 
-import { Button } from '@/components/atoms/Button/Button';
 import { CharacterCard } from '@/components/molecules/CharacterCard/CharacterCard';
 
 import { usePlayers } from '@/hooks/usePlayers';
@@ -40,9 +39,13 @@ export const CharacterList = ({ selectedId, onSelect }: CharacterListProps) => {
 
   if (loading)
     return (
-      <div className={styles.list}>
+      <div className={styles.list} data-testid="character-list-loading">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className={styles.item}>
+          <div
+            key={i}
+            className={styles.item}
+            data-testid={`character-loading-item-${i}`}
+          >
             <div className={styles.skelRow}>
               <div className={styles.skelAvatar} />
               <div className={styles.skelText} />
@@ -52,27 +55,34 @@ export const CharacterList = ({ selectedId, onSelect }: CharacterListProps) => {
       </div>
     );
   if (error) {
-    return <div className={styles.list}>{error}</div>;
+    return (
+      <div className={styles.list} data-testid="character-list-error">
+        {error}
+      </div>
+    );
   }
   if (active.length === 0)
-    return <div className={styles.list}>No hay jugadores disponibles.</div>;
+    return (
+      <div className={styles.list} data-testid="character-list-empty">
+        No hay jugadores disponibles.
+      </div>
+    );
 
   return (
-    <div className={styles.list} role="list">
-      {active.map((c) => (
-        <Button
+    <div className={styles.list} role="list" data-testid="character-list">
+      {active.map((c, index) => (
+        <div
           key={c.id}
-          variant="plain"
           className={styles.item}
-          onClick={() => onSelect?.(c.id)}
-          ariaLabel={`Seleccionar ${c.name}`}
+          data-testid={`character-item-${index}`}
         >
           <CharacterCard
             character={c}
             selected={selectedId === c.id}
-            interactive={false}
+            interactive={true}
+            onSelect={onSelect}
           />
-        </Button>
+        </div>
       ))}
     </div>
   );

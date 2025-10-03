@@ -55,10 +55,15 @@
 }
 .info {
   flex: 1;
+  min-width: 0; /* Allow flex item to shrink below content size */
 }
 .name {
   font-weight: 800;
   color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 .meta {
   color: var(--color-text-muted);

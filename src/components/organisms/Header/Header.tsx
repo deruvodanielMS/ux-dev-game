@@ -11,8 +11,6 @@ import { useModal } from '@/context/ModalContext';
 import { useLoadPlayerProfile } from '@/hooks/useLoadPlayerProfile';
 import { resolvePlayerAvatar } from '@/services/avatarResolve';
 
-import { AuthButton } from '../AuthButton/AuthButton';
-
 import styles from './Header.module.css';
 
 // Settings body extracted to SettingsModalContent component
@@ -90,23 +88,30 @@ export const Header: React.FC = () => {
   );
 
   return (
-    <header className={styles.header}>
-      <div className={styles.brandRow}>
+    <header className={styles.header} data-testid="header">
+      <div className={styles.brandRow} data-testid="header-brand-row">
         <div className={styles.brandGroup}>
           <button
             className={styles.brand}
             onClick={() => navigate('/dashboard')}
             aria-label="Go to dashboard"
+            data-testid="header-logo-button"
           >
             <Logo size={36} />
-            <span className={styles.brandText}>RobotSlayer</span>
+            <span className={styles.brandText} data-testid="header-brand-text">
+              RobotSlayer
+            </span>
           </button>
         </div>
       </div>
 
       {isLoggedIn ? (
-        <div className={styles.right}>
-          <div className={styles.avatarWrap} ref={avatarRef}>
+        <div className={styles.right} data-testid="header-user-section">
+          <div
+            className={styles.avatarWrap}
+            ref={avatarRef}
+            data-testid="header-avatar-wrap"
+          >
             <div
               className={styles.avatar}
               onClick={toggleMenu}
@@ -115,23 +120,31 @@ export const Header: React.FC = () => {
               tabIndex={0}
               aria-haspopup="true"
               aria-expanded={menuOpen}
+              data-testid="header-avatar-button"
             >
               {effectiveAvatarUrl ? (
                 <img
                   src={effectiveAvatarUrl}
                   alt="avatar"
+                  data-testid="header-avatar-image"
                   onError={(e) => {
                     (e.currentTarget as HTMLImageElement).style.display =
                       'none';
                   }}
                 />
               ) : (
-                <div className={styles.placeholder}>
+                <div
+                  className={styles.placeholder}
+                  data-testid="header-avatar-placeholder"
+                >
                   {(player?.name || 'U').slice(0, 2).toUpperCase()}
                 </div>
               )}
             </div>
-            <div className={styles.avatarBadge}>
+            <div
+              className={styles.avatarBadge}
+              data-testid="header-level-badge"
+            >
               Lv {profile?.level ?? player?.level ?? 1}
             </div>
             <UserMenu
@@ -144,9 +157,7 @@ export const Header: React.FC = () => {
             />
           </div>
         </div>
-      ) : (
-        <AuthButton />
-      )}
+      ) : null}
     </header>
   );
 };

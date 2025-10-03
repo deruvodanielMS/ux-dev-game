@@ -14,4 +14,5 @@ export interface CharacterCardProps {
   selected?: boolean;
   absorbed?: boolean;
   interactive?: boolean;
+  onSelect?: (id: string) => void;
 }

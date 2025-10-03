@@ -80,4 +80,12 @@ button:focus-visible {
   height: 100%;
 }
 
+/* Utility classes */
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
 /* Media query removed - theme is now handled by data-theme attributes */

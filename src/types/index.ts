@@ -21,6 +21,7 @@ export * from './context/audio';
 export * from './context/modal';
 export * from './context/players';
 export * from './context/toast';
+export * from './enemy';
 export * from './item';
 export * from './level';
 export * from './pages-profile-setup';
